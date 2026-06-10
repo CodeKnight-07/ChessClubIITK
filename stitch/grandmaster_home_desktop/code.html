@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;600;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-dim": "#131313",
+                    "on-primary-fixed-variant": "#e2e2e2",
+                    "error": "#ffb4ab",
+                    "secondary-container": "#454747",
+                    "on-tertiary-fixed-variant": "#e3e2e2",
+                    "surface-container-low": "#1b1b1b",
+                    "on-primary-fixed": "#ffffff",
+                    "on-tertiary-fixed": "#ffffff",
+                    "on-error": "#690005",
+                    "secondary-fixed-dim": "#ababab",
+                    "outline": "#919191",
+                    "surface-container-lowest": "#0e0e0e",
+                    "on-surface": "#e2e2e2",
+                    "on-secondary-fixed-variant": "#3a3c3c",
+                    "surface-container": "#1f1f1f",
+                    "on-primary": "#1a1c1c",
+                    "tertiary-fixed-dim": "#464747",
+                    "on-background": "#e2e2e2",
+                    "tertiary-fixed": "#5e5e5e",
+                    "surface": "#131313",
+                    "surface-bright": "#393939",
+                    "primary-container": "#d4d4d4",
+                    "tertiary-container": "#919090",
+                    "surface-container-highest": "#353535",
+                    "secondary-fixed": "#c6c6c6",
+                    "background": "#131313",
+                    "on-tertiary-container": "#000000",
+                    "tertiary": "#e3e2e2",
+                    "secondary": "#c6c6c6",
+                    "error-container": "#93000a",
+                    "on-secondary-container": "#e2e2e2",
+                    "on-error-container": "#ffdad6",
+                    "inverse-surface": "#e2e2e2",
+                    "on-secondary": "#1a1c1c",
+                    "surface-container-high": "#2a2a2a",
+                    "on-tertiary": "#1b1c1c",
+                    "outline-variant": "#474747",
+                    "on-secondary-fixed": "#1a1c1c",
+                    "inverse-primary": "#5d5f5f",
+                    "inverse-on-surface": "#303030",
+                    "primary-fixed-dim": "#454747",
+                    "primary": "#ffffff",
+                    "surface-tint": "#c6c6c7",
+                    "on-primary-container": "#000000",
+                    "surface-variant": "#353535",
+                    "primary-fixed": "#5d5f5f",
+                    "on-surface-variant": "#c6c6c6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Noto Serif"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Manrope', sans-serif; background-color: #131313; color: #e2e2e2; }
+        .font-serif { font-family: 'Noto Serif', serif; }
+        .chess-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            aspect-ratio: 1/1;
+        }
+        .vignette-overlay {
+            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.8) 100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopNavBar -->
+<nav class="w-full top-0 sticky bg-[#131313] z-50 flex justify-between items-center px-8 h-16 w-full max-w-none mx-auto transition-colors duration-300">
+<div class="text-2xl font-bold tracking-tighter text-white font-['Noto_Serif']">GRANDMASTER</div>
+<div class="hidden md:flex items-center gap-10">
+<a class="text-white font-bold border-b-2 border-white pb-1 font-['Noto_Serif'] text-sm tracking-tight cursor-pointer active:opacity-70 transition-colors duration-300" href="#">Play</a>
+<a class="text-gray-400 font-normal font-['Noto_Serif'] text-sm tracking-tight hover:text-white transition-colors duration-300 cursor-pointer active:opacity-70" href="#">Matchmaking</a>
+<a class="text-gray-400 font-normal font-['Noto_Serif'] text-sm tracking-tight hover:text-white transition-colors duration-300 cursor-pointer active:opacity-70" href="#">Archive</a>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-white cursor-pointer active:opacity-70">settings</span>
+<span class="material-symbols-outlined text-white cursor-pointer active:opacity-70">account_circle</span>
+<button class="bg-primary text-on-primary px-6 py-1.5 font-bold text-sm tracking-tighter transition-all hover:bg-on-surface-variant active:opacity-70">Sign In</button>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-[#0e0e0e] flex flex-col border-r border-white/5 pt-20 hidden xl:flex z-40">
+<div class="px-6 mb-10">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-xs">person</span>
+</div>
+<div>
+<div class="text-white font-['Manrope'] uppercase tracking-widest text-[10px] font-bold">The Monolith</div>
+<div class="text-gray-500 font-['Manrope'] text-[8px] uppercase tracking-widest">Grandmaster Status</div>
+</div>
+</div>
+<button class="w-full bg-surface-container-high text-white py-3 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-[#1f1f1f] transition-all duration-200">New Gambit</button>
+</div>
+<nav class="flex-1">
+<a class="flex items-center gap-4 text-white border-l-4 border-white bg-[#1f1f1f] pl-4 py-3 font-['Manrope'] uppercase tracking-widest text-[10px]" href="#">
+<span class="material-symbols-outlined text-lg">sports_esports</span> Play
+            </a>
+<a class="flex items-center gap-4 text-gray-500 pl-5 py-3 font-['Manrope'] uppercase tracking-widest text-[10px] hover:bg-[#1f1f1f] hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-lg">emoji_events</span> Tournaments
+            </a>
+<a class="flex items-center gap-4 text-gray-500 pl-5 py-3 font-['Manrope'] uppercase tracking-widest text-[10px] hover:bg-[#1f1f1f] hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-lg">query_stats</span> Analysis
+            </a>
+<a class="flex items-center gap-4 text-gray-500 pl-5 py-3 font-['Manrope'] uppercase tracking-widest text-[10px] hover:bg-[#1f1f1f] hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-lg">history</span> History
+            </a>
+</nav>
+<div class="mt-auto pb-10 border-t border-white/5">
+<a class="flex items-center gap-4 text-gray-500 pl-5 py-3 font-['Manrope'] uppercase tracking-widest text-[10px] hover:bg-[#1f1f1f] hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-lg">settings</span> Settings
+            </a>
+<a class="flex items-center gap-4 text-gray-500 pl-5 py-3 font-['Manrope'] uppercase tracking-widest text-[10px] hover:bg-[#1f1f1f] hover:text-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-lg">help_outline</span> Support
+            </a>
+</div>
+</aside>
+<main class="xl:ml-64 transition-all">
+<!-- Hero Section: Live Match -->
+<section class="relative min-h-[870px] bg-surface flex flex-col md:flex-row items-center px-8 lg:px-20 py-12 gap-12 overflow-hidden border-b border-white/5">
+<!-- Background Vignette -->
+<div class="absolute inset-0 vignette-overlay pointer-events-none opacity-50"></div>
+<div class="relative z-10 w-full md:w-1/2 flex flex-col gap-6">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+<span class="text-xs uppercase tracking-[0.3em] font-bold text-error">Live Now • World Championship Series</span>
+</div>
+<h1 class="text-6xl lg:text-8xl font-serif leading-none tracking-tighter">Carlsen <span class="italic text-outline">vs</span> Nakamura</h1>
+<div class="flex items-center gap-8 mt-4">
+<div class="flex flex-col">
+<span class="text-[10px] text-outline uppercase tracking-widest mb-1">Carlsen Time</span>
+<span class="text-4xl font-light tracking-tighter tabular-nums text-white">04:12</span>
+</div>
+<div class="w-px h-12 bg-white/10"></div>
+<div class="flex flex-col">
+<span class="text-[10px] text-outline uppercase tracking-widest mb-1">Nakamura Time</span>
+<span class="text-4xl font-light tracking-tighter tabular-nums text-white">03:45</span>
+</div>
+</div>
+<div class="flex gap-4 mt-8">
+<button class="bg-primary text-on-primary px-10 py-4 font-bold tracking-widest uppercase text-xs transition-all hover:opacity-90">Enter Arena</button>
+<button class="bg-surface-container-highest text-white px-10 py-4 font-bold tracking-widest uppercase text-xs border border-white/10 hover:bg-surface-bright transition-all">Analysis</button>
+</div>
+</div>
+<!-- Board Component -->
+<div class="relative z-10 w-full md:w-1/2 flex items-center justify-center lg:justify-end">
+<div class="flex h-[400px] lg:h-[550px] w-full max-w-[550px] gap-2 p-4 bg-surface-container-lowest shadow-2xl">
+<!-- Evaluation Bar -->
+<div class="w-8 h-full bg-[#1b1b1b] relative overflow-hidden flex flex-col">
+<div class="h-[52%] w-full bg-white transition-all duration-500"></div>
+<div class="absolute top-2 left-1/2 -translate-x-1/2 text-[8px] font-bold text-black mix-blend-difference">+0.4</div>
+</div>
+<!-- Chess Board -->
+<div class="flex-1 chess-grid bg-[#1b1b1b]">
+<!-- Simple procedural grid logic using pure CSS/HTML -->
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bento Grid: Interactive Sections -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-px bg-white/5 border-b border-white/5">
+<!-- Matchmaking Block -->
+<div class="lg:col-span-4 bg-surface p-10 flex flex-col gap-8">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-outline uppercase tracking-widest font-bold">Protocol</span>
+<h2 class="text-3xl font-serif">Instant Matchmaking</h2>
+</div>
+<div class="space-y-4">
+<div class="p-6 bg-surface-container flex items-center justify-between group cursor-pointer hover:bg-surface-bright transition-all">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-2xl">bolt</span>
+<div>
+<div class="text-xs uppercase tracking-widest font-bold">Bullet</div>
+<div class="text-[10px] text-outline">1 min + 0s</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-white transition-colors">arrow_forward</span>
+</div>
+<div class="p-6 bg-surface-container flex items-center justify-between group cursor-pointer hover:bg-surface-bright transition-all">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-2xl">timer</span>
+<div>
+<div class="text-xs uppercase tracking-widest font-bold">Blitz</div>
+<div class="text-[10px] text-outline">3 min + 2s</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-white transition-colors">arrow_forward</span>
+</div>
+<div class="p-6 bg-surface-container flex items-center justify-between group cursor-pointer hover:bg-surface-bright transition-all">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-2xl">rocket_launch</span>
+<div>
+<div class="text-xs uppercase tracking-widest font-bold">Rapid</div>
+<div class="text-[10px] text-outline">10 min + 5s</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-white transition-colors">arrow_forward</span>
+</div>
+</div>
+</div>
+<!-- Daily Puzzle Block -->
+<div class="lg:col-span-8 bg-surface-container-lowest p-10 flex flex-col lg:flex-row gap-12 items-center">
+<div class="w-full lg:w-1/2 aspect-square bg-[#1b1b1b] p-3 shadow-inner">
+<div class="w-full h-full chess-grid">
+<!-- Simplified representation of a board with a puzzle piece -->
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low flex items-center justify-center"><span class="text-white text-3xl font-serif">♖</span></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-high"></div> <div class="bg-surface-container-low"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low flex items-center justify-center"><span class="text-white text-3xl font-serif">♚</span></div> <div class="bg-surface-container-high"></div>
+<div class="bg-surface-container-low"></div> <div class="bg-surface-container-high"></div>
+<!-- ... rest of board omitted for brevity, layout established ... -->
+<div class="col-span-8 h-full"></div><!-- Padding for visual structure -->
+</div>
+</div>
+<div class="w-full lg:w-1/2 flex flex-col gap-6">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] text-outline uppercase tracking-widest font-bold">Calculation Training</span>
+<h2 class="text-5xl font-serif leading-tight">Daily Puzzle</h2>
+</div>
+<p class="text-outline text-sm leading-relaxed max-w-sm">White to move and deliver mate in 3. Rated 2450. 4,200 Grandmasters solved this today.</p>
+<div class="flex gap-4">
+<button class="bg-white text-black px-8 py-3 text-[10px] uppercase tracking-widest font-bold">Solve Now</button>
+<button class="text-white border border-white/20 px-8 py-3 text-[10px] uppercase tracking-widest font-bold hover:bg-white/5">Skip</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Grandmaster News -->
+<section class="p-10 lg:p-20 bg-surface">
+<div class="flex justify-between items-end mb-12">
+<div class="flex flex-col gap-2">
+<span class="text-[10px] text-outline uppercase tracking-widest font-bold">Intelligence Report</span>
+<h2 class="text-6xl font-serif italic">Grandmaster News</h2>
+</div>
+<button class="text-outline hover:text-white transition-colors text-[10px] uppercase tracking-[0.2em] font-bold border-b border-outline pb-1">Archive</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+<article class="group cursor-pointer">
+<div class="aspect-[4/5] overflow-hidden bg-surface-container-high mb-6">
+<img alt="high contrast monochrome close up of hand moving a chess piece across a dark board with dramatic side lighting" class="w-full h-full object-cover grayscale brightness-75 group-hover:scale-105 transition-transform duration-700" data-alt="high contrast monochrome close up of hand moving a chess piece across a dark board with dramatic side lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-VqXzbH5IwR7Revzc095sZk2KMa572N5IpbyfAGE-qKddkYfax32OsDCYF2ClblB3FmneQewtwEZPoVJipjKY50tKQF87a8Qt-3lhuQ5Wlx0iyw9EV1ZBl86lqLr9T4fG9EN30wSULxJNzclM-fUd3NJhslfzhX-EJ30x1cKTYzTjMh_2HUuxKX3ngi0YYVdFAhM8dZp2Ur8FKJGa3eu84xTB7ajThVMpnvllxISJbiLN_Q0ZmQoC-88AatjHO_DZTx6ynPxfuPs"/>
+</div>
+<div class="text-[10px] text-outline uppercase tracking-widest mb-3">April 12, 2024 • Strategy</div>
+<h3 class="text-2xl font-serif group-hover:underline underline-offset-4 mb-3">The Evolution of the Sicilian Defence in AI Epoch</h3>
+<p class="text-sm text-outline leading-relaxed line-clamp-3">Deep dive into how neural networks have reshaped one of chess's most storied openings, revealing hidden tactical paths once thought impossible by human players.</p>
+</article>
+<article class="group cursor-pointer">
+<div class="aspect-[4/5] overflow-hidden bg-surface-container-high mb-6">
+<img alt="portrait of a focused grandmaster in a dark suit sitting at a tournament desk silhouettes in the background atmospheric lighting" class="w-full h-full object-cover grayscale brightness-75 group-hover:scale-105 transition-transform duration-700" data-alt="portrait of a focused grandmaster in a dark suit sitting at a tournament desk silhouettes in the background atmospheric lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwr-yGUfbcw4oXnQramlYkyOS5CfwV5EL4gnwYUJ16U_KQlPW-DMxEDhq8_b_a3_-hTAbryGKXCnUTppmAgX8Do1YpYV1zvXN5eEB93HP9Kk3qoi3cg0EVehdHOzf_hms0dqvfGAez7vUG_KpURnysPWQLI4PJGxJEmub1ht9GGawWDlrOiS3DoNaickvo71dKZ0S__Eqs3ZEexdphdLSjoVXTlXEzlU_dFC3eYaPXHy6sUo7dAvLftakY_N1DikppGTj0h0tGnv8"/>
+</div>
+<div class="text-[10px] text-outline uppercase tracking-widest mb-3">April 10, 2024 • Profile</div>
+<h3 class="text-2xl font-serif group-hover:underline underline-offset-4 mb-3">Interview: The Psychology of the Endgame</h3>
+<p class="text-sm text-outline leading-relaxed line-clamp-3">We sit down with current world leaders to discuss the mental fortitude required to hold a draw when the clock is ticking against a machine-perfect opponent.</p>
+</article>
+<article class="group cursor-pointer">
+<div class="aspect-[4/5] overflow-hidden bg-surface-container-high mb-6">
+<img alt="minimalist aerial view of rows of chessboards in a grand architectural hall with strong shadows and high contrast" class="w-full h-full object-cover grayscale brightness-75 group-hover:scale-105 transition-transform duration-700" data-alt="minimalist aerial view of rows of chessboards in a grand architectural hall with strong shadows and high contrast" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzqGQTKlKTDtO00sQcHXOVGqhu_2S4YC5JWneJP1VM3KzMXl9K6zngYQren0MjHROPWkeSKyMlZXyKUBkE_UDnHFQL8OnhQnmvSs65NGBu6VwdTqYlpyzARpy77gYjjV1Y50BeEH6SukEQiAgiryPig3iLqq1OdeKPbbbwu1uY6_3Pd3GuInnmWitm8xTqD4Fr3UrYMNoEP37wf3cDMaZZfnhSyUKgQJgwUryJbDwwZKjyLMuRsU7nDKvLl-T89gHMod6oQEsw8P4"/>
+</div>
+<div class="text-[10px] text-outline uppercase tracking-widest mb-3">April 08, 2024 • Events</div>
+<h3 class="text-2xl font-serif group-hover:underline underline-offset-4 mb-3">Tournament of Kings: Reykjavik Invitational</h3>
+<p class="text-sm text-outline leading-relaxed line-clamp-3">The world's top ten return to the historic site of the 1972 match to compete for the largest prize pool in modern blitz history.</p>
+</article>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full py-12 px-8 bg-[#0e0e0e] flex flex-col md:flex-row justify-between items-center w-full gap-4 border-t border-white/10">
+<div class="text-white font-['Noto_Serif'] italic text-xl">GRANDMASTER</div>
+<div class="flex gap-8">
+<a class="text-gray-600 font-['Manrope'] text-[9px] uppercase tracking-[0.2em] hover:text-white transition-colors" href="#">Legal</a>
+<a class="text-gray-600 font-['Manrope'] text-[9px] uppercase tracking-[0.2em] hover:text-white transition-colors" href="#">Privacy</a>
+<a class="text-gray-600 font-['Manrope'] text-[9px] uppercase tracking-[0.2em] hover:text-white transition-colors" href="#">Fair Play</a>
+</div>
+<div class="text-gray-500 font-['Manrope'] text-[9px] uppercase tracking-[0.2em]">© 2024 GRANDMASTER. THE MONOLITH STRATEGY.</div>
+</footer>
+</main>
+</body></html>

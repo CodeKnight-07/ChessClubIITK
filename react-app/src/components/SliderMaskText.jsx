@@ -19,6 +19,7 @@ const SliderMaskText = ({ text, image, className = "" }) => {
           color: 'transparent',
           backgroundSize: '200% auto',
         }}
+        /*
         animate={{
           backgroundPosition: isHovered ? ["0% 50%", "100% 50%"] : ["0% 50%", "100% 50%"],
         }}
@@ -28,6 +29,7 @@ const SliderMaskText = ({ text, image, className = "" }) => {
           ease: "linear",
           repeatType: "reverse"
         }}
+        */
       >
         {text.split('\n').map((line, i) => (
           <span key={i}>

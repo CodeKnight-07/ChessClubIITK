@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GRANDMASTER | ALEXEI VORKOV</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;600;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #131313;
+            color: #e2e2e2;
+            font-family: 'Manrope', sans-serif;
+        }
+        .serif-text { font-family: 'Noto Serif', serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#131313",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "error": "#ffb4ab",
+                        "secondary-container": "#454747",
+                        "on-tertiary-fixed-variant": "#e3e2e2",
+                        "surface-container-low": "#1b1b1b",
+                        "on-primary-fixed": "#ffffff",
+                        "on-tertiary-fixed": "#ffffff",
+                        "on-error": "#690005",
+                        "secondary-fixed-dim": "#ababab",
+                        "outline": "#919191",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-surface": "#e2e2e2",
+                        "on-secondary-fixed-variant": "#3a3c3c",
+                        "surface-container": "#1f1f1f",
+                        "on-primary": "#1a1c1c",
+                        "tertiary-fixed-dim": "#464747",
+                        "on-background": "#e2e2e2",
+                        "tertiary-fixed": "#5e5e5e",
+                        "surface": "#131313",
+                        "surface-bright": "#393939",
+                        "primary-container": "#d4d4d4",
+                        "tertiary-container": "#919090",
+                        "surface-container-highest": "#353535",
+                        "secondary-fixed": "#c6c6c6",
+                        "background": "#131313",
+                        "on-tertiary-container": "#000000",
+                        "tertiary": "#e3e2e2",
+                        "secondary": "#c6c6c6",
+                        "error-container": "#93000a",
+                        "on-secondary-container": "#e2e2e2",
+                        "on-error-container": "#ffdad6",
+                        "inverse-surface": "#e2e2e2",
+                        "on-secondary": "#1a1c1c",
+                        "surface-container-high": "#2a2a2a",
+                        "on-tertiary": "#1b1c1c",
+                        "outline-variant": "#474747",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "inverse-primary": "#5d5f5f",
+                        "inverse-on-surface": "#303030",
+                        "primary-fixed-dim": "#454747",
+                        "primary": "#ffffff",
+                        "surface-tint": "#c6c6c7",
+                        "on-primary-container": "#000000",
+                        "surface-variant": "#353535",
+                        "primary-fixed": "#5d5f5f",
+                        "on-surface-variant": "#c6c6c6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background overflow-hidden">
+<!-- TopNavBar -->
+<nav class="w-full top-0 sticky z-50 bg-[#131313] flex justify-between items-center px-8 h-16 w-full max-w-none mx-auto text-white font-['Noto_Serif'] text-sm tracking-tight border-none">
+<div class="text-2xl font-bold tracking-tighter text-white font-['Noto_Serif']">GRANDMASTER</div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="text-gray-400 font-normal hover:text-white transition-colors duration-300" href="#">Matchmaking</a>
+<a class="text-gray-400 font-normal hover:text-white transition-colors duration-300" href="#">Archive</a>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined cursor-pointer active:opacity-70 transition-all">settings</span>
+<span class="material-symbols-outlined cursor-pointer active:opacity-70 transition-all">account_circle</span>
+</div>
+</nav>
+<!-- SideNavBar (Desktop) -->
+<aside class="hidden md:flex h-screen w-64 fixed left-0 top-0 pt-16 bg-[#0e0e0e] border-r border-white/5 flex flex-col z-40">
+<div class="p-8">
+<div class="w-12 h-12 bg-surface-container-highest flex items-center justify-center rounded-lg mb-4">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+<h3 class="font-headline text-white font-bold">The Monolith</h3>
+<p class="font-label uppercase tracking-widest text-[10px] text-gray-500">Grandmaster Status</p>
+</div>
+<div class="flex-1 mt-4">
+<div class="text-white border-l-4 border-white bg-[#1f1f1f] pl-4 py-3 cursor-pointer duration-200 ease-in-out">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-sm">sports_esports</span>
+<span class="font-label uppercase tracking-widest text-[10px]">Play</span>
+</div>
+</div>
+<div class="text-gray-500 pl-5 py-3 hover:bg-[#1f1f1f] hover:text-white transition-all cursor-pointer duration-200 ease-in-out">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-sm">emoji_events</span>
+<span class="font-label uppercase tracking-widest text-[10px]">Tournaments</span>
+</div>
+</div>
+<div class="text-gray-500 pl-5 py-3 hover:bg-[#1f1f1f] hover:text-white transition-all cursor-pointer duration-200 ease-in-out">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-sm">query_stats</span>
+<span class="font-label uppercase tracking-widest text-[10px]">Analysis</span>
+</div>
+</div>
+<div class="text-gray-500 pl-5 py-3 hover:bg-[#1f1f1f] hover:text-white transition-all cursor-pointer duration-200 ease-in-out">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-sm">history</span>
+<span class="font-label uppercase tracking-widest text-[10px]">History</span>
+</div>
+</div>
+</div>
+<div class="p-6 border-t border-white/5">
+<button class="w-full bg-primary text-on-primary py-3 font-bold text-xs uppercase tracking-widest mb-6">New Gambit</button>
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-4 text-gray-500 hover:text-white transition-all cursor-pointer">
+<span class="material-symbols-outlined text-sm">settings</span>
+<span class="font-label uppercase tracking-widest text-[10px]">Settings</span>
+</div>
+<div class="flex items-center gap-4 text-gray-500 hover:text-white transition-all cursor-pointer">
+<span class="material-symbols-outlined text-sm">help_outline</span>
+<span class="font-label uppercase tracking-widest text-[10px]">Support</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="md:pl-64 pt-4 h-screen overflow-y-auto no-scrollbar bg-surface text-on-surface">
+<div class="max-w-7xl mx-auto p-8 space-y-12 pb-32">
+<!-- Hero Profile Section -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
+<div class="md:col-span-8">
+<div class="font-label uppercase tracking-[0.4em] text-[10px] text-gray-500 mb-2">Current Title Holder</div>
+<h1 class="font-headline text-7xl md:text-8xl font-bold tracking-tighter text-white">ALEXEI VORKOV</h1>
+<div class="mt-6 flex gap-6 items-center">
+<div class="bg-surface-container px-4 py-1 text-[11px] font-label uppercase tracking-widest border border-white/10">FIDE Grandmaster</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary">public</span>
+<span class="font-label uppercase tracking-widest text-[11px]">Rank #4 Global</span>
+</div>
+</div>
+</div>
+<div class="md:col-span-4 text-right">
+<div class="font-label uppercase tracking-widest text-[10px] text-gray-500 mb-2">Strategic Rating</div>
+<div class="font-headline text-8xl md:text-9xl font-bold tracking-tighter text-white leading-none">2842</div>
+</div>
+</section>
+<!-- Metrics Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-1">
+<!-- Accuracy Card -->
+<div class="bg-surface-container-low p-8 aspect-square flex flex-col justify-between">
+<span class="material-symbols-outlined text-white/40">target</span>
+<div>
+<div class="font-headline text-5xl font-bold">98.4<span class="text-xl">%</span></div>
+<div class="font-label uppercase tracking-widest text-[10px] text-gray-500 mt-2">Engine Accuracy</div>
+</div>
+</div>
+<!-- Win Rate Card -->
+<div class="bg-surface-container p-8 aspect-square flex flex-col justify-between">
+<span class="material-symbols-outlined text-white/40">trending_up</span>
+<div>
+<div class="font-headline text-5xl font-bold">64.2<span class="text-xl">%</span></div>
+<div class="font-label uppercase tracking-widest text-[10px] text-gray-500 mt-2">Win Rate (W/B)</div>
+</div>
+</div>
+<!-- Visual Identity Image -->
+<div class="md:col-span-2 bg-surface-container-high overflow-hidden relative group">
+<img class="w-full h-full object-cover opacity-40 grayscale group-hover:scale-105 transition-transform duration-700" data-alt="Monochrome close-up of a carved wooden chess king standing alone on a dark marble board with sharp dramatic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCn28aoh7wVpKrfFx0_gM0oPXFZfAykHJItSqt1qr6u8YbMr4ZA0tUNehtk-cPAOmQgZlURybEUHRi-QGMbulut2o3kIFv2TpKkKgnyaTQIE4o_45lGDufHqM7foanq9o8TEtWtwhyrIdiJ0Lyi5JqdR85SJ4X7thMAoap12v2uAJcaGRHDsjuBG7R3rq4Zk3IOUQfhw0sT3PoSRovfwS3xb2CZi8NEOVZvkNsU0wZyQWVGE6VByEu7E1y70KSCFW2t-DTwoLPjOPk"/>
+<div class="absolute inset-0 p-8 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent">
+<div class="font-headline italic text-2xl text-white">"Calculation is not strategy."</div>
+</div>
+</div>
+</section>
+<!-- Performance Curve (Line Graph Simulation) -->
+<section class="bg-surface-container-lowest border border-white/5 p-12">
+<div class="flex justify-between items-center mb-12">
+<div>
+<h2 class="font-headline text-2xl font-bold text-white uppercase tracking-tight">Performance Curve</h2>
+<p class="font-label text-[10px] text-gray-500 uppercase tracking-widest">ELO Progression (Last 12 Months)</p>
+</div>
+<div class="flex gap-4">
+<div class="w-3 h-3 bg-white"></div>
+<span class="font-label text-[9px] uppercase tracking-widest">Global Avg</span>
+</div>
+</div>
+<div class="h-64 flex items-end gap-[2px] w-full">
+<div class="flex-1 bg-surface-container h-[40%] hover:bg-white transition-colors"></div>
+<div class="flex-1 bg-surface-container h-[45%] hover:bg-white transition-colors"></div>
+<div class="flex-1 bg-surface-container h-[42%] hover:bg-white transition-colors"></div>
+<div class="flex-1 bg-surface-container h-[55%] hover:bg-white transition-colors"></div>
+<div class="flex-1 bg-surface-container h-[60%] hover:bg-white transition-colors"></div>
+<div class="flex-1 bg-surface-container h-[58%] hover:bg-white transition-colors"></div>
+<div class="flex-1 bg-surface-container h-[70%] hover:bg-white transition-colors"></div>
+<div class="flex-1 bg-surface-container h-[75%] hover:bg-white transition-colors"></div>
+<div class="flex-1 bg-surface-container h-[82%] hover:bg-white transition-colors"></div>
+<div class="flex-1 bg-surface-container h-[85%] hover:bg-white transition-colors"></div>
+<div class="flex-1 bg-surface-container h-[88%] hover:bg-white transition-colors"></div>
+<div class="flex-1 bg-primary h-[94%] shadow-[0_0_20px_rgba(255,255,255,0.2)]"></div>
+</div>
+<div class="flex justify-between mt-6 font-label text-[9px] text-gray-600 uppercase tracking-[0.2em]">
+<span>JAN</span><span>FEB</span><span>MAR</span><span>APR</span><span>MAY</span><span>JUN</span><span>JUL</span><span>AUG</span><span>SEP</span><span>OCT</span><span>NOV</span><span>DEC</span>
+</div>
+</section>
+<!-- Recent Encounters -->
+<section>
+<div class="flex items-baseline gap-4 mb-8">
+<h2 class="font-headline text-4xl font-bold text-white uppercase tracking-tighter">Recent Encounters</h2>
+<div class="h-px flex-1 bg-white/10"></div>
+</div>
+<div class="w-full space-y-[1px]">
+<!-- Table Header -->
+<div class="grid grid-cols-12 gap-4 px-8 py-4 font-label text-[10px] text-gray-500 uppercase tracking-widest bg-surface-container-lowest">
+<div class="col-span-1">Result</div>
+<div class="col-span-5">Opponent</div>
+<div class="col-span-2">Format</div>
+<div class="col-span-2">Accuracy</div>
+<div class="col-span-2 text-right">ELO Shift</div>
+</div>
+<!-- Row 1 -->
+<div class="grid grid-cols-12 gap-4 px-8 py-6 bg-surface-container-low items-center hover:bg-surface-container transition-all">
+<div class="col-span-1"><span class="bg-white text-on-primary px-2 py-0.5 font-bold text-[10px]">W</span></div>
+<div class="col-span-5 flex items-center gap-4">
+<div class="w-8 h-8 bg-surface-container-highest rounded-sm flex items-center justify-center font-bold text-[10px]">ML</div>
+<div>
+<div class="font-bold text-white text-sm">MAGNUS LI (GM)</div>
+<div class="text-[9px] text-gray-500 font-label tracking-widest uppercase">Rating: 2831</div>
+</div>
+</div>
+<div class="col-span-2 text-[10px] uppercase font-label tracking-widest text-gray-400">Classical</div>
+<div class="col-span-2 text-[10px] font-bold">98.1%</div>
+<div class="col-span-2 text-right text-[10px] font-bold text-white">+12</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-12 gap-4 px-8 py-6 bg-surface-container items-center hover:bg-surface-container-high transition-all">
+<div class="col-span-1"><span class="bg-white/10 text-white px-2 py-0.5 font-bold text-[10px]">D</span></div>
+<div class="col-span-5 flex items-center gap-4">
+<div class="w-8 h-8 bg-surface-container-highest rounded-sm flex items-center justify-center font-bold text-[10px]">HA</div>
+<div>
+<div class="font-bold text-white text-sm">HIKARU AKIO (GM)</div>
+<div class="text-[9px] text-gray-500 font-label tracking-widest uppercase">Rating: 2855</div>
+</div>
+</div>
+<div class="col-span-2 text-[10px] uppercase font-label tracking-widest text-gray-400">Blitz</div>
+<div class="col-span-2 text-[10px] font-bold">96.4%</div>
+<div class="col-span-2 text-right text-[10px] font-bold text-white">0</div>
+</div>
+<!-- Row 3 -->
+<div class="grid grid-cols-12 gap-4 px-8 py-6 bg-surface-container-low items-center hover:bg-surface-container transition-all">
+<div class="col-span-1"><span class="bg-error-container text-white px-2 py-0.5 font-bold text-[10px]">L</span></div>
+<div class="col-span-5 flex items-center gap-4">
+<div class="w-8 h-8 bg-surface-container-highest rounded-sm flex items-center justify-center font-bold text-[10px]">DN</div>
+<div>
+<div class="font-bold text-white text-sm">DING NELSON (GM)</div>
+<div class="text-[9px] text-gray-500 font-label tracking-widest uppercase">Rating: 2798</div>
+</div>
+</div>
+<div class="col-span-2 text-[10px] uppercase font-label tracking-widest text-gray-400">Rapid</div>
+<div class="col-span-2 text-[10px] font-bold">92.8%</div>
+<div class="col-span-2 text-right text-[10px] font-bold text-error">-8</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer -->
+<footer class="w-full py-12 px-8 bg-[#0e0e0e] border-t border-white/10 flex flex-col md:flex-row justify-between items-center w-full gap-4 text-gray-500 font-['Manrope'] text-[9px] uppercase tracking-[0.2em]">
+<div class="text-white font-['Noto_Serif'] italic tracking-normal text-sm">GRANDMASTER</div>
+<div>© 2024 GRANDMASTER. THE MONOLITH STRATEGY.</div>
+<div class="flex gap-8">
+<a class="hover:text-white transition-colors" href="#">Legal</a>
+<a class="hover:text-white transition-colors" href="#">Privacy</a>
+<a class="hover:text-white transition-colors" href="#">Fair Play</a>
+</div>
+</footer>
+</main>
+<!-- Floating UI Action for mobile (Suppressed as per rules but available if needed) -->
+<div class="md:hidden fixed bottom-6 right-6">
+<button class="w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</body></html>

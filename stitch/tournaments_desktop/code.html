@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#131313",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "error": "#ffb4ab",
+                        "secondary-container": "#454747",
+                        "on-tertiary-fixed-variant": "#e3e2e2",
+                        "surface-container-low": "#1b1b1b",
+                        "on-primary-fixed": "#ffffff",
+                        "on-tertiary-fixed": "#ffffff",
+                        "on-error": "#690005",
+                        "secondary-fixed-dim": "#ababab",
+                        "outline": "#919191",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-surface": "#e2e2e2",
+                        "on-secondary-fixed-variant": "#3a3c3c",
+                        "surface-container": "#1f1f1f",
+                        "on-primary": "#1a1c1c",
+                        "tertiary-fixed-dim": "#464747",
+                        "on-background": "#e2e2e2",
+                        "tertiary-fixed": "#5e5e5e",
+                        "surface": "#131313",
+                        "surface-bright": "#393939",
+                        "primary-container": "#d4d4d4",
+                        "tertiary-container": "#919090",
+                        "surface-container-highest": "#353535",
+                        "secondary-fixed": "#c6c6c6",
+                        "background": "#131313",
+                        "on-tertiary-container": "#000000",
+                        "tertiary": "#e3e2e2",
+                        "secondary": "#c6c6c6",
+                        "error-container": "#93000a",
+                        "on-secondary-container": "#e2e2e2",
+                        "on-error-container": "#ffdad6",
+                        "inverse-surface": "#e2e2e2",
+                        "on-secondary": "#1a1c1c",
+                        "surface-container-high": "#2a2a2a",
+                        "on-tertiary": "#1b1c1c",
+                        "outline-variant": "#474747",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "inverse-primary": "#5d5f5f",
+                        "inverse-on-surface": "#303030",
+                        "primary-fixed-dim": "#454747",
+                        "primary": "#ffffff",
+                        "surface-tint": "#c6c6c7",
+                        "on-primary-container": "#000000",
+                        "surface-variant": "#353535",
+                        "primary-fixed": "#5d5f5f",
+                        "on-surface-variant": "#c6c6c6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #131313;
+            color: #e2e2e2;
+            font-family: 'Manrope', sans-serif;
+        }
+        .serif-text {
+            font-family: 'Noto Serif', serif;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="w-full top-0 sticky z-50 bg-[#131313] flex justify-between items-center px-8 h-16 w-full max-w-none mx-auto">
+<div class="text-2xl font-bold tracking-tighter text-white font-['Noto_Serif']">GRANDMASTER</div>
+<nav class="flex gap-8 items-center font-['Noto_Serif'] text-sm tracking-tight">
+<a class="text-white font-bold border-b-2 border-white pb-1 transition-colors duration-300" href="#">Matchmaking</a>
+<a class="text-gray-400 font-normal hover:text-white transition-colors duration-300" href="#">Archive</a>
+</nav>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-white cursor-pointer active:opacity-70">settings</span>
+<span class="material-symbols-outlined text-white cursor-pointer active:opacity-70">account_circle</span>
+<button class="bg-primary text-on-primary px-4 py-1.5 font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">Sign In</button>
+</div>
+</header>
+<div class="flex">
+<!-- Side Navigation Bar -->
+<aside class="h-[calc(100vh-64px)] w-64 sticky left-0 top-16 bg-[#0e0e0e] flex flex-col border-r border-white/5 hidden md:flex">
+<div class="p-8">
+<div class="flex items-center gap-3 mb-8">
+<img class="w-10 h-10 rounded-full" data-alt="high-contrast portrait of a professional chess player in a dark suit with dramatic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxvnGCCaosG2gjCAV19AC7EJo4G63BCco7SN1rC4IKkrauYEaBCPSy1tdIU9GhvcO8J0-q_1OctQlbhnokKVNc9HhlqMHYRH0K7ssIGMb9iMXGCK0Yf1sJu6LSikONahGGLyPZp6laSxMWogMxBkVazHCeRexqlYbCoKKazs9HqeXvvmqio0wN0vdl-hyI5H0B5_CxzkMVqdIM1-8w2KPmNM0PyLW0OeZUdpDoJm9658CVFRV4ghcVR5MdjDFAFPc_ZCem-l0zJ-4"/>
+<div>
+<div class="text-white font-bold text-xs uppercase tracking-wider font-['Manrope']">The Monolith</div>
+<div class="text-gray-500 text-[10px] uppercase tracking-widest font-['Manrope']">Grandmaster Status</div>
+</div>
+</div>
+<button class="w-full bg-white text-black py-3 font-bold text-[10px] uppercase tracking-[0.2em] mb-10 transition-transform active:scale-95">New Gambit</button>
+</div>
+<nav class="flex flex-col flex-grow">
+<div class="text-white border-l-4 border-white bg-[#1f1f1f] pl-4 py-3 cursor-pointer duration-200 ease-in-out font-['Manrope'] uppercase tracking-widest text-[10px] flex items-center gap-3">
+<span class="material-symbols-outlined text-sm">sports_esports</span> Play
+                </div>
+<div class="text-gray-500 pl-5 py-3 cursor-pointer hover:bg-[#1f1f1f] hover:text-white transition-all duration-200 ease-in-out font-['Manrope'] uppercase tracking-widest text-[10px] flex items-center gap-3">
+<span class="material-symbols-outlined text-sm">emoji_events</span> Tournaments
+                </div>
+<div class="text-gray-500 pl-5 py-3 cursor-pointer hover:bg-[#1f1f1f] hover:text-white transition-all duration-200 ease-in-out font-['Manrope'] uppercase tracking-widest text-[10px] flex items-center gap-3">
+<span class="material-symbols-outlined text-sm">query_stats</span> Analysis
+                </div>
+<div class="text-gray-500 pl-5 py-3 cursor-pointer hover:bg-[#1f1f1f] hover:text-white transition-all duration-200 ease-in-out font-['Manrope'] uppercase tracking-widest text-[10px] flex items-center gap-3">
+<span class="material-symbols-outlined text-sm">history</span> History
+                </div>
+</nav>
+<div class="p-8 border-t border-white/5 space-y-4">
+<div class="text-gray-500 flex items-center gap-3 font-['Manrope'] uppercase tracking-widest text-[10px] cursor-pointer hover:text-white transition-colors">
+<span class="material-symbols-outlined text-sm">settings</span> Settings
+                </div>
+<div class="text-gray-500 flex items-center gap-3 font-['Manrope'] uppercase tracking-widest text-[10px] cursor-pointer hover:text-white transition-colors">
+<span class="material-symbols-outlined text-sm">help_outline</span> Support
+                </div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 bg-surface-dim p-12 overflow-y-auto">
+<!-- Hero Featured Event Section -->
+<section class="relative w-full h-[400px] mb-16 overflow-hidden bg-surface-container flex items-center group">
+<div class="absolute inset-0 bg-gradient-to-r from-surface-dim via-transparent to-transparent z-10"></div>
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover grayscale opacity-40 group-hover:scale-105 transition-transform duration-700" data-alt="dramatic close-up of a white chess king on a black background with cold winter frost atmospheric lighting and fog" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrQ7QcVLHeBUmnJwlsmutsdLNfO9v6fijaxJnDJxU3Hc0jTSuycjAeV4pDmQWZvbRwc5NKxlLeW-s7R_ENDqYvFpOIgXQGZwPcOsW0eK2s_UHZug63TYUuRQmUGeHfkhTOx_AQEw4YVUKUmzrh1ZoyQ9rZVPdEkEh-gQPMpjrxoQ0LMFSE_75T5PkVh9CuH_e8NzWqpovxOd40eHCokv9wY7oFtw_xXMnmKoLiKwT7ZbWgSoE0xhvH58T8GXQzP4vjt0UR8stCh_E"/>
+</div>
+<div class="relative z-20 px-16 max-w-2xl">
+<span class="text-white text-[10px] uppercase tracking-[0.4em] font-body bg-surface-container-highest px-3 py-1 inline-block mb-6">World Premiere Event</span>
+<h1 class="serif-text text-7xl font-bold text-white mb-4 tracking-tighter italic">The Winter Gambit 2024</h1>
+<p class="text-on-surface-variant font-body text-sm tracking-wide leading-relaxed mb-8 max-w-md">
+                        Compete at the highest level where precision meets the cold vacuum of strategic perfection. A global invitation for Grandmasters and rising stars.
+                    </p>
+<div class="flex gap-6 items-center">
+<button class="bg-primary text-on-primary px-8 py-3 font-bold text-xs uppercase tracking-widest hover:bg-on-primary-fixed-variant transition-colors">Register Entry</button>
+<div class="flex flex-col">
+<span class="text-gray-500 text-[9px] uppercase tracking-widest">Prize Pool</span>
+<span class="text-white font-bold text-xl">$250,000.00</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Active & Upcoming Grid -->
+<section class="mb-20">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h2 class="serif-text text-3xl text-white tracking-tight">Competitive Landscape</h2>
+<p class="text-gray-500 font-body text-[10px] uppercase tracking-widest mt-2">Active and Scheduled Engagements</p>
+</div>
+<div class="flex gap-4">
+<button class="text-white border border-white/10 px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-surface-container-high transition-colors">Filters</button>
+<button class="text-white border border-white/10 px-4 py-2 text-[10px] uppercase tracking-widest hover:bg-surface-container-high transition-colors">Sort: Time</button>
+</div>
+</div>
+<!-- Tournament List (Tonal Shifts Layout) -->
+<div class="space-y-px bg-white/5">
+<!-- Table Header -->
+<div class="grid grid-cols-12 bg-surface-container-lowest px-8 py-4 text-gray-500 text-[10px] uppercase tracking-widest font-bold">
+<div class="col-span-5">Tournament Name</div>
+<div class="col-span-2 text-center">Start Time</div>
+<div class="col-span-2 text-center">Entrants</div>
+<div class="col-span-2 text-center">Prize Pool</div>
+<div class="col-span-1 text-right">Action</div>
+</div>
+<!-- Tournament Item: Row 1 -->
+<div class="grid grid-cols-12 bg-surface-container px-8 py-6 items-center group hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="col-span-5 flex items-center gap-4">
+<div class="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"></div>
+<div>
+<h3 class="text-white font-bold text-base tracking-tight">Blitz Masters: Nightfall</h3>
+<p class="text-gray-500 text-[10px] uppercase tracking-widest font-body">Format: 3+2 Blitz</p>
+</div>
+</div>
+<div class="col-span-2 text-center text-white font-mono text-sm uppercase">02:30:45</div>
+<div class="col-span-2 text-center">
+<span class="text-white font-bold">1,242</span>
+<span class="text-gray-600 text-[10px] uppercase tracking-widest">/ 2000</span>
+</div>
+<div class="col-span-2 text-center text-white font-bold">$12,000</div>
+<div class="col-span-1 text-right">
+<span class="material-symbols-outlined text-gray-600 group-hover:text-white transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- Tournament Item: Row 2 -->
+<div class="grid grid-cols-12 bg-surface-container-low px-8 py-6 items-center group hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="col-span-5 flex items-center gap-4">
+<div class="w-1.5 h-1.5 rounded-full bg-gray-700"></div>
+<div>
+<h3 class="text-white font-bold text-base tracking-tight">The Sicilian Defense Open</h3>
+<p class="text-gray-500 text-[10px] uppercase tracking-widest font-body">Format: 10+5 Rapid</p>
+</div>
+</div>
+<div class="col-span-2 text-center text-gray-500 font-mono text-sm uppercase">14:00 GMT</div>
+<div class="col-span-2 text-center">
+<span class="text-white font-bold">489</span>
+<span class="text-gray-600 text-[10px] uppercase tracking-widest">/ 1000</span>
+</div>
+<div class="col-span-2 text-center text-white font-bold">$5,500</div>
+<div class="col-span-1 text-right">
+<span class="material-symbols-outlined text-gray-600 group-hover:text-white transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- Tournament Item: Row 3 -->
+<div class="grid grid-cols-12 bg-surface-container px-8 py-6 items-center group hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="col-span-5 flex items-center gap-4">
+<div class="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"></div>
+<div>
+<h3 class="text-white font-bold text-base tracking-tight">The Monolith Strategy Daily</h3>
+<p class="text-gray-500 text-[10px] uppercase tracking-widest font-body">Format: 1+0 Bullet</p>
+</div>
+</div>
+<div class="col-span-2 text-center text-white font-mono text-sm uppercase">00:05:12</div>
+<div class="col-span-2 text-center">
+<span class="text-white font-bold">3,110</span>
+<span class="text-gray-600 text-[10px] uppercase tracking-widest">/ UNLIM</span>
+</div>
+<div class="col-span-2 text-center text-white font-bold">$1,000</div>
+<div class="col-span-1 text-right">
+<span class="material-symbols-outlined text-gray-600 group-hover:text-white transition-colors">chevron_right</span>
+</div>
+</div>
+<!-- Tournament Item: Row 4 -->
+<div class="grid grid-cols-12 bg-surface-container-low px-8 py-6 items-center group hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="col-span-5 flex items-center gap-4">
+<div class="w-1.5 h-1.5 rounded-full bg-gray-700"></div>
+<div>
+<h3 class="text-white font-bold text-base tracking-tight">Endgame Mastery Invitational</h3>
+<p class="text-gray-500 text-[10px] uppercase tracking-widest font-body">Format: 30+0 Classical</p>
+</div>
+</div>
+<div class="col-span-2 text-center text-gray-500 font-mono text-sm uppercase">18:30 GMT</div>
+<div class="col-span-2 text-center">
+<span class="text-white font-bold">12</span>
+<span class="text-gray-600 text-[10px] uppercase tracking-widest">/ 32</span>
+</div>
+<div class="col-span-2 text-center text-white font-bold">$50,000</div>
+<div class="col-span-1 text-right">
+<span class="material-symbols-outlined text-gray-600 group-hover:text-white transition-colors">lock</span>
+</div>
+</div>
+</div>
+</section>
+<!-- History & Archive (Bento/Card Layout) -->
+<section class="mb-20">
+<div class="flex items-center gap-4 mb-8">
+<h2 class="serif-text text-3xl text-white tracking-tight">History &amp; Archive</h2>
+<div class="h-px flex-1 bg-white/10"></div>
+<button class="text-[10px] uppercase tracking-widest text-gray-500 hover:text-white transition-colors">View All Analysis</button>
+</div>
+<div class="grid grid-cols-12 gap-8">
+<!-- Featured Archive Entry -->
+<div class="col-span-8 bg-surface-container p-8 relative overflow-hidden group border border-transparent hover:border-white/10 transition-colors">
+<div class="relative z-10 h-full flex flex-col justify-between">
+<div>
+<span class="text-white text-[9px] uppercase tracking-[0.3em] font-body mb-4 block">Major Tournament Recap</span>
+<h3 class="serif-text text-4xl text-white italic max-w-md">Grandmaster Summit 2023: The Final Checkmate</h3>
+</div>
+<div class="flex gap-12 mt-12">
+<div class="flex flex-col">
+<span class="text-gray-600 text-[9px] uppercase tracking-widest mb-1">Winner</span>
+<span class="text-white font-bold uppercase tracking-widest text-sm">GM K. Kasparov</span>
+</div>
+<div class="flex flex-col">
+<span class="text-gray-600 text-[9px] uppercase tracking-widest mb-1">Participants</span>
+<span class="text-white font-bold uppercase tracking-widest text-sm">2,500+</span>
+</div>
+<div class="flex flex-col">
+<span class="text-gray-600 text-[9px] uppercase tracking-widest mb-1">Avg Rating</span>
+<span class="text-white font-bold uppercase tracking-widest text-sm">2450</span>
+</div>
+</div>
+</div>
+<!-- Background Pattern -->
+<div class="absolute -right-10 -bottom-10 opacity-5 group-hover:rotate-12 transition-transform duration-1000">
+<span class="material-symbols-outlined text-[300px] text-white">chess</span>
+</div>
+</div>
+<!-- Archive Side Cards -->
+<div class="col-span-4 flex flex-col gap-8">
+<div class="bg-surface-container-low p-6 flex items-center justify-between group hover:bg-surface-container transition-colors cursor-pointer">
+<div>
+<span class="text-gray-500 text-[9px] uppercase tracking-widest mb-1 block">November 15</span>
+<h4 class="text-white font-bold text-sm">The Blitz Invitational</h4>
+</div>
+<span class="material-symbols-outlined text-gray-700 group-hover:text-white transition-colors">auto_stories</span>
+</div>
+<div class="bg-surface-container-low p-6 flex items-center justify-between group hover:bg-surface-container transition-colors cursor-pointer">
+<div>
+<span class="text-gray-500 text-[9px] uppercase tracking-widest mb-1 block">October 28</span>
+<h4 class="text-white font-bold text-sm">Rapid Ladder S3</h4>
+</div>
+<span class="material-symbols-outlined text-gray-700 group-hover:text-white transition-colors">auto_stories</span>
+</div>
+<div class="bg-surface-container-low p-6 flex items-center justify-between group hover:bg-surface-container transition-colors cursor-pointer">
+<div>
+<span class="text-gray-500 text-[9px] uppercase tracking-widest mb-1 block">September 02</span>
+<h4 class="text-white font-bold text-sm">Classic Archive V.4</h4>
+</div>
+<span class="material-symbols-outlined text-gray-700 group-hover:text-white transition-colors">auto_stories</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- Footer -->
+<footer class="w-full py-12 px-8 bg-[#0e0e0e] border-t border-white/10 flex flex-col md:flex-row justify-between items-center w-full gap-4">
+<div class="text-white font-['Noto_Serif'] italic text-base">GRANDMASTER</div>
+<div class="text-gray-500 font-['Manrope'] text-[9px] uppercase tracking-[0.2em]">
+            © 2024 GRANDMASTER. THE MONOLITH STRATEGY.
+        </div>
+<div class="flex gap-8">
+<a class="text-gray-600 hover:text-white transition-colors font-['Manrope'] text-[9px] uppercase tracking-[0.2em]" href="#">Legal</a>
+<a class="text-gray-600 hover:text-white transition-colors font-['Manrope'] text-[9px] uppercase tracking-[0.2em]" href="#">Privacy</a>
+<a class="text-gray-600 hover:text-white transition-colors font-['Manrope'] text-[9px] uppercase tracking-[0.2em]" href="#">Fair Play</a>
+</div>
+</footer>
+</body></html>
