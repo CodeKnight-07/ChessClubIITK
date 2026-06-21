@@ -231,7 +231,7 @@ const Gallery = () => {
           transition={{ delay: 0.1 }}
           className="text-6xl font-serif italic mb-8"
         >
-          The Gallery of <span className="text-primary">Kings</span>
+          The Gallery of <div className="text-primary">Chess Club IITK</div>
         </motion.h1>
 
       </header>

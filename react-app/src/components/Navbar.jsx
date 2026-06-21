@@ -61,7 +61,7 @@ const Navbar = () => {
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-6">
+        {/*<div className="flex items-center gap-6">
           <button 
             onClick={handleAuthClick}
             className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest px-5 py-2.5 rounded-full transition-all duration-300 ${
@@ -81,7 +81,7 @@ const Navbar = () => {
               <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>person</span>
             </Link>
           )}
-        </div>
+        </div>*/}
 
       </div>
     </nav>
