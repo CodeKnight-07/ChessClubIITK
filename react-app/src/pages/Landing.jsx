@@ -42,7 +42,7 @@ const Landing = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 2.0, ease: "easeOut" }}
+          transition={{ duration: 1.8, ease: "easeOut" }}
           className="relative z-10 w-full text-center flex flex-col items-center justify-center mt-12"
         >
           {/* Displaying Chess Club IITK in elite scale */}
