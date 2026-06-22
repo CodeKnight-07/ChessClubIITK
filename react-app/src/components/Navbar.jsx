@@ -1,6 +1,7 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import logo from '../assets/chessclubiitklogo.jpeg';
 import { useAuth } from '../context/AuthContext';
+import { motion } from 'framer-motion';
 
 const Navbar = () => {
   const { isLoggedIn, logout } = useAuth();
@@ -25,21 +26,32 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-surface border-b border-outline-variant/15 px-8 py-6 z-50">
+    <motion.nav
+      initial={{ opacity: 0, y: -18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      className="bg-surface border-b border-outline-variant/15 px-8 py-6 z-50"
+    >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
         {/* Left: Logo */}
-        <Link to="/" className="flex items-center gap-4 group">
-          <img 
-            alt="Chess Club IITK Seal" 
-            className="w-10 h-10 rounded-full border border-primary-container/20 group-hover:border-primary transition-all duration-300 shadow-md object-cover" 
-            src={logo} 
-          />
-          <div className="flex flex-col">
-            <span className="text-xl font-headline text-primary leading-none">Chess Club IITK</span>
-            <span className="text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/60 font-bold">IIT Kanpur</span>
-          </div>
-        </Link>
+        <motion.div
+          initial={{ opacity: 0, x: -16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.75, delay: 0.18, ease: "easeOut" }}
+        >
+          <Link to="/" className="flex items-center gap-4 group">
+            <img 
+              alt="Chess Club IITK Seal" 
+              className="w-10 h-10 rounded-full border border-primary-container/20 group-hover:border-primary transition-all duration-300 shadow-md object-cover" 
+              src={logo} 
+            />
+            <div className="flex flex-col">
+              <span className="text-xl font-headline text-primary leading-none">Chess Club IITK</span>
+              <span className="text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/60 font-bold">IIT Kanpur</span>
+            </div>
+          </Link>
+        </motion.div>
 
         {/* Center: Navigation Links */}
         <div className="hidden md:flex items-center gap-10">
@@ -84,7 +96,7 @@ const Navbar = () => {
         </div>
 
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 
