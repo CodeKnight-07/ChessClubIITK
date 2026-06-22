@@ -172,7 +172,7 @@ const Blogs = () => {
         </a>
 
         <a
-          href="mailto:chessclub@iitk.ac.in"
+          href="mailto:chessiitk21@gmail.com"
           aria-label="Email"
           className="inline-flex h-9 items-center justify-center rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
         >
