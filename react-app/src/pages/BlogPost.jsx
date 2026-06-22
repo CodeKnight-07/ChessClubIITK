@@ -103,8 +103,8 @@ const BlogPost = () => {
       </div>
 
       {/* Hero Image */}
-      <div className="w-full h-[400px] rounded-xl overflow-hidden mb-16 relative shadow-2xl shadow-black/50">
-        <img alt="Fresher's Chess League Recap" className="w-full h-full object-cover" src={fresherImg}/>
+      <div className="w-full h-[500px] rounded-xl overflow-hidden mb-16 relative shadow-2xl shadow-black/50">
+        <img alt="Fresher's Chess League Recap" className="w-full h-full object-contain" src={fresherImg}/>
         <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-60"></div>
       </div>
 
