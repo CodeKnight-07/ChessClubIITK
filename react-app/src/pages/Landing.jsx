@@ -48,10 +48,10 @@ const Landing = () => {
           {/* Displaying Chess Club IITK in elite scale */}
           <div className="relative py-8 px-4 md:px-12 border border-zinc-800/40 bg-black/20 backdrop-blur-md rounded-2xl max-w-5xl mx-auto shadow-2xl shadow-black/80">
             {/* Subtle vintage mechanical coordinates in corners */}
-            <span className="absolute top-2 left-3 text-[9px] font-mono tracking-widest text-[#d4af37]/40">A8</span>
-            <span className="absolute top-2 right-3 text-[9px] font-mono tracking-widest text-[#d4af37]/40">H8</span>
-            <span className="absolute bottom-2 left-3 text-[9px] font-mono tracking-widest text-[#d4af37]/40">A1</span>
-            <span className="absolute bottom-2 right-3 text-[9px] font-mono tracking-widest text-[#d4af37]/40">H1</span>
+            <span className="absolute top-2 left-3 text-[9px] font-mono tracking-widest text-[#d4af37]/40"> </span>
+            <span className="absolute top-2 right-3 text-[9px] font-mono tracking-widest text-[#d4af37]/40"> </span>
+            <span className="absolute bottom-2 left-3 text-[9px] font-mono tracking-widest text-[#d4af37]/40"> </span>
+            <span className="absolute bottom-2 right-3 text-[9px] font-mono tracking-widest text-[#d4af37]/40"> </span>
 
             <SliderMaskText
               text={"CHESS CLUB\nIITK"}
