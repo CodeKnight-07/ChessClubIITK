@@ -65,7 +65,7 @@ const Landing = () => {
 
             <SliderMaskText
               text={"CHESS CLUB\nIITK"}
-              className="text-6xl sm:text-7xl md:text-8xl lg:text-[11rem] !font-headline font-semibold tracking-normal leading-[0.9] text-[#d4af37] drop-shadow-[0_10px_28px_rgba(0,0,0,0.72)]"
+              className="text-4xl sm:text-5xl md:text-8xl lg:text-[11rem] !font-headline font-semibold tracking-normal leading-[0.9] text-[#d4af37] drop-shadow-[0_10px_28px_rgba(0,0,0,0.72)]"
             />
           </div>
 
