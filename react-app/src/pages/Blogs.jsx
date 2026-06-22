@@ -65,7 +65,7 @@ const Blogs = () => {
     <div className="px-12 pb-20 max-w-7xl mx-auto">
       <section className="relative mb-20 group mt-8">
         <div className="grid grid-cols-12 gap-0 overflow-hidden rounded-xl bg-surface-container-low border border-[#4d4635]/10">
-          <div className="col-span-12 lg:col-span-7 h-[500px] overflow-hidden">
+          <div className="col-span-12 lg:col-span-7 h-[400px] overflow-hidden">
             <img alt="IIT Kanpur FIDE-rated rapid tournament" className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700" src={tournamentImg} />
 
           </div>
