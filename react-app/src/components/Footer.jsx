@@ -104,7 +104,7 @@ const Footer = () => {
               </a>
 
               <a
-                href="https://www.youtube.com/@chessiitk"
+                href="https://www.youtube.com/@chessiitk" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary gap-2"
