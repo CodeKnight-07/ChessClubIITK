@@ -33,8 +33,8 @@ const Landing = () => {
         className="relative min-h-[85vh] flex items-center justify-center px-6 md:px-12 lg:px-20 overflow-hidden bg-[#131313] bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `
-            radial-gradient(circle at center, rgba(19, 19, 19, 0.18) 0%, rgba(19, 19, 19, 0.72) 58%, rgba(0, 0, 0, 0.94) 100%),
-            linear-gradient(180deg, rgba(0, 0, 0, 0.66) 0%, rgba(0, 0, 0, 0.76) 55%, rgba(0, 0, 0, 0.94) 100%),
+            radial-gradient(circle at center, rgba(19, 19, 19, 0.04) 0%, rgba(19, 19, 19, 0.45) 62%, rgba(0, 0, 0, 0.78) 100%),
+            linear-gradient(180deg, rgba(0, 0, 0, 0.38) 0%, rgba(0, 0, 0, 0.46) 55%, rgba(0, 0, 0, 0.76) 100%),
             url(${homePgBg})
           `,
         }}
