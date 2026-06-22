@@ -339,24 +339,24 @@ const Contact = () => {
         </p>
       </div>
 
-      <div className="w-full md:w-auto md:min-w-[220px] md:ml-auto">
-        <p className="m-0 text-right text-[10px] font-label uppercase tracking-widest text-primary">
+      <div className="w-full md:ml-auto md:w-auto md:min-w-[360px]">
+        <p className="m-0 text-[10px] font-label uppercase tracking-widest text-primary">
           Connect
         </p>
 
-        <div className="mt-5 flex flex-col items-start gap-3">
+        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <a
             href="https://www.instagram.com/chessiitk/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-9 min-w-[160px] items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+            className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
           >
             Instagram
           </a>
 
           <a
             href="mailto:chessclub@iitk.ac.in"
-            className="inline-flex h-9 min-w-[160px] items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+            className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
           >
             Email
           </a>
@@ -365,7 +365,7 @@ const Contact = () => {
             href="https://x.com/chessiitk"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-9 min-w-[160px] items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+            className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
           >
             X
           </a>
@@ -374,7 +374,7 @@ const Contact = () => {
             href="https://www.linkedin.com/company/chess-iitk/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-9 min-w-[160px] items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+            className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
           >
             LinkedIn
           </a>
@@ -383,7 +383,7 @@ const Contact = () => {
             href="https://www.facebook.com/chessclubiitk/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-9 min-w-[160px] items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+            className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
           >
             Facebook
           </a>
@@ -392,7 +392,7 @@ const Contact = () => {
             href="https://www.chess.com/club/iitk-chess-club"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-9 min-w-[160px] items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+            className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
           >
             Chess.com
           </a>
@@ -401,7 +401,7 @@ const Contact = () => {
             href="https://www.threads.com/@chessiitk?xmt=AQG0WclpAXcX0l6MVRZkMQ6ltp7AQi8X1H4vyrFo6qXNahU"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-9 min-w-[160px] items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+            className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary sm:col-span-2"
           >
             Threads
           </a>
@@ -415,6 +415,7 @@ const Contact = () => {
     </div>
   </div>
 </footer>
+
 
     </div>
   );
