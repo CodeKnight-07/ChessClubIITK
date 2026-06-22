@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body {
+  overflow-x: clip;
+}
+
 body { 
   font-family: 'Manrope', sans-serif; 
   background-color: #131313; 

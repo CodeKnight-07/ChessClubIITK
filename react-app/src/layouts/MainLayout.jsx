@@ -2,7 +2,7 @@ import Navbar from '../components/Navbar';
 
 const MainLayout = ({ children }) => {
   return (
-    <div className="min-h-screen bg-surface text-on-surface overflow-x-hidden">
+    <div className="min-h-screen bg-surface text-on-surface">
       <Navbar />
       <main className="w-full">
         {children}
