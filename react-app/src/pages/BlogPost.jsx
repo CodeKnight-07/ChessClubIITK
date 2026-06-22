@@ -86,7 +86,7 @@ const BlogPost = () => {
             </div>
             <div className="pt-0.5">
               <p className="text-sm font-bold text-on-surface leading-tight m-0">Laksh Dhir</p>
-              <p className="text-[10px] text-on-surface-variant font-label uppercase tracking-widest leading-tight mt-1 m-0">
+              <p className="text-[10px] text-on-surface-variant font-label uppercase tracking-widest leading-tight m-0">
                 Coordinator, Chess Club IITK
               </p>
             </div>
