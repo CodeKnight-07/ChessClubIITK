@@ -36,7 +36,7 @@ const Navbar = () => {
             src={logo} 
           />
           <div className="flex flex-col">
-            <span className="text-xl font-headline italic text-primary leading-none">Chess Club IITK</span>
+            <span className="text-xl font-headline text-primary leading-none">Chess Club IITK</span>
             <span className="text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/60 font-bold">IIT Kanpur</span>
           </div>
         </Link>
