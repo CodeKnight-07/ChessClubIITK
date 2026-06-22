@@ -161,7 +161,7 @@ const Landing = () => {
         </div>
       </motion.section>
 
-      <footer className="bg-surface-container-lowest border-t border-outline-variant/10 px-12 py-16 lg:px-20">
+     <footer className="bg-surface-container-lowest border-t border-outline-variant/10 px-12 py-16 lg:px-20">
   <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
     <div className="col-span-1 md:col-span-2">
       <h4 className="mb-4 text-xl font-serif text-primary">Chess Club IITK</h4>
@@ -218,19 +218,19 @@ const Landing = () => {
       <h5 className="mb-6 text-sm font-label uppercase tracking-widest text-primary">
         Connect
       </h5>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-1">
+      <div className="grid grid-cols-2 gap-3">
         <a
           href="https://www.instagram.com/chessiitk/"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex h-9 items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+          className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
         >
           Instagram
         </a>
 
         <a
           href="mailto:chessclub@iitk.ac.in"
-          className="inline-flex h-9 items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+          className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
         >
           Email
         </a>
@@ -239,7 +239,7 @@ const Landing = () => {
           href="https://x.com/chessiitk"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex h-9 items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+          className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
         >
           X
         </a>
@@ -248,7 +248,7 @@ const Landing = () => {
           href="https://www.linkedin.com/company/chess-iitk/"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex h-9 items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+          className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
         >
           LinkedIn
         </a>
@@ -257,7 +257,7 @@ const Landing = () => {
           href="https://www.facebook.com/chessclubiitk/"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex h-9 items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+          className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
         >
           Facebook
         </a>
@@ -266,7 +266,7 @@ const Landing = () => {
           href="https://www.chess.com/club/iitk-chess-club"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex h-9 items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+          className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
         >
           Chess.com
         </a>
@@ -275,7 +275,7 @@ const Landing = () => {
           href="https://www.threads.com/@chessiitk?xmt=AQG0WclpAXcX0l6MVRZkMQ6ltp7AQi8X1H4vyrFo6qXNahU"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex h-9 items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+          className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary col-span-2"
         >
           Threads
         </a>
@@ -288,6 +288,7 @@ const Landing = () => {
     <p>Designed for the Intellectual Elite</p>
   </div>
 </footer>
+
 
     </>
   );
