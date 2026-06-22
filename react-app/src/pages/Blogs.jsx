@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import fresherImg from '../assets/fresher_league_recap_1775765383248.png';
+import fresherImg from '../assets/fcl.png';
 import grandSwissImg from '../assets/grand_swiss_recap_1775765397656.png';
 import smotheredMateImg from '../assets/smothered_mate_puzzle_1775765413177.png';
 import endgameImg from '../assets/endgame_puzzle_1775765427614.png';

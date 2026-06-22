@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
-import fresherImg from '../assets/fresher_league_recap_1775765383248.png';
+import fresherImg from '../assets/fcl.png';
 import tournamentImg from '../assets/fide.png';
 
 const BlogPost = () => {
@@ -109,7 +109,7 @@ const BlogPost = () => {
       </div>
 
       {/* Article Body */}
-      <div className="font-body text-lg text-on-surface-variant">
+      <article className="font-body text-lg text-on-surface-variant">
         <p className="text-2xl text-on-surface font-serif leading-relaxed mb-10 first-letter:float-left first-letter:text-7xl first-letter:pr-4 first-letter:font-serif first-letter:text-primary">
           Recapping the absolute hype surrounding the offline auctions in the Senate Hall, analyzing the intense Round Robin pool matches at the OAT, and spotlighting the brilliant knockout blunders that ultimately led the underdogs to gold memberships.
         </p>
@@ -134,7 +134,7 @@ const BlogPost = () => {
         </div>
 
         <p>If you missed this event, don't worry! Keep grinding your tactics, analyzing your blunders, and we will see you back on the board for the upcoming IITK Grand Swiss qualifiers!</p>
-      </div>
+      </article>
 
       {/* Footer Nav */}
       <div className="mt-20 border-t border-outline-variant/15 pt-10 flex items-center justify-between">
