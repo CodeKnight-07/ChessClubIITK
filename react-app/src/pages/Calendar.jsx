@@ -385,96 +385,134 @@ const Calendar = () => {
         </div> 
       </main>
 
-      <footer className="w-full border-t border-outline-variant/10 bg-surface-container-lowest">
-        <div className="mx-auto max-w-7xl px-6 py-14 sm:px-8 md:px-10 lg:px-12">
-          <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
-            <div className="max-w-md">
-              <h6 className="m-0 text-xl font-serif text-primary sm:text-2xl">
-                Chess Club IITK
-              </h6>
-              <p className="mt-4 m-0 max-w-sm text-sm leading-relaxed text-on-surface-variant">
-                The official intellectual repository and match-log of the Chess Club at
-                the Indian Institute of Technology, Kanpur. Founded for the love of the
-                game, sustained by the pursuit of logic.
-              </p>
-            </div>
+      <footer className="bg-surface-container-lowest border-t border-outline-variant/10 px-12 py-16 lg:px-20">
+  <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
+    <div className="col-span-1 md:col-span-2">
+      <h4 className="mb-4 text-xl font-serif text-primary">Chess Club IITK</h4>
+      <p className="mb-6 max-w-sm text-on-surface-variant">
+        The official digital portal for the IIT Kanpur Chess Club. Archiving brilliance since 2007.
+      </p>
+      <div className="flex gap-4">
+        <a
+          href="https://www.chess.com/club/iitk-chess-club"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-surface-container transition-colors hover:bg-primary hover:text-on-primary"
+        >
+          <span className="material-symbols-outlined">public</span>
+        </a>
+        <a
+          href="mailto:chessclub@iitk.ac.in"
+          className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-surface-container transition-colors hover:bg-primary hover:text-on-primary"
+        >
+          <span className="material-symbols-outlined">mail</span>
+        </a>
+      </div>
+    </div>
 
-            <div className="md:max-w-md md:text-right">
-              <p className="m-0 text-[10px] font-label uppercase tracking-widest text-primary">
-                Connect
-              </p>
+    <div>
+      <h5 className="mb-6 text-sm font-label uppercase tracking-widest text-primary">
+        Organization
+      </h5>
+      <ul className="space-y-3 text-sm text-on-surface-variant">
+        <li>
+          <span className="cursor-pointer transition-colors hover:text-primary">
+            Our History
+          </span>
+        </li>
+        <li>
+          <span className="cursor-pointer transition-colors hover:text-primary">
+            Core Committee
+          </span>
+        </li>
+        <li>
+          <span className="cursor-pointer transition-colors hover:text-primary">
+            Alumni Network
+          </span>
+        </li>
+        <li>
+          <span className="cursor-pointer transition-colors hover:text-primary">
+            Hall of Fame
+          </span>
+        </li>
+      </ul>
+    </div>
 
-              <div className="mt-5 flex flex-wrap gap-3 md:justify-end">
-                <a
-                  href="https://www.instagram.com/chessiitk/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-9 items-center justify-center rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
-                >
-                  Instagram
-                </a>
+    <div>
+      <h5 className="mb-6 text-sm font-label uppercase tracking-widest text-primary">
+        Connect
+      </h5>
+      <div className="grid grid-cols-2 gap-3">
+        <a
+          href="https://www.instagram.com/chessiitk/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+        >
+          Instagram
+        </a>
 
-                <a
-                  href="mailto:chessclub@iitk.ac.in"
-                  className="inline-flex h-9 items-center justify-center rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
-                >
-                  Email
-                </a>
+        <a
+          href="mailto:chessclub@iitk.ac.in"
+          className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+        >
+          Email
+        </a>
 
-                <a
-                  href="https://x.com/chessiitk"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-9 items-center justify-center rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
-                >
-                  X
-                </a>
+        <a
+          href="https://x.com/chessiitk"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+        >
+          X
+        </a>
 
-                <a
-                  href="https://www.linkedin.com/company/chess-iitk/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-9 items-center justify-center rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
-                >
-                  LinkedIn
-                </a>
+        <a
+          href="https://www.linkedin.com/company/chess-iitk/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+        >
+          LinkedIn
+        </a>
 
-                <a
-                  href="https://www.facebook.com/chessclubiitk/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-9 items-center justify-center rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
-                >
-                  Facebook
-                </a>
+        <a
+          href="https://www.facebook.com/chessclubiitk/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+        >
+          Facebook
+        </a>
 
-                <a
-                  href="https://www.chess.com/club/iitk-chess-club"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-9 items-center justify-center rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
-                >
-                  Chess.com
-                </a>
+        <a
+          href="https://www.chess.com/club/iitk-chess-club"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
+        >
+          Chess.com
+        </a>
 
-                <a
-                  href="https://www.threads.com/@chessiitk?xmt=AQG0WclpAXcX0l6MVRZkMQ6ltp7AQi8X1H4vyrFo6qXNahU"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-9 items-center justify-center rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary"
-                >
-                  Threads
-                </a>
-              </div>
-            </div>
-          </div>
+        <a
+          href="https://www.threads.com/@chessiitk?xmt=AQG0WclpAXcX0l6MVRZkMQ6ltp7AQi8X1H4vyrFo6qXNahU"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary col-span-2"
+        >
+          Threads
+        </a>
+      </div>
+    </div>
+  </div>
 
-          <div className="mt-12 flex flex-col gap-3 border-t border-outline-variant/10 pt-6 text-[10px] font-label uppercase tracking-widest text-on-surface-variant/50 sm:flex-row sm:items-center sm:justify-between">
-            <span>© 2026 Chess Club IITK. Intellectual Property Reserved.</span>
-            <span>Est. 1960</span>
-          </div>
-        </div>
-      </footer>
+  <div className="mt-16 flex items-center justify-between border-t border-outline-variant/5 pt-8 text-[10px] uppercase tracking-widest text-on-surface-variant/40">
+    <p>© 2026 IIT Kanpur Chess Club. All Rights Reserved.</p>
+    <p>Designed for the Intellectual Elite</p>
+  </div>
+</footer>
+
 
       {isLoggedIn && (
         <button
