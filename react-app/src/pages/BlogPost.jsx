@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import fresherImg from '../assets/fresher_league_recap_1775765383248.png';
-import tournamentImg from '../assets/chess_tournament_gallery_1775821881801.png';
+import tournamentImg from '../assets/fide.png';
 
 const BlogPost = () => {
   const { id } = useParams();
