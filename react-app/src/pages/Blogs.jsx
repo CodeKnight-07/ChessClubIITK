@@ -160,7 +160,7 @@ const Blogs = () => {
 
               <div className="flex flex-wrap gap-3">
                 <a
-                  href="https://instagram.com/"
+                  href="https://www.instagram.com/chessiitk/"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
@@ -178,7 +178,7 @@ const Blogs = () => {
                 </a>
 
                 <a
-                  href="https://x.com/"
+                  href="https://x.com/chessiitk"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="X"
@@ -188,7 +188,7 @@ const Blogs = () => {
                 </a>
 
                 <a
-                  href="https://linkedin.com/"
+                  href="https://www.linkedin.com/company/chess-iitk/"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="LinkedIn"
@@ -198,7 +198,7 @@ const Blogs = () => {
                 </a>
 
                 <a
-                  href="https://facebook.com/"
+                  href="https://www.facebook.com/chessclubiitk/"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Facebook"
@@ -208,7 +208,7 @@ const Blogs = () => {
                 </a>
 
                 <a
-                  href="https://www.chess.com/club/"
+                  href="https://www.chess.com/club/iitk-chess-club"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Chess.com"
@@ -218,7 +218,7 @@ const Blogs = () => {
                 </a>
 
                 <a
-                  href="https://threads.net/"
+                  href="https://www.threads.com/@chessiitk?xmt=AQG0WclpAXcX0l6MVRZkMQ6ltp7AQi8X1H4vyrFo6qXNahU"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Threads"
@@ -228,7 +228,6 @@ const Blogs = () => {
                 </a>
               </div>
             </div>
-
 
           </div>
         </div>
