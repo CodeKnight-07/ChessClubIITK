@@ -16,15 +16,6 @@ const BLOG_POSTS = [
     author: "Tanmay Sahare",
     image: fresherImg
   },
-  {
-    id: 5,
-    title: "IIT Kanpur's First FIDE-Rated Rapid Tournament: A New Chapter",
-    date: "January 26, 2026",
-    tag: "Tournament News",
-    excerpt: "IIT Kanpur steps onto the rated chess map with its first FIDE-rated rapid tournament, a 9-round Swiss event carrying a prize pool of INR 2,00,000.",
-    author: "Chess Club IITK",
-    image: tournamentImg
-  },
   // {
   //   id: 3,
   //   title: "IITK Grand Swiss: Path to the Candidates",

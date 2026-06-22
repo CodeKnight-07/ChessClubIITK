@@ -32,10 +32,11 @@ const BlogPost = () => {
           </div>
         </div>
 
-        <div className="w-full h-[400px] rounded-xl overflow-hidden mb-16 relative shadow-2xl shadow-black/50">
-          <img alt="IIT Kanpur FIDE-rated rapid tournament" className="w-full h-full object-cover" src={tournamentImg}/>
-          <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-60"></div>
+        <div className="w-full h-[700px] rounded-xl overflow-hidden mb-16 relative shadow-2xl shadow-black/50 bg-black/20">
+          <img alt="IIT Kanpur FIDE-rated rapid tournament" className="w-full h-full object-contain" src={tournamentImg}/>
+          <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-40 pointer-events-none"></div>
         </div>
+
 
         <article className="font-body text-lg text-on-surface-variant">
           <p className="text-2xl text-on-surface font-serif leading-relaxed mb-10 first-letter:float-left first-letter:text-7xl first-letter:pr-4 first-letter:font-serif first-letter:text-primary">
