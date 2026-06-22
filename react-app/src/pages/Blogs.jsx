@@ -101,7 +101,7 @@ const Blogs = () => {
       <div className={`flex items-end justify-between mb-12 ${viewMode === 'list' ? 'max-w-4xl mx-auto' : ''}`}>
         <div>
           <h3 className="text-xs font-label uppercase tracking-[0.2em] text-primary mb-2">The Archive</h3>
-          <h4 className="text-4xl font-serif font-bold">Lates Dispatches</h4>
+          <h4 className="text-4xl font-serif font-bold">Latest Dispatches</h4>
         </div>
         <div className="flex space-x-2">
           <button 
