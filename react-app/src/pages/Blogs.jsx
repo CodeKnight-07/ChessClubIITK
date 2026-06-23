@@ -124,10 +124,10 @@ const Blogs = () => {
         {BLOG_POSTS.map((post, idx) => (
           <motion.div
             key={post.id}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 60 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5, delay: (idx % 3) * 0.1, ease: "easeOut" }}
+            transition={{ duration: 0.8, delay: (idx % 3) * 0.08, ease: [0.16, 1, 0.3, 1] }}
             className="h-full"
           >
             <Link to={`/blog/${post.id}`} className={`flex bg-surface-container-low group cursor-pointer border border-transparent hover:border-outline-variant/20 transition-all duration-300 h-full ${viewMode === 'grid' ? 'flex-col' : 'flex-col md:flex-row'}`}>

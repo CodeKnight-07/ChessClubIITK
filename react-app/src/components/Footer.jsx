@@ -10,7 +10,7 @@ const Footer = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.6, delay: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0 }}
           className="col-span-1 md:col-span-2"
         >
           <h4 className="mb-4 text-xl font-serif text-primary">Chess Club IITK</h4>
@@ -24,7 +24,7 @@ const Footer = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
         >
           <h5 className="mb-6 text-sm font-label uppercase tracking-widest text-primary">
             Organization
@@ -58,7 +58,7 @@ const Footer = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.16 }}
         >
           <h5 className="mb-6 text-sm font-label uppercase tracking-widest text-primary">
             Connect
@@ -195,7 +195,7 @@ const Footer = () => {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-20px" }}
-        transition={{ duration: 0.8, delay: 0.3 }}
+        transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.24 }}
         className="mt-16 flex items-center justify-between border-t border-outline-variant/5 pt-8 text-[10px] uppercase tracking-widest text-on-surface-variant/40"
       >
         <p>© 2026 IIT Kanpur Chess Club. All Rights Reserved.</p>

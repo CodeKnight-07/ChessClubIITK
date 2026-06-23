@@ -118,10 +118,10 @@ const Landing = () => {
       </section>
 
       <motion.section
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 70 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
         className="py-24 px-12 lg:px-20 gap-8"
       >
         <div className="col-span-12 lg:col-span-5 mb-12 lg:mb-0">

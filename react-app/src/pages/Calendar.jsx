@@ -151,9 +151,9 @@ const Calendar = () => {
   return (
     <>
       <motion.main
-        initial={{ opacity: 0, y: 15 }}
+        initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="mx-auto min-h-screen max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10"
       >
         <div className="mb-8 md:mb-10">

@@ -90,10 +90,10 @@ const Events = () => {
             return (
               <motion.div
                 key={event.id}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 60 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: (idx % 3) * 0.1, ease: "easeOut" }}
+                transition={{ duration: 0.8, delay: (idx % 3) * 0.08, ease: [0.16, 1, 0.3, 1] }}
                 className={`overflow-hidden rounded-2xl border transition-all duration-500 ${
                   isExpanded
                     ? 'border-primary/40 bg-surface-container shadow-[0_12px_36px_rgba(212,175,55,0.08)]'
