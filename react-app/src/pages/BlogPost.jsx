@@ -24,8 +24,8 @@ const BlogPost = () => {
               <span className="material-symbols-outlined text-primary font-bold">person</span>
             </div>
             <div>
-              <p className="text-sm font-bold text-on-surface">Devansh Singh</p>
-              <p className="text-[10px] text-on-surface-variant font-label uppercase tracking-widest">Author, ChessBase India</p>
+              <p className="text-sm font-bold text-on-surface">Laksh Dhir</p>
+              <p className="text-[10px] text-on-surface-variant font-label uppercase tracking-widest">Coordinator, Chess Club IITK</p>
             </div>
           </div>
           <div className="h-8 w-px bg-outline-variant/30"></div>
@@ -41,14 +41,14 @@ const BlogPost = () => {
 
         <article className="font-body text-lg text-on-surface-variant space-y-12">
           <p className="text-2xl text-on-surface font-serif leading-relaxed mb-10 first-letter:float-left first-letter:text-7xl first-letter:pr-4 first-letter:font-serif first-letter:text-primary">
-            Top seed Anuj Shrivatri wins SBI GIC Fide Rated Rapid Tournament 2026 at IIT Kanpur. Anuj scored 8/9 points to secure the victory. He was leading the event with 8/8 points going into the 9th round, Anuj lost to Arnav Agrawal, a young talent from the host state Uttar Pradesh. This important win helped Arnav to secure second place with 8/9 points. India's latest GM Aaryav Varshney and IM Aaditya Dhingra also scored 8/9 points to secure 3rd and 4th positions, respectively, on tiebreaks. This one-day rapid-rated event was organized in the IIT Kanpur campus on 7th February with a total cash prize of ₹2,00,000. Photos: Akshat Srivastava/ChessClub IITK
+            Top seed Anuj Shrivatri wins SBI GIC Fide Rated Rapid Tournament 2026 at IIT Kanpur. Anuj scored 8/9 points to secure the victory. He was leading the event with 8/8 points going into the 9th round, Anuj lost to Arnav Agrawal, a young talent from the host state Uttar Pradesh. This important win helped Arnav to secure second place with 8/9 points. India's latest GM Aaryav Varshney and IM Aaditya Dhingra also scored 8/9 points to secure 3rd and 4th positions, respectively, on tiebreaks. This one-day rapid-rated event was organized in the IIT Kanpur campus on 7th February with a total cash prize of ₹2,00,000.
           </p>
 
           <h2 className="text-3xl font-serif font-bold text-on-surface mt-16 mb-6 border-b border-outline-variant/15 pb-2">
             Anuj's 4th-Rated Tournament victory this year!!
           </h2>
           <p>
-            IM Anuj Shrivatri is on an unstoppable winning run right now. This is Anuj's 4th rated tournament victory, and the year just started. Anuj started the year by winning the <a target="_blank" rel="noopener noreferrer" href="https://www.chessbase.in/news/2nd-khelo-chess-india-rapid-and-blitz-report" className="text-primary hover:underline">2nd Khelo Chess India Rapid and Blitz</a>, then he won the <a target="_blank" rel="noopener noreferrer" href="https://www.chessbase.in/news/anuj-shrivatri-wins-2nd-rejoice-chanakya-ctf-fide-rapid-rating-2026" className="text-primary hover:underline">2nd Rejoice Chanakya CTF Fide Rapid Rating 2026</a>, and now he won this one-day rapid event at IITK.
+            IM Anuj Shrivatri is on an unstoppable winning run right now. This is Anuj's 4th rated tournament victory, and the year just started. Anuj started the year by winning the 2nd Khelo Chess India Rapid and Blitz, then he won the 2nd Rejoice Chanakya CTF Fide Rapid Rating 2026, and now he won this one-day rapid event at IITK.
           </p>
           <p>
             A total of 336 players took part in this event, including 4 International Masters, 1 Fide master, and 2 Candidate Masters. 9 rounds are played in Swiss format with the time control of 10+5 Minutes at Yoga Hall, New SAC, IIT Kanpur Campus.
@@ -89,28 +89,28 @@ const BlogPost = () => {
           <div className="space-y-6 my-8">
             <blockquote className="border-l-4 border-primary pl-6 py-2 bg-surface-container-low p-6 rounded-r-xl border border-outline-variant/15">
               <p className="text-primary font-bold font-label text-sm uppercase tracking-wider mb-2">Devansh Singh (DS)</p>
-              <p className="italic text-on-surface font-serif text-lg leading-relaxed mb-4">How does it feel to win this tournament?</p>
+              <p className="text-on-surface font-serif text-lg leading-relaxed mb-4">How does it feel to win this tournament?</p>
               <p className="text-primary font-bold font-label text-sm uppercase tracking-wider mb-2">Anuj Shrivatri (AS)</p>
               <p className="text-on-surface-variant leading-relaxed">It feels great, the tournament was overall well organized and it was worth it to visit the IIT Kanpur campus.</p>
             </blockquote>
 
             <blockquote className="border-l-4 border-primary pl-6 py-2 bg-surface-container-low p-6 rounded-r-xl border border-outline-variant/15">
               <p className="text-primary font-bold font-label text-sm uppercase tracking-wider mb-2">Devansh Singh (DS)</p>
-              <p className="italic text-on-surface font-serif text-lg leading-relaxed mb-4">Which match was the toughest for you and why?</p>
+              <p className="text-on-surface font-serif text-lg leading-relaxed mb-4">Which match was the toughest for you and why?</p>
               <p className="text-primary font-bold font-label text-sm uppercase tracking-wider mb-2">Anuj Shrivatri (AS)</p>
               <p className="text-on-surface-variant leading-relaxed">Maybe against Aaryan, because after opening the position was tense and unclear and it quickly became complicated.</p>
             </blockquote>
 
             <blockquote className="border-l-4 border-primary pl-6 py-2 bg-surface-container-low p-6 rounded-r-xl border border-outline-variant/15">
               <p className="text-primary font-bold font-label text-sm uppercase tracking-wider mb-2">Devansh Singh (DS)</p>
-              <p className="italic text-on-surface font-serif text-lg leading-relaxed mb-4">What is one lesson this tournament taught you?</p>
+              <p className="text-on-surface font-serif text-lg leading-relaxed mb-4">What is one lesson this tournament taught you?</p>
               <p className="text-primary font-bold font-label text-sm uppercase tracking-wider mb-2">Anuj Shrivatri (AS)</p>
               <p className="text-on-surface-variant leading-relaxed">One takeaway was not to relax too early, before last round I was pretty sure that even if I lose, I'll most likely be 1st. So I wasn't too much focused in the last match which caused a lot of blunders.</p>
             </blockquote>
 
             <blockquote className="border-l-4 border-primary pl-6 py-2 bg-surface-container-low p-6 rounded-r-xl border border-outline-variant/15">
               <p className="text-primary font-bold font-label text-sm uppercase tracking-wider mb-2">Devansh Singh (DS)</p>
-              <p className="italic text-on-surface font-serif text-lg leading-relaxed mb-4">Anything else you'd like to share, maybe a game from the event</p>
+              <p className="text-on-surface font-serif text-lg leading-relaxed mb-4">Anything else you'd like to share, maybe a game from the event</p>
               <p className="text-primary font-bold font-label text-sm uppercase tracking-wider mb-2">Anuj Shrivatri (AS)</p>
               <p className="text-on-surface-variant leading-relaxed">Yes, the game with Aaditya Dhingra</p>
             </blockquote>
@@ -237,17 +237,11 @@ const BlogPost = () => {
             </div>
           </div>
 
-          <div className="my-8 text-center">
-            <a target="_blank" rel="noopener noreferrer" href="https://photos.app.goo.gl/xPTGKbL3mc9Wgi5j8" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-label text-sm uppercase tracking-widest rounded-lg hover:bg-primary/95 transition-all shadow-lg">
-              <span className="material-symbols-outlined text-sm">photo_library</span>
-              View Photo Gallery
-            </a>
-          </div>
 
-          <h2 className="text-3xl font-serif font-bold text-on-surface mt-16 mb-6 border-b border-outline-variant/15 pb-2 text-center italic">
+          <h2 className="text-3xl font-serif font-bold text-on-surface mt-16 mb-6 border-b border-outline-variant/15 pb-2 text-center">
             What This Meant to Us - Chess Club IITK
           </h2>
-          <blockquote className="border-l-4 border-primary pl-6 my-8 italic text-on-surface/90 bg-primary/5 p-6 rounded-r-xl space-y-4">
+          <blockquote className="border-l-4 border-primary pl-6 my-8 text-on-surface/90 bg-primary/5 p-6 rounded-r-xl space-y-4">
             <p>This tournament wasn’t perfect. We learned a lot. We improvised a lot. We ran on adrenaline and chai for most of the day.</p>
             <p>But it worked.</p>
             <p>It proved that IIT Kanpur can host a professional, large-scale, FIDE-rated event!</p>
@@ -322,9 +316,6 @@ const BlogPost = () => {
             </div>
           </div>
 
-          <p className="text-sm font-label text-on-surface-variant/70 italic text-center mt-12">
-            Thanks to Akshat Srivastava, Coordinator, Chess Club IITK, for sharing photographs and information about the tournament and chess culture at IITK
-          </p>
 
           <h2 className="text-3xl font-serif font-bold text-on-surface mt-16 mb-6 border-b border-outline-variant/15 pb-2">
             Final Ranking after 9 Rounds
@@ -375,9 +366,6 @@ const BlogPost = () => {
               </tbody>
             </table>
           </div>
-          <p className="text-sm font-label text-on-surface-variant/70 text-center">
-            For the complete list, visit <a target="_blank" rel="noopener noreferrer" href="https://s1.chess-results.com/tnr1341791.aspx?lan=1&amp;art=1&amp;rd=9&amp;flag=30&amp;SNode=S0" className="text-primary hover:underline">Chess Results Details</a>
-          </p>
         </article>
 
         <div className="mt-20 border-t border-outline-variant/15 pt-10 flex items-center justify-between">
