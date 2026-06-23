@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import Footer from '../components/Footer';
 
@@ -83,12 +84,16 @@ const Events = () => {
         </div>
 
         <div className="space-y-5">
-          {OFFICIAL_EVENTS.map((event) => {
+          {OFFICIAL_EVENTS.map((event, idx) => {
             const isExpanded = expandedId === event.id;
 
             return (
-              <div
+              <motion.div
                 key={event.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, delay: (idx % 3) * 0.1, ease: "easeOut" }}
                 className={`overflow-hidden rounded-2xl border transition-all duration-500 ${
                   isExpanded
                     ? 'border-primary/40 bg-surface-container shadow-[0_12px_36px_rgba(212,175,55,0.08)]'
@@ -225,9 +230,10 @@ const Events = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
+
         </div>
       </main>
 

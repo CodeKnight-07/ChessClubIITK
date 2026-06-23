@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import fresherImg from '../assets/fcl.png';
 import grandSwissImg from '../assets/grand_swiss_recap_1775765397656.png';
 import winnerImg from '../assets/anuj_shivratri.png';
@@ -120,26 +121,35 @@ const Blogs = () => {
       </div>
 
       <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" : "flex flex-col space-y-6 max-w-4xl mx-auto"}>
-        {BLOG_POSTS.map(post => (
-          <Link key={post.id} to={`/blog/${post.id}`} className={`flex bg-surface-container-low group cursor-pointer border border-transparent hover:border-outline-variant/20 transition-all duration-300 ${viewMode === 'grid' ? 'flex-col' : 'flex-col md:flex-row'}`}>
-            <div className={`overflow-hidden relative ${viewMode === 'grid' ? 'h-100' : 'h-64 md:h-full md:w-48 flex-shrink-0'}`}>
-              <img alt={post.tag} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src={post.image} />
-              <div className="absolute top-4 left-4">
-                <span className="bg-surface/80 backdrop-blur-md px-3 py-1 text-[9px] font-label tracking-widest uppercase text-on-surface rounded-sm">{post.tag}</span>
+        {BLOG_POSTS.map((post, idx) => (
+          <motion.div
+            key={post.id}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, delay: (idx % 3) * 0.1, ease: "easeOut" }}
+            className="h-full"
+          >
+            <Link to={`/blog/${post.id}`} className={`flex bg-surface-container-low group cursor-pointer border border-transparent hover:border-outline-variant/20 transition-all duration-300 h-full ${viewMode === 'grid' ? 'flex-col' : 'flex-col md:flex-row'}`}>
+              <div className={`overflow-hidden relative ${viewMode === 'grid' ? 'h-100' : 'h-64 md:h-full md:w-48 flex-shrink-0'}`}>
+                <img alt={post.tag} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src={post.image} />
+                <div className="absolute top-4 left-4">
+                  <span className="bg-surface/80 backdrop-blur-md px-3 py-1 text-[9px] font-label tracking-widest uppercase text-on-surface rounded-sm">{post.tag}</span>
+                </div>
               </div>
-            </div>
-            <div className={`flex flex-col flex-grow ${viewMode === 'grid' ? 'p-8' : 'p-6 md:p-8'}`}>
-              <span className="text-[10px] font-label text-on-surface-variant/50 uppercase mb-3">{post.date}</span>
-              <h5 className="text-xl font-serif font-bold mb-4 group-hover:text-primary transition-colors">{post.title}</h5>
-              <p className={`text-sm text-on-surface-variant leading-relaxed line-clamp-3 ${viewMode === 'grid' ? 'mb-6' : 'mb-4'}`}>
-                {post.excerpt}
-              </p>
-              <div className="mt-auto flex items-center justify-between">
-                <span className="text-[10px] font-label text-on-surface uppercase">By {post.author}</span>
-                <span className="material-symbols-outlined text-primary text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+              <div className={`flex flex-col flex-grow ${viewMode === 'grid' ? 'p-8' : 'p-6 md:p-8'}`}>
+                <span className="text-[10px] font-label text-on-surface-variant/50 uppercase mb-3">{post.date}</span>
+                <h5 className="text-xl font-serif font-bold mb-4 group-hover:text-primary transition-colors">{post.title}</h5>
+                <p className={`text-sm text-on-surface-variant leading-relaxed line-clamp-3 ${viewMode === 'grid' ? 'mb-6' : 'mb-4'}`}>
+                  {post.excerpt}
+                </p>
+                <div className="mt-auto flex items-center justify-between">
+                  <span className="text-[10px] font-label text-on-surface uppercase">By {post.author}</span>
+                  <span className="material-symbols-outlined text-primary text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </div>
               </div>
-            </div>
-          </Link>
+            </Link>
+          </motion.div>
         ))}
       </div>
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import profileImg from '../assets/profile_image.webp';
 import Footer from '../components/Footer';
 
@@ -266,8 +267,14 @@ const SECRETARIES = Array.from({ length: 26 }, (_, i) => ({
 ]
 */
 
-const ContactCard = ({ person }) => (
-  <div className="group relative bg-surface-container-low rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_20px_40px_rgba(242,202,80,0.15)] transition-all duration-500 hover:-translate-y-2 flex flex-col h-full border border-outline-variant/5 hover:border-primary/30 cursor-pointer">
+const ContactCard = ({ person, index }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-50px" }}
+    transition={{ duration: 0.6, delay: (index % 5) * 0.1, ease: "easeOut" }}
+    className="group relative bg-surface-container-low rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_20px_40px_rgba(242,202,80,0.15)] transition-all duration-500 hover:-translate-y-2 flex flex-col h-full border border-outline-variant/5 hover:border-primary/30 cursor-pointer"
+  >
     <div className="relative h-72 overflow-hidden flex-shrink-0">
       <img
         alt={person.name}
@@ -293,7 +300,7 @@ const ContactCard = ({ person }) => (
         {person.funnyDescription}
       </p>
     </div>
-  </div>
+  </motion.div>
 );
 
 const Contact = () => {
@@ -307,8 +314,8 @@ const Contact = () => {
           <h2 className="text-5xl font-serif font-bold tracking-tighter text-on-surface">Coordinators</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
-          {COORDINATORS.map(person => (
-            <ContactCard key={person.id} person={person} />
+          {COORDINATORS.map((person, idx) => (
+            <ContactCard key={person.id} person={person} index={idx} />
           ))}
         </div>
       </section>
@@ -320,8 +327,8 @@ const Contact = () => {
           <h2 className="text-5xl font-serif font-bold tracking-tighter text-on-surface">Secretaries</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {SECRETARIES.map(person => (
-            <ContactCard key={person.id} person={person} />
+          {SECRETARIES.map((person, idx) => (
+            <ContactCard key={person.id} person={person} index={idx} />
           ))}
         </div>
       </section>
