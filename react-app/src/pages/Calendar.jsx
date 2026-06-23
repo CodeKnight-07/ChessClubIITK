@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import AddEventModal from '../components/AddEventModal';
 import ViewDayModal from '../components/ViewDayModal';
 import { useAuth } from '../context/AuthContext';
+import { motion } from 'framer-motion';
 import Footer from '../components/Footer';
 
 const PRE_SCHEDULED_EVENTS = [
@@ -149,7 +150,12 @@ const Calendar = () => {
 
   return (
     <>
-      <main className="mx-auto min-h-screen max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+      <motion.main
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="mx-auto min-h-screen max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10"
+      >
         <div className="mb-8 md:mb-10">
           <div className="max-w-3xl">
             <h2 className="text-4xl font-serif leading-tight text-on-surface sm:text-5xl">
@@ -384,7 +390,8 @@ const Calendar = () => {
             </div>
           </div>
         </div> 
-      </main>
+      </motion.main>
+
 
       <Footer />
 

@@ -1,19 +1,31 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const Footer = () => {
   return (
     <footer className="bg-surface-container-lowest border-t border-outline-variant/10 px-12 py-16 lg:px-20">
       <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
         {/* Brand Info */}
-        <div className="col-span-1 md:col-span-2">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0 }}
+          className="col-span-1 md:col-span-2"
+        >
           <h4 className="mb-4 text-xl font-serif text-primary">Chess Club IITK</h4>
           <p className="mb-6 max-w-sm text-on-surface-variant">
             The official digital portal for the IIT Kanpur Chess Club. Archiving brilliance since 2007.
           </p>
-        </div>
+        </motion.div>
 
         {/* Organization Links */}
-        <div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
+        >
           <h5 className="mb-6 text-sm font-label uppercase tracking-widest text-primary">
             Organization
           </h5>
@@ -39,10 +51,15 @@ const Footer = () => {
               </span>
             </li>
           </ul>
-        </div>
+        </motion.div>
 
         {/* Connect Links */}
-        <div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.16 }}
+        >
           <h5 className="mb-6 text-sm font-label uppercase tracking-widest text-primary">
             Connect
           </h5>
@@ -104,7 +121,7 @@ const Footer = () => {
               </a>
 
               <a
-                href="https://www.youtube.com/@chessiitk" 
+                href="https://www.youtube.com/@chessiitk"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex h-9 w-full items-center justify-start rounded-full border border-outline-variant/30 px-4 text-xs font-medium text-on-surface-variant transition-all hover:border-primary hover:text-primary gap-2"
@@ -171,14 +188,21 @@ const Footer = () => {
               </a>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      <div className="mt-16 flex items-center justify-between border-t border-outline-variant/5 pt-8 text-[10px] uppercase tracking-widest text-on-surface-variant/40">
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: "-20px" }}
+        transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.24 }}
+        className="mt-16 flex items-center justify-between border-t border-outline-variant/5 pt-8 text-[10px] uppercase tracking-widest text-on-surface-variant/40"
+      >
         <p>© 2026 IIT Kanpur Chess Club. All Rights Reserved.</p>
         <p>Designed for the Intellectual Elite</p>
-      </div>
+      </motion.div>
     </footer>
+
   );
 };
 

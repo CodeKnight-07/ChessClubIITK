@@ -117,7 +117,13 @@ const Landing = () => {
         </motion.div>
       </section>
 
-      <section className="py-24 px-12 lg:px-20 gap-8">
+      <motion.section
+        initial={{ opacity: 0, y: 70 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+        className="py-24 px-12 lg:px-20 gap-8"
+      >
         <div className="col-span-12 lg:col-span-5 mb-12 lg:mb-0">
           <p className="text-primary font-label text-xs tracking-[0.3em] uppercase mb-4">Establishing Excellence</p>
           <h3 className="text-5xl font-serif mb-8 leading-tight">Beyond the 64 Squares</h3>
@@ -132,7 +138,7 @@ const Landing = () => {
         </div>
         <div className="col-span-12 lg:col-span-7 flex flex-wrap gap-6 items-start justify-start mt-8 lg:mt-0 lg:pl-12">
         </div>
-      </section>
+      </motion.section>
 
       <motion.section className="py-24 px-12 lg:px-20 bg-surface-container-lowest">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
