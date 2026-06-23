@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Footer from '../components/Footer';
 import tournamentImg from '../assets/chess_tournament_gallery_1775821881801.png';
 import workshopImg from '../assets/chess_workshop_gallery_1775821901249.png';
 import socialImg from '../assets/chess_social_gallery_1775821917712.png';
@@ -216,6 +217,7 @@ const Gallery = () => {
   const containerHeight = cardHeight + 60;
 
   return (
+    <div>
     <div className="px-6 md:px-12 pb-20 max-w-7xl mx-auto min-h-screen">
       <header className="py-16 text-center">
         <motion.p
@@ -469,12 +471,11 @@ const Gallery = () => {
       </AnimatePresence>
 
       {/* Footer Decoration */}
-      <footer className="mt-32 pt-16 border-t border-outline-variant/5 text-center">
-        <p className="text-[10px] font-label uppercase tracking-[0.5em] text-on-surface-variant/30">
-          Capturing the soul of the move since 2007
-        </p>
-      </footer>
+      
+
     </div>
+    <Footer />
+</div>
   );
 };
 

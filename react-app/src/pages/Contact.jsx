@@ -1,5 +1,7 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import profileImg from '../assets/profile_image.webp';
+import Footer from '../components/Footer';
 
 const COORDINATORS = [
   {
@@ -265,8 +267,14 @@ const SECRETARIES = Array.from({ length: 26 }, (_, i) => ({
 ]
 */
 
-const ContactCard = ({ person }) => (
-  <div className="group relative bg-surface-container-low rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_20px_40px_rgba(242,202,80,0.15)] transition-all duration-500 hover:-translate-y-2 flex flex-col h-full border border-outline-variant/5 hover:border-primary/30 cursor-pointer">
+const ContactCard = ({ person, index }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 60 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-50px" }}
+    transition={{ duration: 0.8, delay: (index % 5) * 0.08, ease: [0.16, 1, 0.3, 1] }}
+    className="group relative bg-surface-container-low rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_20px_40px_rgba(242,202,80,0.15)] transition-all duration-500 hover:-translate-y-2 flex flex-col h-full border border-outline-variant/5 hover:border-primary/30 cursor-pointer"
+  >
     <div className="relative h-72 overflow-hidden flex-shrink-0">
       <img
         alt={person.name}
@@ -292,11 +300,12 @@ const ContactCard = ({ person }) => (
         {person.funnyDescription}
       </p>
     </div>
-  </div>
+  </motion.div>
 );
 
 const Contact = () => {
   return (
+    <div>
     <div className="px-12 pb-20 max-w-7xl mx-auto">
       {/* Coordinators Section */}
       <section className="mb-20 mt-12">
@@ -305,8 +314,8 @@ const Contact = () => {
           <h2 className="text-5xl font-serif font-bold tracking-tighter text-on-surface">Coordinators</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
-          {COORDINATORS.map(person => (
-            <ContactCard key={person.id} person={person} />
+          {COORDINATORS.map((person, idx) => (
+            <ContactCard key={person.id} person={person} index={idx} />
           ))}
         </div>
       </section>
@@ -318,57 +327,20 @@ const Contact = () => {
           <h2 className="text-5xl font-serif font-bold tracking-tighter text-on-surface">Secretaries</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {SECRETARIES.map(person => (
-            <ContactCard key={person.id} person={person} />
+          {SECRETARIES.map((person, idx) => (
+            <ContactCard key={person.id} person={person} index={idx} />
           ))}
         </div>
       </section>
 
       {/* Footer matching Blogs.jsx */}
-      <footer className="bg-surface-container-lowest py-16 px-12 border-t border-outline-variant/10 mt-20 relative before:content-[''] before:absolute before:inset-0 before:bg-surface-container-lowest before:-mx-[100vw] before:z-[-1]">
-        <div className="flex flex-col md:flex-row justify-between items-start">
-          <div className="max-w-xs mb-10 md:mb-0">
-            <h6 className="text-xl font-serif text-primary mb-4">Chess Club IITK</h6>
-            <p className="text-xs text-on-surface-variant leading-relaxed">
-              The official intellectual repository and match-log of the Chess Club at the Indian Institute of Technology, Kanpur. Founded for the love of the game, sustained by the pursuit of logic.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-12">
-            <div>
-              <p className="text-[10px] font-label uppercase tracking-widest text-primary mb-6">Explore</p>
-              <ul className="space-y-3 text-xs text-on-surface-variant">
-                <li><span className="hover:text-on-surface cursor-pointer">Archive</span></li>
-                <li><span className="hover:text-on-surface cursor-pointer">Theory</span></li>
-                <li><span className="hover:text-on-surface cursor-pointer">Rankings</span></li>
-              </ul>
-            </div>
-            <div>
-              <p className="text-[10px] font-label uppercase tracking-widest text-primary mb-6">Club</p>
-              <ul className="space-y-3 text-xs text-on-surface-variant">
-                <li><span className="hover:text-on-surface cursor-pointer">About Us</span></li>
-                <li><span className="hover:text-on-surface cursor-pointer">Constitution</span></li>
-                <li><span className="hover:text-on-surface cursor-pointer">Contact</span></li>
-              </ul>
-            </div>
-            <div className="col-span-2 sm:col-span-1">
-              <p className="text-[10px] font-label uppercase tracking-widest text-primary mb-6">Connect</p>
-              <div className="flex space-x-4">
-                <span className="w-8 h-8 rounded-full border border-outline-variant/30 flex items-center justify-center hover:border-primary text-on-surface-variant hover:text-primary transition-all cursor-pointer">
-                  <span className="material-symbols-outlined text-sm">share</span>
-                </span>
-                <span className="w-8 h-8 rounded-full border border-outline-variant/30 flex items-center justify-center hover:border-primary text-on-surface-variant hover:text-primary transition-all cursor-pointer">
-                  <span className="material-symbols-outlined text-sm">mail</span>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="mt-16 pt-8 border-t border-outline-variant/5 flex justify-between items-center text-[10px] font-label uppercase tracking-widest text-on-surface-variant/30">
-          <span>© 2024 Chess Club IITK. Intellectual Property Reserved.</span>
-          <span>Est. 1960</span>
-        </div>
-      </footer>
+     
+
+
     </div>
+      <Footer />
+
+</div>
   );
 }
 

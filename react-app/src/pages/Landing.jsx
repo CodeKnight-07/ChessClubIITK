@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import SliderMaskText from '../components/SliderMaskText';
 import chessboardImg from '../assets/chessboard.jpg';
 import homePgBg from './home-pg-bg.png';
+import Footer from '../components/Footer';
 
 const Landing = () => {
   const { isLoggedIn } = useAuth();
@@ -116,7 +117,13 @@ const Landing = () => {
         </motion.div>
       </section>
 
-      <section className="py-24 px-12 lg:px-20 gap-8">
+      <motion.section
+        initial={{ opacity: 0, y: 70 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+        className="py-24 px-12 lg:px-20 gap-8"
+      >
         <div className="col-span-12 lg:col-span-5 mb-12 lg:mb-0">
           <p className="text-primary font-label text-xs tracking-[0.3em] uppercase mb-4">Establishing Excellence</p>
           <h3 className="text-5xl font-serif mb-8 leading-tight">Beyond the 64 Squares</h3>
@@ -131,7 +138,7 @@ const Landing = () => {
         </div>
         <div className="col-span-12 lg:col-span-7 flex flex-wrap gap-6 items-start justify-start mt-8 lg:mt-0 lg:pl-12">
         </div>
-      </section>
+      </motion.section>
 
       <motion.section className="py-24 px-12 lg:px-20 bg-surface-container-lowest">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
@@ -161,43 +168,10 @@ const Landing = () => {
         </div>
       </motion.section>
 
-      <footer className="bg-surface-container-lowest py-16 px-12 lg:px-20 border-t border-outline-variant/10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          <div className="col-span-1 md:col-span-2">
-            <h4 className="text-xl font-serif text-primary mb-4">Chess Club IITK</h4>
-            <p className="text-on-surface-variant max-w-sm mb-6">The official digital portal for the IIT Kanpur Chess Club. Archiving brilliance since 2007.</p>
-            <div className="flex gap-4">
-              <span className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-primary transition-colors hover:text-on-primary cursor-pointer">
-                <span className="material-symbols-outlined">public</span>
-              </span>
-              <span className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-primary transition-colors hover:text-on-primary cursor-pointer">
-                <span className="material-symbols-outlined">mail</span>
-              </span>
-            </div>
-          </div>
-          <div>
-            <h5 className="text-sm font-label uppercase tracking-widest text-primary mb-6">Organization</h5>
-            <ul className="space-y-3 text-on-surface-variant text-sm">
-              <li><span className="hover:text-primary transition-colors cursor-pointer">Our History</span></li>
-              <li><span className="hover:text-primary transition-colors cursor-pointer">Core Committee</span></li>
-              <li><span className="hover:text-primary transition-colors cursor-pointer">Alumni Network</span></li>
-              <li><span className="hover:text-primary transition-colors cursor-pointer">Hall of Fame</span></li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="text-sm font-label uppercase tracking-widest text-primary mb-6">Legal</h5>
-            <ul className="space-y-3 text-on-surface-variant text-sm">
-              <li><span className="hover:text-primary transition-colors cursor-pointer">Privacy Policy</span></li>
-              <li><span className="hover:text-primary transition-colors cursor-pointer">Terms of Play</span></li>
-              <li><span className="hover:text-primary transition-colors cursor-pointer">Anti-Cheat Policy</span></li>
-            </ul>
-          </div>
-        </div>
-        <div className="mt-16 pt-8 border-t border-outline-variant/5 flex justify-between items-center text-[10px] uppercase tracking-widest text-on-surface-variant/40">
-          <p>© 2026 IIT Kanpur Chess Club. All Rights Reserved.</p>
-          <p>Designed for the Intellectual Elite</p>
-        </div>
-      </footer>
+      <Footer />
+
+
+
     </>
   );
 };
