@@ -193,7 +193,7 @@ const Gallery = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpenLightbox, isAlbumLightboxOpen, spreadIndex, isFlipping]);
 
-  // Autoplay slideshow for Album (automatically flips every 15 seconds)
+  // Autoplay slideshow for Album (automatically flips every 5 seconds)
   useEffect(() => {
     if (!isAlbumAutoplay || isFlipping) return;
     const interval = setInterval(() => {
@@ -202,7 +202,7 @@ const Gallery = () => {
       } else {
         flipNext();
       }
-    }, 15000);
+    }, 3000);
     return () => clearInterval(interval);
   }, [isAlbumAutoplay, spreadIndex, isFlipping]);
 
@@ -574,8 +574,8 @@ const Gallery = () => {
                 <button
                   onClick={() => setIsAlbumAutoplay(!isAlbumAutoplay)}
                   className={`w-12 h-12 rounded-full border flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl outline-none ${isAlbumAutoplay
-                      ? 'bg-primary border-primary text-on-primary'
-                      : 'bg-surface-container-low border-outline-variant/20 hover:border-primary/50 text-on-surface'
+                    ? 'bg-primary border-primary text-on-primary'
+                    : 'bg-surface-container-low border-outline-variant/20 hover:border-primary/50 text-on-surface'
                     }`}
                   title={isAlbumAutoplay ? 'Pause Slideshow' : 'Play Slideshow'}
                 >
@@ -595,8 +595,8 @@ const Gallery = () => {
                 <button
                   onClick={() => setShowThumbnails(!showThumbnails)}
                   className={`w-12 h-12 rounded-full border flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl outline-none ${showThumbnails
-                      ? 'bg-primary/20 border-primary text-primary'
-                      : 'bg-surface-container-low border-outline-variant/20 hover:border-primary/50 text-on-surface'
+                    ? 'bg-primary/20 border-primary text-primary'
+                    : 'bg-surface-container-low border-outline-variant/20 hover:border-primary/50 text-on-surface'
                     }`}
                   title="Show All Photos Grid"
                 >
@@ -631,8 +631,8 @@ const Gallery = () => {
                             key={idx}
                             onClick={() => jumpToPhoto(idx)}
                             className={`aspect-square rounded-lg overflow-hidden border-2 transition-all relative group ${isHighlighted && spreadIndex > 0 && spreadIndex < 21
-                                ? 'border-primary scale-[0.98] shadow-md shadow-primary/20'
-                                : 'border-transparent opacity-60 hover:opacity-100 hover:scale-[1.02]'
+                              ? 'border-primary scale-[0.98] shadow-md shadow-primary/20'
+                              : 'border-transparent opacity-60 hover:opacity-100 hover:scale-[1.02]'
                               }`}
                           >
                             <img src={photo} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
