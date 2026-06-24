@@ -24,3 +24,8 @@ app.register_blueprint(auth_bp, url_prefix='/api')
 if __name__ == "__main__":
     # Local development settings with auto-reload enabled
     app.run(debug=True)
+
+
+@app.route("/health")
+def health():
+    return {"status": "ok"}
