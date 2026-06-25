@@ -1,6 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import profileImg from '../assets/profile_image.webp';
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
 
 import adityaImg from "../assets/secretaries/aditya.jpg";
 import akshatImg from "../assets/secretaries/akshat.jpeg";
@@ -24,8 +27,32 @@ import pratikImg from "../assets/secretaries/pratik.jpg";
 import swayamImg from "../assets/secretaries/swayam.JPG";
 // import anantImg from '../assets/anant.webp';
 
+>>>>>>> be50e3eeff57bda8702e609ae520963b71affe11
 import Footer from '../components/Footer';
 
+=======
+import adityaImg from "../assets/secretaries/aditya.jpg";
+import akshatImg from "../assets/secretaries/akshat.jpeg";
+import anantImg from "../assets/secretaries/anant.jpeg";
+import arhamImg from "../assets/secretaries/arham.jpeg";
+// import arushImg from "../assets/secretaries/arush.HEIC";
+import aryanImg from "../assets/secretaries/aryan.jpeg";
+import chaitanyaImg from "../assets/secretaries/chaitanya.jpg";
+import divyeshImg from "../assets/secretaries/divyesh.jpeg";
+import furzaanImg from "../assets/secretaries/furzaan.png";
+import hariomImg from "../assets/secretaries/hariom.jpg";
+import kdheerajImg from "../assets/secretaries/kdheeraj.png";
+import kratagyaImg from "../assets/secretaries/kratagya.jpg";
+import madhavImg from "../assets/secretaries/madhav.jpg";
+import mayankBhakhandImg from "../assets/secretaries/mayank_bhakhand.jpeg";
+import mayankGautamImg from "../assets/secretaries/mayank_gautam.webp";
+import mishthyImg from "../assets/secretaries/mishthy.jpg";
+import nishantImg from "../assets/secretaries/nishant.jpg";
+import prajwalImg from "../assets/secretaries/prajwal.jpeg";
+import pratikImg from "../assets/secretaries/pratik.jpg";
+import swayamImg from "../assets/secretaries/swayam.JPG";
+// import anantImg from '../assets/anant.webp';
+>>>>>>> a2d6e02c22c0631d4832ee00f6ab1ae9423987c3
 const COORDINATORS = [
   {
     id: 'coord-0',
