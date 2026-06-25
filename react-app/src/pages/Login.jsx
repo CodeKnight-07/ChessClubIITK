@@ -36,6 +36,7 @@ const Login = () => {
         setError(data.error || 'Failed to login');
       } else {
         // Success! Log the user in through your Context and send them home
+        localStorage.setItem('logged_in_user_email', data.user.email);
         login(data.user); // Passing the user data to your context
         navigate('/');
       }
