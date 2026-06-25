@@ -1,6 +1,29 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import profileImg from '../assets/profile_image.webp';
+
+import adityaImg from "../assets/secretaries/aditya.jpg";
+import akshatImg from "../assets/secretaries/akshat.jpeg";
+import anantImg from "../assets/secretaries/anant.jpeg";
+import arhamImg from "../assets/secretaries/arham.jpeg";
+// import arushImg from "../assets/secretaries/arush.HEIC";
+import aryanImg from "../assets/secretaries/aryan.jpeg";
+import chaitanyaImg from "../assets/secretaries/chaitanya.jpg";
+import divyeshImg from "../assets/secretaries/divyesh.jpeg";
+import furzaanImg from "../assets/secretaries/furzaan.png";
+import hariomImg from "../assets/secretaries/hariom.jpg";
+import kdheerajImg from "../assets/secretaries/kdheeraj.png";
+import kratagyaImg from "../assets/secretaries/kratagya.jpg";
+import madhavImg from "../assets/secretaries/madhav.jpg";
+import mayankBhakhandImg from "../assets/secretaries/mayank_bhakhand.jpeg";
+import mayankGautamImg from "../assets/secretaries/mayank_gautam.webp";
+import mishthyImg from "../assets/secretaries/mishthy.jpg";
+import nishantImg from "../assets/secretaries/nishant.jpg";
+import prajwalImg from "../assets/secretaries/prajwal.jpeg";
+import pratikImg from "../assets/secretaries/pratik.jpg";
+import swayamImg from "../assets/secretaries/swayam.JPG";
+// import anantImg from '../assets/anant.webp';
+
 import Footer from '../components/Footer';
 
 const COORDINATORS = [
@@ -46,15 +69,171 @@ const COORDINATORS = [
   }
 ];
 
-const SECRETARIES = Array.from({ length: 26 }, (_, i) => ({
-  id: `sec-${i}`,
-  name: `Secretary Name ${i + 1}`,
-  role: "Secretary",
-  funnyDescription: `"A very funny description placeholder highlighting their quirk."`,
-  email: `sec${i + 1}@iitk.ac.in`,
-  image: profileImg
-}));
-  /*[{
+const SECRETARIES = [
+  {
+    id: "sec-0",
+    name: "Aditya Dum",
+    role: "Secretary",
+    funnyDescription: `"I am high on chess, let's play and enjoy this addiction!!"`,
+    email: "aditya.dum@iitk.ac.in",
+    image: adityaImg,
+  },
+  {
+    id: "sec-1",
+    name: "Akshat Joshi",
+    role: "Secretary",
+    funnyDescription: `"Every move is a lesson."`,
+    email: "akshat.joshi@iitk.ac.in",
+    image: akshatImg,
+  },
+  {
+    id: "sec-2",
+    name: "Anant Singh",
+    role: "Secretary",
+    funnyDescription: `"Still looking for the best move."`,
+    email: "anantsi25@iitk.ac.in",
+    image: anantImg,
+  },
+  {
+    id: "sec-3",
+    name: "Arham Nadeem",
+    role: "Secretary",
+    funnyDescription: `"After every blunder, there is a great move!"`,
+    email: "arham.nadeem@iitk.ac.in",
+    image: arhamImg,
+  },
+  {
+    id: "sec-4",
+    name: "Arush Jain",
+    role: "Secretary",
+    funnyDescription: `"My opening preparation lasts longer than my actual games."`,
+    email: "arush.jain@iitk.ac.in",
+    // image: arushImg,
+  },
+  {
+    id: "sec-5",
+    name: "Aryan Kurade",
+    role: "Secretary",
+    funnyDescription: `"My opponents fear my unpredictability, so do I."`,
+    email: "aryan.kurade@iitk.ac.in",
+    image: aryanImg,
+  },
+  {
+    id: "sec-6",
+    name: "B Madhav Krishna",
+    role: "Secretary",
+    funnyDescription: `"Chess is my number one priority."`,
+    email: "bmadhav@iitk.ac.in",
+    image: madhavImg,
+  },
+  {
+    id: "sec-7",
+    name: "Chaitanya Malhotra",
+    role: "Secretary",
+    funnyDescription: `"Everything was satisfying until a bishop ruined my smothered mate :-("`,
+    email: "chaitanya.malhotra@iitk.ac.in",
+    image: chaitanyaImg,
+  },
+  {
+    id: "sec-8",
+    name: "Divyesh Bhattacharyya",
+    role: "Secretary",
+    funnyDescription: `"Arguing with idiots is like playing chess with a pigeon. No matter how good you are, the bird is going to poop on the board."`,
+    email: "divyeshb25@iitk.ac.in",
+    image: divyeshImg,
+  },
+  {
+    id: "sec-9",
+    name: "Furzaan S. Ullah",
+    role: "Secretary",
+    funnyDescription: `"Every game is a new puzzle to solve."`,
+    email: "furzaan.ullah@iitk.ac.in",
+    image: furzaanImg,
+  },
+  {
+    id: "sec-10",
+    name: "Hariom Mishra",
+    role: "Secretary",
+    funnyDescription: `"Chess taught me patience. My clock says otherwise."`,
+    email: "hariom.mishra@iitk.ac.in",
+    image: hariomImg,
+  },
+    {
+    id: "sec-11",
+    name: "K Dheeraj",
+    role: "Secretary",
+    funnyDescription: `"One brilliant move outweighs thousand horrible blunders."`,
+    email: "kdheeraj@iitk.ac.in",
+    image: kdheerajImg,
+  },
+  {
+    id: "sec-12",
+    name: "Kratagya Jain",
+    role: "Secretary",
+    funnyDescription: `"Discovering creative ways not to win at chess."`,
+    email: "kratagya.jain@iitk.ac.in",
+    image: kratagyaImg,
+  },
+  {
+    id: "sec-13",
+    name: "Mayank Bhakhand",
+    role: "Secretary",
+    funnyDescription: `"It is always better to sacrifice your opponent's pieces."`,
+    email: "mayank.bhakhand@iitk.ac.in",
+    image: mayankBhakhandImg,
+  },
+  {
+    id: "sec-14",
+    name: "Mayank Gautam",
+    role: "Secretary",
+    funnyDescription: `"I can spot tactics instantly—after the game."`,
+    email: "mayank.gautam@iitk.ac.in",
+    image: mayankGautamImg,
+  },
+  {
+    id: "sec-15",
+    name: "Mishty Khatwa",
+    role: "Secretary",
+    funnyDescription: `"My pieces have trust issues with me."`,
+    email: "mishty.khatwa@iitk.ac.in",
+    image: mishthyImg,
+  },
+  {
+    id: "sec-16",
+    name: "Nishant",
+    role: "Secretary",
+    funnyDescription: `"Chess has made me redefine beauty!"`,
+    email: "nishantkr25@iitk.ac.in",
+    image: nishantImg,
+  },
+  {
+    id: "sec-17",
+    name: "Pratik Dhanuka",
+    role: "Secretary",
+    funnyDescription: `"I enjoy playing chess, chess enjoys playing with my emotions."`,
+    email: "pratik.dhanuka@iitk.ac.in",
+    image: pratikImg,
+  },
+  {
+    id: "sec-18",
+    name: "Prajwal Ravi Rai",
+    role: "Secretary",
+    funnyDescription: `"I am better than Magnus Carlsen."`,
+    email: "raipr25@iitk.ac.in",
+    image: prajwalImg,
+  },
+  {
+    id: "sec-19",
+    name: "Swayam Krishna Manohari",
+    role: "Secretary",
+    funnyDescription: `"I'm not a bad chess player, I'm the biggest philanthropist in the community. I generously donate my pieces to needy opponents every single game."`,
+    email: "swayam.manohari@iitk.ac.in",
+    image: swayamImg,
+  },
+
+];
+  
+    /*{
     id: 'sec-0',
     name: 'Aarush Waghmare',
     role: "Secretary",
@@ -79,6 +258,14 @@ const SECRETARIES = Array.from({ length: 26 }, (_, i) => ({
     image: profileImg
   },
   {
+    id:'sec-0',
+    name: 'Anant Singh',
+    role: "Secretary",
+    funnyDescription: `"Still looking for the best move"`,
+    email:`anantsi25@iitk.ac.in`,
+    image: 
+  },
+  /*{
     id:
     name: 'Arham Nadeem',
     role: "Secretary",
@@ -126,14 +313,7 @@ const SECRETARIES = Array.from({ length: 26 }, (_, i) => ({
     email:
     image: profileImg
   },
-  {
-    id:
-    name: 
-    role: "Secretary",
-    funnyDescription: `"A very funny description placeholder highlighting their quirk."`,
-    email:
-    image: profileImg
-  },
+  
   {
     id:
     name:
@@ -198,14 +378,7 @@ const SECRETARIES = Array.from({ length: 26 }, (_, i) => ({
     email:
     image: profileImg
   },
-  {
-    id:
-    name:
-    role: "Secretary",
-    funnyDescription: `"A very funny description placeholder highlighting their quirk."`,
-    email:
-    image: profileImg
-  },
+  
   {
     id:
     name:
@@ -262,10 +435,10 @@ const SECRETARIES = Array.from({ length: 26 }, (_, i) => ({
     email:
     image: profileImg
   },
-
- 
-]
 */
+ 
+
+
 
 const ContactCard = ({ person, index }) => (
   <motion.div
