@@ -19,6 +19,7 @@ import mayankBhakhandImg from "../assets/secretaries/mayank_bhakhand.jpeg";
 import mayankGautamImg from "../assets/secretaries/mayank_gautam.webp";
 import mishthyImg from "../assets/secretaries/mishthy.jpg";
 import nishantImg from "../assets/secretaries/nishant.jpg";
+import piyushImg from "../assets/secretaries/piyush.jpg";
 import prajwalImg from "../assets/secretaries/prajwal.jpeg";
 import pratikImg from "../assets/secretaries/pratik.jpg";
 import swayamImg from "../assets/secretaries/swayam.JPG";
@@ -233,6 +234,14 @@ const SECRETARIES = [
   },
   {
     id: "sec-20",
+    name: "Piyush Agarwal",
+    role: "Secretary",
+    funnyDescription: `"The only thing I calculate accurately is how much rating I'm about to lose."`,
+    email: "piyusha25@iitk.ac.in",
+    image: piyushImg,
+  },
+  {
+    id: "sec-21",
     name: "Prajwal Ravi Rai",
     role: "Secretary",
     funnyDescription: `"I am better than magnus carlsen"`,
@@ -240,7 +249,7 @@ const SECRETARIES = [
     image: prajwalImg,
   },
   {
-    id: "sec-21",
+    id: "sec-22",
     name: "Pratik Dhanuka",
     role: "Secretary",
     funnyDescription: `"I enjoy playing chess, chess enjoys playing with my emotions."`,
@@ -248,7 +257,7 @@ const SECRETARIES = [
     image: pratikImg,
   },
   {
-    id: "sec-22",
+    id: "sec-23",
     name: "Shaoni Mukherjee",
     role: "Secretary",
     funnyDescription: `"Life is like chess. I don't know how to play chess."`,
@@ -256,7 +265,7 @@ const SECRETARIES = [
     image: shaoniImg,
   },
   {
-    id: "sec-23",
+    id: "sec-24",
     name: "Siddhant Ghate",
     role: "Secretary",
     funnyDescription: `"My favourite chess opening is the one where my opponent doesn't show up."`,
@@ -264,7 +273,7 @@ const SECRETARIES = [
     image: siddhantImg,
   },
   {
-    id: "sec-24",
+    id: "sec-25",
     name: "Swayam Krishna Manohari",
     role: "Secretary",
     funnyDescription: `"I’m not a bad chess player, I’m the biggest philanthropist in the community. I generously donate my pieces to needy opponents every single game."`,
@@ -272,7 +281,6 @@ const SECRETARIES = [
     image: swayamImg,
   }
 ];
-
 const ContactCard = ({ person, index }) => (
   <motion.div
     initial={{ opacity: 0, y: 60 }}
