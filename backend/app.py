@@ -70,7 +70,7 @@ def login():
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
             }
             
-            token = jwt.encode(payload, 'IITKCHESSCLUBSECRETKEYDONOTSHARE', algorithm='HS256')
+            token = jwt.encode(payload, 'JWT_SECRET', algorithm='HS256')
             
             # Optional: We can also send the role back in the JSON so React knows instantly
             return jsonify({'token': token, 'role': user_role}), 200
@@ -128,7 +128,7 @@ def token_required(f):
             
         try:
             # 2. Try to decode the token using the SAME hardcoded secret key
-            data = jwt.decode(token, 'IITKCHESSCLUBSECRETKEYDONOTSHARE', algorithms=['HS256'])
+            data = jwt.decode(token, 'JWT_SECRET', algorithms=['HS256'])
             
             # 3. Check if they have the right role
             if data['role'] != 'secretary':

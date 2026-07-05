@@ -35,8 +35,7 @@ const Login = () => {
       if (!response.ok) {
         setError(data.error || 'Failed to login');
       } else {
-        // 1. THE TRAP: Print the exact package from Flask to your console
-        console.log("EXACT PACKAGE FROM FLASK:", data); 
+        
         
         // 2. Grab the token safely
         const theToken = data.token;

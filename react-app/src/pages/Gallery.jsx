@@ -15,9 +15,22 @@ const Gallery = () => {
 // Pull the user data from your login system
   const { isLoggedIn, token } = useAuth();
 
-  // Create a simple boolean to check if they are authorized
-  const userRole = localStorage.getItem('chess-club-role');
-  const isAdmin = userRole === 'secretary';
+
+// The Ultimate Bouncer: Checks local storage AND the secure token payload
+  let isAdmin = false;
+  if (isLoggedIn && token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      
+      // We are now checking the 'role' key exactly as your Python backend wrote it!
+      // I included both 'admin' and 'secretary' just in case. 
+      if (payload.role === 'admin' || payload.role === 'secretary') {
+        isAdmin = true;
+      }
+    } catch (error) {
+      console.error("Could not decode token for admin check:", error);
+    }
+  }
 
   // State to hold the array of images from the database
   const [carouselImages, setCarouselImages] = useState([]);
@@ -103,8 +116,7 @@ useEffect(() => {
 
   const handleSaveFeatured = async () => {
     // Add these right before the try/catch block
-console.log("1. The token Gallery is holding:", token);
-console.log("2. Is the token a string?", typeof token);
+
     try {
       const response = await fetch('http://127.0.0.1:5000/api/config/featured', {
         method: 'PUT',
