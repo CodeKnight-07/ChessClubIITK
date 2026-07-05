@@ -10,9 +10,12 @@ from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 import bcrypt
 
+
 # Load your local .env file BEFORE anything else
 load_dotenv()
 
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # Import your blueprints
 from routes.auth import auth_bp
 
@@ -139,6 +142,80 @@ def token_required(f):
         return f(*args, **kwargs)
     return decorated
 
+
+@app.route('/api/carousel', methods=['POST'])
+@token_required
+def upload_carousel_image():
+    try:
+        # 1. Grab the physical file from the request
+        if 'image' not in request.files:
+            return jsonify({"error": "No image provided"}), 400
+            
+        file = request.files['image']
+        
+        # 2. Clean the filename to prevent hacking, then save it
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(filepath)
+        
+        # 3. Save the local path to your SQL database
+        # We save it as '/static/uploads/filename.jpg' so React can read it
+        db_path = f"/static/uploads/{filename}" 
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO featured_carousel (image_url) VALUES (%s)", (db_path,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({"message": "Image uploaded successfully!", "url": db_path}), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+@app.route('/api/carousel', methods=['GET'])
+def get_carousel_images():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor() 
+        
+        # Grab all the saved images
+        cursor.execute("SELECT id, image_url FROM featured_carousel ORDER BY id DESC")
+        
+        # Safely and universally convert the SQL rows into a JSON dictionary
+        row_headers = [x[0] for x in cursor.description]
+        images = [dict(zip(row_headers, row)) for row in cursor.fetchall()]
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify(images), 200
+        
+    except Exception as e:
+        print(f"GET CAROUSEL ERROR: {e}") # This will print the exact crash reason to your terminal!
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/carousel/<int:image_id>', methods=['DELETE'])
+@token_required
+def delete_carousel_image(image_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Note: In a production app, you would also use os.remove() here 
+        # to delete the physical file from the static/uploads folder. 
+        # For now, we just remove it from the database so it disappears from the website!
+        cursor.execute("DELETE FROM featured_carousel WHERE id = %s", (image_id,))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({"message": "Image deleted successfully!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 # 1. PUBLIC ROUTE: Anyone can read the text (No @token_required here)
 @app.route('/api/config/featured', methods=['GET'])
 def get_featured_config():

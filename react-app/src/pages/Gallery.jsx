@@ -19,6 +19,8 @@ const Gallery = () => {
   const userRole = localStorage.getItem('chess-club-role');
   const isAdmin = userRole === 'secretary';
 
+  // State to hold the array of images from the database
+  const [carouselImages, setCarouselImages] = useState([]);
   // --- Admin Editing States ---
   const [isEditingFeatured, setIsEditingFeatured] = useState(false);
   const [featuredTitle, setFeaturedTitle] = useState("Loading...");
@@ -81,6 +83,23 @@ const Gallery = () => {
 
     fetchGallery();
   }, []);
+
+  // The GET request to load images on page load
+useEffect(() => {
+  const fetchImages = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/carousel');
+      const data = await response.json();
+      if (response.ok) {
+        setCarouselImages(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch carousel images:", err);
+    }
+  };
+  
+  fetchImages();
+}, []);
 
   const handleSaveFeatured = async () => {
     // Add these right before the try/catch block
@@ -293,12 +312,17 @@ console.log("2. Is the token a string?", typeof token);
   };
 
   const handleSpotlightClick = () => {
-    if (SLIDESHOW_PHOTOS.length === 0) return;
-    const currentPhoto = SLIDESHOW_PHOTOS[slideshowIndex];
-    const mainIndex = fideRatedPhotos.indexOf(currentPhoto);
-    setLightboxIndex(mainIndex !== -1 ? mainIndex : 0);
+    // 1. If the database has no photos, do nothing
+    if (carouselImages.length === 0) return;
+    
+    // 2. Figure out exactly which photo the slideshow is currently on
+    // We use the same modulo (%) math trick so it perfectly matches what is on screen
+    const currentPhotoIndex = slideshowIndex % carouselImages.length;
+    
+    // 3. Open the lightbox directly to that photo!
+    setLightboxIndex(currentPhotoIndex);
     setIsOpenLightbox(true);
-  };
+};
 
   // Measure container width for responsive calculations
   useEffect(() => {
@@ -317,12 +341,16 @@ console.log("2. Is the token a string?", typeof token);
   }, []);
 
   const handleNextPhoto = () => {
-    setLightboxIndex(prev => (prev + 1) % fideRatedPhotos.length);
-  };
+  setLightboxIndex((prev) => 
+    prev === carouselImages.length - 1 ? 0 : prev + 1
+  );
+};
 
   const handlePrevPhoto = () => {
-    setLightboxIndex(prev => (prev - 1 + fideRatedPhotos.length) % fideRatedPhotos.length);
-  };
+  setLightboxIndex((prev) => 
+    prev === 0 ? carouselImages.length - 1 : prev - 1
+  );
+};
 
   // Keyboard navigation listener for lightbox modal
   useEffect(() => {
@@ -392,21 +420,63 @@ console.log("2. Is the token a string?", typeof token);
             >
               <div className="flex flex-col lg:flex-row">
                 {/* Image side */}
-                <div className="lg:w-3/5 relative aspect-[16/10] overflow-hidden flex-shrink-0">
-                  <AnimatePresence>
-                    <motion.img
-                      key={slideshowIndex}
-                      src={SLIDESHOW_PHOTOS[slideshowIndex]}
-                      alt={featuredTournament.title}
-                      initial={{ opacity: 0, zIndex: 2 }}
-                      animate={{ opacity: 1, zIndex: 2 }}
-                      exit={{ opacity: 1, zIndex: 1 }}
-                      transition={{ duration: 1.8, ease: "easeInOut" }}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
-                    />
-                  </AnimatePresence>
+                <div className="lg:w-3/5 relative aspect-[16/10] overflow-hidden flex-shrink-0 bg-surface-container-highest">
+                  
+                  {/* Check if we have images from the database */}
+                  {carouselImages.length > 0 ? (
+                    <>
+                      <AnimatePresence>
+                        <motion.img
+                          // We use modulo (%) so the index loops safely without crashing if an image is deleted
+                          key={carouselImages[slideshowIndex % carouselImages.length].id}
+                          src={`http://127.0.0.1:5000${carouselImages[slideshowIndex % carouselImages.length].image_url}`}
+                          alt={featuredTitle}
+                          initial={{ opacity: 0, zIndex: 2 }}
+                          animate={{ opacity: 1, zIndex: 2 }}
+                          exit={{ opacity: 1, zIndex: 1 }}
+                          transition={{ duration: 1.8, ease: "easeInOut" }}
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
+                        />
+                      </AnimatePresence>
+
+                      {/* ADMIN DELETE BUTTON */}
+                      {isAdmin && (
+                        <button
+                          onClick={async () => {
+                            const imgId = carouselImages[slideshowIndex % carouselImages.length].id;
+                            if (window.confirm("Are you sure you want to delete this photo?")) {
+                              try {
+                                const response = await fetch(`http://127.0.0.1:5000/api/carousel/${imgId}`, {
+                                  method: 'DELETE',
+                                  headers: {
+                                    'Authorization': `Bearer ${localStorage.getItem('chess-club-jwt')}`
+                                  }
+                                });
+                                if (response.ok) {
+                                  // Instantly remove it from the array so the screen updates
+                                  setCarouselImages(carouselImages.filter(img => img.id !== imgId));
+                                }
+                              } catch (err) {
+                                console.error("Delete failed", err);
+                              }
+                            }
+                          }}
+                          className="absolute top-4 right-4 bg-red-600/90 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold shadow-lg hover:bg-red-500 z-50 transition-colors cursor-pointer"
+                          title="Delete this photo"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </>
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center text-zinc-500 text-sm">
+                      No featured images uploaded yet.
+                    </div>
+                  )}
+
+                  {/* Your original gradients and tags stay exactly the same! */}
                   <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-surface-container-low opacity-80 pointer-events-none z-10"></div>
-                  <div className="absolute top-4 left-4 bg-primary text-on-primary font-label text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-md z-10">
+                  <div className="absolute top-4 left-4 bg-primary text-on-primary font-label text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-md z-20">
                     FIDE Rated
                   </div>
                 </div>
@@ -455,24 +525,73 @@ console.log("2. Is the token a string?", typeof token);
         
 
         {isAdmin && (
-  <button 
-    onClick={() => setIsEditingFeatured(true)} 
-    className="text-yellow-400 text-sm hover:underline"
-  >
-    ✏️ Edit Details
-  </button>
+  <div className="mt-8 flex flex-col md:flex-row gap-6 items-start md:items-center bg-zinc-900/80 p-4 rounded-lg border border-yellow-400/20">
+    
+    {/* 1. Edit Text Button */}
+    <button 
+      onClick={() => setIsEditingFeatured(true)} 
+      className="text-yellow-400 text-sm font-bold hover:underline flex items-center gap-2"
+    >
+      <span>✏️</span> Edit Title & Details
+    </button>
+
+    <div className="hidden md:block w-px h-8 bg-zinc-700"></div>
+
+    {/* 2. Add New Carousel Photo Input */}
+    <div className="flex flex-col gap-2">
+      <label className="text-[10px] uppercase tracking-wider text-zinc-400 font-bold">
+        📸 Add Carousel Photo
+      </label>
+      <input 
+        type="file" 
+        accept="image/*"
+        className="text-sm text-zinc-400 file:mr-4 file:py-1.5 file:px-4 file:rounded file:border-0 file:text-sm file:font-bold file:bg-yellow-400 file:text-black hover:file:bg-yellow-500 cursor-pointer transition-colors"
+        onChange={async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          // Package the physical file
+          const formData = new FormData();
+          formData.append('image', file);
+
+          try {
+            // Send it to your Python backend
+            const response = await fetch('http://127.0.0.1:5000/api/carousel', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('chess-club-jwt')}`
+              },
+              body: formData
+            });
+            
+            if (response.ok) {
+              alert("Image uploaded successfully! Refresh the page to see it in the carousel.");
+              // NOTE: If you have a fetch function to reload images, you can call it right here instead of refreshing!
+            } else {
+              alert("Failed to upload image.");
+            }
+          } catch (err) {
+            console.error("Upload error:", err);
+            alert("Server connection failed.");
+          }
+        }} 
+      />
+    </div>
+
+  </div>
 )}
       </div>
     )}
 
                   {/* View Gallery CTA Button */}
                   <button
-                    onClick={handleSpotlightClick}
-                    className="mt-8 self-start bg-primary text-on-primary font-bold px-6 py-3 rounded-lg shadow-lg hover:scale-[1.03] active:scale-95 transition-all flex items-center gap-2 hover:bg-primary-container outline-none"
-                  >
-                    <span className="material-symbols-outlined text-lg">photo_library</span>
-                    <span>View Captures ({fideRatedPhotos.length})</span>
-                  </button>
+  onClick={handleSpotlightClick}
+  className="mt-8 self-start bg-primary text-on-primary font-bold px-6 py-3 rounded-lg shadow-lg hover:scale-[1.03] active:scale-95 transition-all flex items-center gap-2 hover:bg-primary-container outline-none"
+>
+  <span className="material-symbols-outlined text-lg">photo_library</span>
+  {/* Now it will read exactly how many photos are in your database! */}
+  <span>View Captures ({carouselImages.length})</span>
+</button>
                 </div>
               </div>
             </motion.div>
@@ -697,80 +816,83 @@ console.log("2. Is the token a string?", typeof token);
         })()}
 
         {/* Full-Screen Image Lightbox Modal */}
-        <AnimatePresence>
-          {isOpenLightbox && fideRatedPhotos.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 md:p-8 outline-none"
-            >
-              {/* Header Controls */}
-              <div className="flex justify-between items-center w-full max-w-7xl mx-auto h-12">
-                <div className="text-on-surface/75 text-xs md:text-sm font-label uppercase tracking-widest">
-                  FIDE Rated Tournament Capture ({lightboxIndex + 1} / {fideRatedPhotos.length})
-                </div>
-                <button
-                  onClick={() => setIsOpenLightbox(false)}
-                  className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary transition-colors text-on-surface hover:text-on-primary flex items-center justify-center outline-none shadow-lg"
-                >
-                  <span className="material-symbols-outlined text-xl">close</span>
-                </button>
-              </div>
+  <AnimatePresence>
+  {/* We check carouselImages instead of fideRatedPhotos */}
+  {isOpenLightbox && carouselImages.length > 0 && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 md:p-8 outline-none"
+    >
+      {/* Header Controls */}
+      <div className="flex justify-between items-center w-full max-w-7xl mx-auto h-12">
+        <div className="text-on-surface/75 text-xs md:text-sm font-label uppercase tracking-widest">
+          FIDE Rated Tournament Capture ({lightboxIndex + 1} / {carouselImages.length})
+        </div>
+        <button
+          onClick={() => setIsOpenLightbox(false)}
+          className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary transition-colors text-on-surface hover:text-on-primary flex items-center justify-center outline-none shadow-lg"
+        >
+          <span className="material-symbols-outlined text-xl">close</span>
+        </button>
+      </div>
 
-              {/* Main Photo Area */}
-              <div className="flex-1 flex items-center justify-center relative max-w-7xl mx-auto w-full my-4">
-                {/* Previous Button */}
-                <button
-                  onClick={handlePrevPhoto}
-                  className="absolute left-2 md:left-4 z-10 w-12 h-12 rounded-full bg-surface-container-low/80 hover:bg-primary text-on-surface hover:text-on-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all outline-none"
-                >
-                  <span className="material-symbols-outlined text-2xl">chevron_left</span>
-                </button>
+      {/* Main Photo Area */}
+      <div className="flex-1 flex items-center justify-center relative max-w-7xl mx-auto w-full my-4">
+        {/* Previous Button */}
+        <button
+          onClick={handlePrevPhoto}
+          className="absolute left-2 md:left-4 z-10 w-12 h-12 rounded-full bg-surface-container-low/80 hover:bg-primary text-on-surface hover:text-on-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all outline-none"
+        >
+          <span className="material-symbols-outlined text-2xl">chevron_left</span>
+        </button>
 
-                {/* Active Image */}
-                <div className="relative max-h-[68vh] max-w-[85vw] flex items-center justify-center overflow-hidden rounded-xl shadow-2xl border border-outline-variant/10">
-                  <AnimatePresence mode="wait">
-                    <motion.img
-                      key={lightboxIndex}
-                      src={fideRatedPhotos[lightboxIndex]}
-                      alt={`FIDE Rated Tournament Photo ${lightboxIndex + 1}`}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.25 }}
-                      className="max-h-[68vh] max-w-full object-contain rounded-xl"
-                    />
-                  </AnimatePresence>
-                </div>
+        {/* Active Image */}
+        <div className="relative max-h-[68vh] max-w-[85vw] flex items-center justify-center overflow-hidden rounded-xl shadow-2xl border border-outline-variant/10">
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={lightboxIndex}
 
-                {/* Next Button */}
-                <button
-                  onClick={handleNextPhoto}
-                  className="absolute right-2 md:right-4 z-10 w-12 h-12 rounded-full bg-surface-container-low/80 hover:bg-primary text-on-surface hover:text-on-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all outline-none"
-                >
-                  <span className="material-symbols-outlined text-2xl">chevron_right</span>
-                </button>
-              </div>
+              src={`http://127.0.0.1:5000${carouselImages[lightboxIndex]?.image_url}`}
+              alt={`FIDE Rated Tournament Photo ${lightboxIndex + 1}`}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.25 }}
+              className="max-h-[68vh] max-w-full object-contain rounded-xl"
+            />
+          </AnimatePresence>
+        </div>
 
-              {/* Thumbnails Footer */}
-              <div className="w-full max-w-7xl mx-auto py-4 overflow-x-auto flex justify-center gap-2 border-t border-outline-variant/10">
-                {fideRatedPhotos.map((photo, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setLightboxIndex(idx)}
-                    className={`w-16 h-12 md:w-20 md:h-14 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all ${idx === lightboxIndex
-                      ? 'border-primary scale-105 shadow-md shadow-primary/20'
-                      : 'border-transparent opacity-50 hover:opacity-100'
-                      }`}
-                  >
-                    <img src={photo} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Next Button */}
+        <button
+          onClick={handleNextPhoto}
+          className="absolute right-2 md:right-4 z-10 w-12 h-12 rounded-full bg-surface-container-low/80 hover:bg-primary text-on-surface hover:text-on-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all outline-none"
+        >
+          <span className="material-symbols-outlined text-2xl">chevron_right</span>
+        </button>
+      </div>
+
+      {/* Thumbnails Footer */}
+      <div className="w-full max-w-7xl mx-auto py-4 overflow-x-auto flex justify-center gap-2 border-t border-outline-variant/10">
+        {carouselImages.map((photo, idx) => (
+          <button
+            key={photo.id || idx}
+            onClick={() => setLightboxIndex(idx)}
+            className={`w-16 h-12 md:w-20 md:h-14 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all ${idx === lightboxIndex
+              ? 'border-primary scale-105 shadow-md shadow-primary/20'
+              : 'border-transparent opacity-50 hover:opacity-100'
+              }`}
+          >
+            {/* Same backend URL setup for the thumbnails */}
+            <img src={`http://127.0.0.1:5000${photo.image_url}`} alt="" className="w-full h-full object-cover" />
+          </button>
+        ))}
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
 
         {/* Full-Screen Album Lightbox Modal */}
         <AnimatePresence>
