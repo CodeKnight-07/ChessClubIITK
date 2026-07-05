@@ -135,45 +135,7 @@ def verify_and_register():
             connection.close()
 
 
-# --- LOGIN ROUTE (WITH ADMIN CHECKS) ---
 
-@auth_bp.route('/login', methods=['POST'])
-def login():
-    data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
-
-    if not email or not password:
-        return jsonify({"error": "Email and password are required."}), 400
-
-    connection = None
-    try:
-        connection = get_db_connection()
-        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            # Pull core identifiers + is_admin flag from your permanent table
-            sql = "SELECT id, email, chess_username, password_hash, is_admin FROM users WHERE email = %s"
-            cursor.execute(sql, (email,))
-            user = cursor.fetchone()
-
-            if not user or not bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):
-                return jsonify({"error": "Invalid email or password."}), 401
-
-            return jsonify({
-                "message": "Login successful!",
-                "user": {
-                    "id": user['id'],
-                    "email": user['email'],
-                    "chess_username": user['chess_username'],
-                    "is_admin": bool(user['is_admin'])
-                }
-            }), 200
-
-    except Exception as e:
-        print(f"Login Error: {e}")
-        return jsonify({"error": "Internal server error."}), 500
-    finally:
-        if connection and connection.open:
-            connection.close()
 
 
 # --- FORGOT / RESET PASSWORD ROUTES ---

@@ -1,117 +1,35 @@
+import { useContext } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from '../components/Footer';
+
+// Keep your static UI assets
 import tournamentImg from '../assets/chess_tournament_gallery_1775821881801.png';
 import workshopImg from '../assets/chess_workshop_gallery_1775821901249.png';
 import socialImg from '../assets/chess_social_gallery_1775821917712.png';
 
-// Import custom Gallery assets
-import img2 from '../Gallery/3 3.png';
-import img3 from '../Gallery/Untitled design (19).png';
-import img4 from '../Gallery/6.png';
-import img5 from '../Gallery/4.png';
-import img6 from '../Gallery/2 3.png';
-import img7 from '../Gallery/5.png';
-import img8 from '../Gallery/8.png';
-import img9 from '../Gallery/9.png';
-import img10 from '../Gallery/SCHOOL VISIT.png';
-
-// Dynamically import all images in the FIDE RATED folder using Vite's glob import
-const FIDE_IMAGES_GLOB = import.meta.glob('../Gallery/FIDE RATED/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
-const FIDE_RATED_PHOTOS = Object.values(FIDE_IMAGES_GLOB).map(module => module.default);
-
-// Dynamically import all images in the OTHER PHOTOS folder using Vite's glob import
-const OTHER_PHOTOS_GLOB = import.meta.glob('../Gallery/OTHER PHOTOS/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
-const OTHER_PHOTOS = Object.values(OTHER_PHOTOS_GLOB).map(module => module.default);
-
-// Extract the specific 1-indexed photos (1, 3, 13, 15, 17, and the last photo in the folder) for the spotlight slideshow
-const SLIDESHOW_PHOTOS = FIDE_RATED_PHOTOS.length >= 17
-  ? [
-    FIDE_RATED_PHOTOS[0],   // Photo 1
-    FIDE_RATED_PHOTOS[2],   // Photo 3
-    FIDE_RATED_PHOTOS[13],  // Photo 13
-    FIDE_RATED_PHOTOS[15],  // Photo 15
-    FIDE_RATED_PHOTOS[17],  // Photo 17
-    FIDE_RATED_PHOTOS[FIDE_RATED_PHOTOS.length - 1] // Last photo in the folder
-  ]
-  : FIDE_RATED_PHOTOS;
-
-const GALLERY_IMAGES = [
-  {
-    id: 1,
-    category: 'Tournaments',
-    title: 'SBI GIC Ltd. Presents FIDE Rated Open Rapid Chess Tournament 2026',
-    image: tournamentImg,
-    description: 'High-stakes tactical battles at IIT Kanpur. Click to view all captures from the event.'
-  },
-  {
-    id: 2,
-    category: 'Workshops',
-    title: 'Chess in Slums',
-    image: img2,
-    description: 'Deconstructing the Sicilian Defense with our core team.'
-  },
-  {
-    id: 3,
-    category: 'Socials',
-    title: 'We The Ones',
-    image: img3,
-    description: 'Late night sessions filled with coffee and 3-minute madness.'
-  },
-  {
-    id: 4,
-    category: 'Tournaments',
-    title: 'IITK Grand Swiss',
-    image: img4,
-    description: 'The road to the candidates starts here.'
-  },
-  {
-    id: 5,
-    category: 'Workshops',
-    title: 'School Visits',
-    image: img5,
-    description: 'Empowering the next generation of grandmasters.'
-  },
-  {
-    id: 6,
-    category: 'Socials',
-    title: 'Tournament Visits',
-    image: img6,
-    description: 'Honoring our graduating legends with one last match.'
-  },
-  {
-    id: 7,
-    category: 'Socials',
-    title: 'Torch Relay',
-    image: img7,
-    description: 'Honoring our graduating legends with one last match.'
-  },
-  {
-    id: 8,
-    category: 'Tournaments',
-    title: 'IITK Chess Cup',
-    image: img8,
-    description: 'Honoring our graduating legends with one last match.'
-  },
-  {
-    id: 9,
-    category: 'Tournaments',
-    title: 'Freshers',
-    image: img9,
-    description: 'Honoring our graduating legends with one last match.'
-  },
-  {
-    id: 10,
-    category: 'Tournaments',
-    title: 'Qualifiers|UDGHOSH',
-    image: img10,
-    description: 'Honoring our graduating legends with one last match.'
-  },
-];
-
 const CATEGORIES = ['All', 'Tournaments', 'Workshops', 'Socials'];
 
 const Gallery = () => {
+// Pull the user data from your login system
+  const { isLoggedIn, token } = useAuth();
+
+  // Create a simple boolean to check if they are authorized
+  const userRole = localStorage.getItem('chess-club-role');
+  const isAdmin = userRole === 'secretary';
+
+  // --- Admin Editing States ---
+  const [isEditingFeatured, setIsEditingFeatured] = useState(false);
+  const [featuredTitle, setFeaturedTitle] = useState("Loading...");
+  const [featuredDesc, setFeaturedDesc] = useState("Loading...");
+  // 1. CLOUD DATA STATES
+  const [fideRatedPhotos, setFideRatedPhotos] = useState([]);
+  const [clubMemoriesPhotos, setClubMemoriesPhotos] = useState([]);
+  const [galleryCards, setGalleryCards] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 2. EXISTING UI STATES
   const [activeCategory, setActiveCategory] = useState('All');
   const [isOpenLightbox, setIsOpenLightbox] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -119,7 +37,6 @@ const Gallery = () => {
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
 
-  // Album memories states
   const [spreadIndex, setSpreadIndex] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
   const [flipDirection, setFlipDirection] = useState('next');
@@ -128,6 +45,86 @@ const Gallery = () => {
   const [isAlbumLightboxOpen, setIsAlbumLightboxOpen] = useState(false);
   const [albumLightboxIndex, setAlbumLightboxIndex] = useState(0);
 
+  
+
+  // 3. FETCH DATA FROM YOUR PYTHON BACKEND
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/gallery'); 
+        const data = await response.json();
+        
+        // Split the database rows into your two arrays
+        const fide = data
+          .filter(img => img.album_type === 'FIDE_RATED')
+          .map(img => img.image_url.replace(/\s/g, '%20'));
+          
+        const memories = data
+          .filter(img => img.album_type === 'CLUB_MEMORIES')
+          .map(img => img.image_url.replace(/\s/g, '%20'));
+        
+        setFideRatedPhotos(fide);
+        setClubMemoriesPhotos(memories);
+        setGalleryCards(data);
+        setIsLoading(false);
+        const configResponse = await fetch('http://127.0.0.1:5000/api/config/featured');
+        if (configResponse.ok) {
+          const configData = await configResponse.json();
+          setFeaturedTitle(configData.featured_title);
+          setFeaturedDesc(configData.featured_desc);
+        }
+      } catch (error) {
+        console.error("Error fetching gallery images:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchGallery();
+  }, []);
+
+  const handleSaveFeatured = async () => {
+    // Add these right before the try/catch block
+console.log("1. The token Gallery is holding:", token);
+console.log("2. Is the token a string?", typeof token);
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/config/featured', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // THE VIP PASS
+        },
+        body: JSON.stringify({
+          title: featuredTitle,
+          description: featuredDesc
+        })
+      });
+
+      if (response.ok) {
+        setIsEditingFeatured(false); 
+      } else {
+        const errorData = await response.json();
+        alert(`Failed: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error("Error saving config:", error);
+    }
+  };
+
+  // 4. CALCULATE SLIDESHOW PHOTOS DYNAMICALLY
+  const SLIDESHOW_PHOTOS = fideRatedPhotos.length >= 17
+    ? [
+      fideRatedPhotos[0],   
+      fideRatedPhotos[2],   
+      fideRatedPhotos[13],  
+      fideRatedPhotos[15],  
+      fideRatedPhotos[17],  
+      fideRatedPhotos[fideRatedPhotos.length - 1] 
+    ]
+    : fideRatedPhotos;
+
+  // If the data is still fetching, return a simple loading state
+    
+
   // Slideshow interval timer (20 seconds)
   useEffect(() => {
     if (SLIDESHOW_PHOTOS.length <= 1) return;
@@ -135,9 +132,9 @@ const Gallery = () => {
       setSlideshowIndex(prev => (prev + 1) % SLIDESHOW_PHOTOS.length);
     }, 20000);
     return () => clearInterval(interval);
-  }, []);
+  }, [SLIDESHOW_PHOTOS.length]);
 
-  // Preload slideshow and album photos to prevent sudden flashes or delays during transitions
+  // Preload slideshow and album photos to prevent sudden flashes or delays
   useEffect(() => {
     if (SLIDESHOW_PHOTOS.length > 0) {
       SLIDESHOW_PHOTOS.forEach(photo => {
@@ -145,13 +142,13 @@ const Gallery = () => {
         img.src = photo;
       });
     }
-    if (OTHER_PHOTOS.length > 0) {
-      OTHER_PHOTOS.forEach(photo => {
+    if (clubMemoriesPhotos.length > 0) {
+      clubMemoriesPhotos.forEach(photo => {
         const img = new Image();
         img.src = photo;
       });
     }
-  }, []);
+  }, [SLIDESHOW_PHOTOS, clubMemoriesPhotos]);
 
   const flipNext = () => {
     if (isFlipping) return;
@@ -174,9 +171,9 @@ const Gallery = () => {
 
       if (isAlbumLightboxOpen) {
         if (e.key === 'ArrowRight') {
-          setAlbumLightboxIndex(prev => (prev + 1) % OTHER_PHOTOS.length);
+          setAlbumLightboxIndex(prev => (prev + 1) % clubMemoriesPhotos.length);
         } else if (e.key === 'ArrowLeft') {
-          setAlbumLightboxIndex(prev => (prev - 1 + OTHER_PHOTOS.length) % OTHER_PHOTOS.length);
+          setAlbumLightboxIndex(prev => (prev - 1 + clubMemoriesPhotos.length) % clubMemoriesPhotos.length);
         } else if (e.key === 'Escape') {
           setIsAlbumLightboxOpen(false);
         }
@@ -191,7 +188,7 @@ const Gallery = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpenLightbox, isAlbumLightboxOpen, spreadIndex, isFlipping]);
+  }, [isOpenLightbox, isAlbumLightboxOpen, spreadIndex, isFlipping, clubMemoriesPhotos.length]);
 
   // Autoplay slideshow for Album (automatically flips every 5 seconds)
   useEffect(() => {
@@ -216,10 +213,10 @@ const Gallery = () => {
 
   useEffect(() => {
     if (isAlbumLightboxOpen) {
-      const photoIdx = Math.max(0, Math.min(OTHER_PHOTOS.length - 1, 2 * spreadIndex - 2));
+      const photoIdx = Math.max(0, Math.min(clubMemoriesPhotos.length - 1, 2 * spreadIndex - 2));
       setAlbumLightboxIndex(photoIdx);
     }
-  }, [isAlbumLightboxOpen]);
+  }, [isAlbumLightboxOpen, clubMemoriesPhotos.length, spreadIndex]);
 
   const jumpToPhoto = (idx) => {
     if (isFlipping) return;
@@ -228,7 +225,7 @@ const Gallery = () => {
   };
 
   const getPageContent = (pageNum) => {
-    if (pageNum < 0 || pageNum > OTHER_PHOTOS.length + 1) return null;
+    if (pageNum < 0 || pageNum > clubMemoriesPhotos.length + 1) return null;
 
     if (pageNum === 0) {
       // Front Cover
@@ -249,7 +246,7 @@ const Gallery = () => {
       );
     }
 
-    if (pageNum === OTHER_PHOTOS.length + 1) {
+    if (pageNum === clubMemoriesPhotos.length + 1) {
       // Back Cover
       return (
         <div className="absolute inset-0 bg-gradient-to-bl from-amber-955 to-amber-900 flex flex-col justify-center items-center p-6 text-center border-r-4 border-amber-800 shadow-inner rounded-l-xl select-none">
@@ -265,9 +262,9 @@ const Gallery = () => {
       );
     }
 
-    // Photo Page (pageNum: 1 to 40)
+    // Photo Page 
     const photoIdx = pageNum - 1;
-    const photoUrl = OTHER_PHOTOS[photoIdx];
+    const photoUrl = clubMemoriesPhotos[photoIdx];
 
     return (
       <div className="absolute inset-0 bg-[#fbf9f4] text-zinc-800 p-4 flex flex-col justify-between shadow-inner select-none border border-zinc-300/30">
@@ -298,7 +295,7 @@ const Gallery = () => {
   const handleSpotlightClick = () => {
     if (SLIDESHOW_PHOTOS.length === 0) return;
     const currentPhoto = SLIDESHOW_PHOTOS[slideshowIndex];
-    const mainIndex = FIDE_RATED_PHOTOS.indexOf(currentPhoto);
+    const mainIndex = fideRatedPhotos.indexOf(currentPhoto);
     setLightboxIndex(mainIndex !== -1 ? mainIndex : 0);
     setIsOpenLightbox(true);
   };
@@ -319,14 +316,12 @@ const Gallery = () => {
     return () => observer.disconnect();
   }, []);
 
-
-
   const handleNextPhoto = () => {
-    setLightboxIndex(prev => (prev + 1) % FIDE_RATED_PHOTOS.length);
+    setLightboxIndex(prev => (prev + 1) % fideRatedPhotos.length);
   };
 
   const handlePrevPhoto = () => {
-    setLightboxIndex(prev => (prev - 1 + FIDE_RATED_PHOTOS.length) % FIDE_RATED_PHOTOS.length);
+    setLightboxIndex(prev => (prev - 1 + fideRatedPhotos.length) % fideRatedPhotos.length);
   };
 
   // Keyboard navigation listener for lightbox modal
@@ -345,13 +340,23 @@ const Gallery = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpenLightbox]);
+  }, [isOpenLightbox, fideRatedPhotos.length]);
 
-  const fideTournament = GALLERY_IMAGES.find(img => img.id === 1);
+  // Static content for the featured tournament card since DB doesn't have titles yet
+  const featuredTournament = {
+    title: 'SBI GIC Ltd. Presents FIDE Rated Open Rapid Chess Tournament 2026',
+    description: 'High-stakes tactical battles at IIT Kanpur. Click to view all captures from the event.'
+  };
 
   // Determine if spotlight should show (only for All or Tournaments category)
   const showSpotlight = activeCategory === 'All' || activeCategory === 'Tournaments';
-
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-primary font-serif text-2xl">
+        Loading Archives...
+      </div>
+    );
+  }
   return (
     <div>
       <div className="px-6 md:px-12 pb-20 max-w-7xl mx-auto min-h-screen" ref={containerRef}>
@@ -376,7 +381,7 @@ const Gallery = () => {
 
         {/* Featured FIDE Tournament Spotlight (Top) */}
         <AnimatePresence mode="wait">
-          {showSpotlight && fideTournament && (
+          {showSpotlight && (
             <motion.div
               key="spotlight"
               initial={{ opacity: 0, y: 30 }}
@@ -392,7 +397,7 @@ const Gallery = () => {
                     <motion.img
                       key={slideshowIndex}
                       src={SLIDESHOW_PHOTOS[slideshowIndex]}
-                      alt={fideTournament.title}
+                      alt={featuredTournament.title}
                       initial={{ opacity: 0, zIndex: 2 }}
                       animate={{ opacity: 1, zIndex: 2 }}
                       exit={{ opacity: 1, zIndex: 1 }}
@@ -411,12 +416,54 @@ const Gallery = () => {
                   <span className="text-[10px] font-label text-primary uppercase tracking-[0.3em] mb-3 block">
                     Featured Tournament
                   </span>
-                  <h2 className="text-3xl font-serif text-on-surface mb-4 leading-tight group-hover:text-primary transition-colors">
-                    {fideTournament.title}
-                  </h2>
-                  <p className="text-sm text-on-surface-variant leading-relaxed">
-                    {fideTournament.description}
-                  </p>
+                  {/* THE EDITING UI SWAP */}
+    { isEditingFeatured ? (
+      <div className="flex flex-col gap-3">
+        <input 
+          className="bg-zinc-800 text-white p-2 rounded border border-zinc-700 font-serif text-2xl md:text-3xl"
+          value={featuredTitle}
+          onChange={(e) => setFeaturedTitle(e.target.value)}
+        />
+        <textarea 
+          className="bg-zinc-800 text-zinc-400 p-2 rounded border border-zinc-700 h-24 text-sm"
+          value={featuredDesc}
+          onChange={(e) => setFeaturedDesc(e.target.value)}
+        />
+        <div className="flex gap-2">
+          <button 
+            onClick={handleSaveFeatured} 
+            className="bg-yellow-400 text-black px-4 py-2 rounded font-bold hover:bg-yellow-500 transition-colors"
+          >
+            Save Changes
+          </button>
+          <button 
+            onClick={() => setIsEditingFeatured(false)} 
+            className="bg-zinc-700 text-white px-4 py-2 rounded font-bold hover:bg-zinc-600 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ) : (
+      <div>
+        <h2 className="text-3xl md:text-4xl font-serif text-white mb-4">
+          {featuredTitle}
+        </h2>
+        <p className="text-zinc-400 text-sm md:text-base leading-relaxed mb-6">
+          {featuredDesc}
+        </p>
+        
+
+        {isAdmin && (
+  <button 
+    onClick={() => setIsEditingFeatured(true)} 
+    className="text-yellow-400 text-sm hover:underline"
+  >
+    ✏️ Edit Details
+  </button>
+)}
+      </div>
+    )}
 
                   {/* View Gallery CTA Button */}
                   <button
@@ -424,7 +471,7 @@ const Gallery = () => {
                     className="mt-8 self-start bg-primary text-on-primary font-bold px-6 py-3 rounded-lg shadow-lg hover:scale-[1.03] active:scale-95 transition-all flex items-center gap-2 hover:bg-primary-container outline-none"
                   >
                     <span className="material-symbols-outlined text-lg">photo_library</span>
-                    <span>View Captures ({FIDE_RATED_PHOTOS.length})</span>
+                    <span>View Captures ({fideRatedPhotos.length})</span>
                   </button>
                 </div>
               </div>
@@ -433,7 +480,7 @@ const Gallery = () => {
         </AnimatePresence>
 
         {/* Club Memories Section */}
-        {OTHER_PHOTOS.length > 0 && (() => {
+        {clubMemoriesPhotos.length > 0 && (() => {
           const bookScale = containerWidth > 0 && containerWidth < 840 ? (containerWidth - 32) / 800 : 1;
           const bookHeight = 500 * bookScale;
 
@@ -623,8 +670,8 @@ const Gallery = () => {
                     className="mt-12 border-t border-outline-variant/10 pt-8 overflow-hidden"
                   >
                     <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 max-h-72 overflow-y-auto p-2 border border-outline-variant/5 bg-surface-container-lowest/50 rounded-xl custom-scrollbar">
-                      {OTHER_PHOTOS.map((photo, idx) => {
-                        const isHighlighted = idx === Math.max(0, Math.min(OTHER_PHOTOS.length - 1, 2 * spreadIndex - 2)) || idx === Math.max(0, Math.min(OTHER_PHOTOS.length - 1, 2 * spreadIndex - 1));
+                      {clubMemoriesPhotos.map((photo, idx) => {
+                        const isHighlighted = idx === Math.max(0, Math.min(clubMemoriesPhotos.length - 1, 2 * spreadIndex - 2)) || idx === Math.max(0, Math.min(clubMemoriesPhotos.length - 1, 2 * spreadIndex - 1));
                         return (
                           <button
                             key={idx}
@@ -651,7 +698,7 @@ const Gallery = () => {
 
         {/* Full-Screen Image Lightbox Modal */}
         <AnimatePresence>
-          {isOpenLightbox && FIDE_RATED_PHOTOS.length > 0 && (
+          {isOpenLightbox && fideRatedPhotos.length > 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -661,7 +708,7 @@ const Gallery = () => {
               {/* Header Controls */}
               <div className="flex justify-between items-center w-full max-w-7xl mx-auto h-12">
                 <div className="text-on-surface/75 text-xs md:text-sm font-label uppercase tracking-widest">
-                  FIDE Rated Tournament Capture ({lightboxIndex + 1} / {FIDE_RATED_PHOTOS.length})
+                  FIDE Rated Tournament Capture ({lightboxIndex + 1} / {fideRatedPhotos.length})
                 </div>
                 <button
                   onClick={() => setIsOpenLightbox(false)}
@@ -686,7 +733,7 @@ const Gallery = () => {
                   <AnimatePresence mode="wait">
                     <motion.img
                       key={lightboxIndex}
-                      src={FIDE_RATED_PHOTOS[lightboxIndex]}
+                      src={fideRatedPhotos[lightboxIndex]}
                       alt={`FIDE Rated Tournament Photo ${lightboxIndex + 1}`}
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -708,7 +755,7 @@ const Gallery = () => {
 
               {/* Thumbnails Footer */}
               <div className="w-full max-w-7xl mx-auto py-4 overflow-x-auto flex justify-center gap-2 border-t border-outline-variant/10">
-                {FIDE_RATED_PHOTOS.map((photo, idx) => (
+                {fideRatedPhotos.map((photo, idx) => (
                   <button
                     key={idx}
                     onClick={() => setLightboxIndex(idx)}
@@ -727,7 +774,7 @@ const Gallery = () => {
 
         {/* Full-Screen Album Lightbox Modal */}
         <AnimatePresence>
-          {isAlbumLightboxOpen && OTHER_PHOTOS.length > 0 && (
+          {isAlbumLightboxOpen && clubMemoriesPhotos.length > 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -737,7 +784,7 @@ const Gallery = () => {
               {/* Header Controls */}
               <div className="flex justify-between items-center w-full max-w-7xl mx-auto h-12">
                 <div className="text-on-surface/75 text-xs md:text-sm font-label uppercase tracking-widest">
-                  Club Memories Capture ({albumLightboxIndex + 1} / {OTHER_PHOTOS.length})
+                  Club Memories Capture ({albumLightboxIndex + 1} / {clubMemoriesPhotos.length})
                 </div>
                 <button
                   onClick={() => setIsAlbumLightboxOpen(false)}
@@ -751,7 +798,7 @@ const Gallery = () => {
               <div className="flex-1 flex items-center justify-center relative max-w-7xl mx-auto w-full my-4">
                 {/* Previous Button */}
                 <button
-                  onClick={() => setAlbumLightboxIndex(prev => (prev - 1 + OTHER_PHOTOS.length) % OTHER_PHOTOS.length)}
+                  onClick={() => setAlbumLightboxIndex(prev => (prev - 1 + clubMemoriesPhotos.length) % clubMemoriesPhotos.length)}
                   className="absolute left-2 md:left-4 z-10 w-12 h-12 rounded-full bg-surface-container-low/80 hover:bg-primary text-on-surface hover:text-on-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all outline-none"
                 >
                   <span className="material-symbols-outlined text-2xl">chevron_left</span>
@@ -762,7 +809,7 @@ const Gallery = () => {
                   <AnimatePresence mode="wait">
                     <motion.img
                       key={albumLightboxIndex}
-                      src={OTHER_PHOTOS[albumLightboxIndex]}
+                      src={clubMemoriesPhotos[albumLightboxIndex]}
                       alt={`Club Memories Photo ${albumLightboxIndex + 1}`}
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -774,9 +821,9 @@ const Gallery = () => {
                       onDragEnd={(e, info) => {
                         const swipeThreshold = 50;
                         if (info.offset.x > swipeThreshold) {
-                          setAlbumLightboxIndex(prev => (prev - 1 + OTHER_PHOTOS.length) % OTHER_PHOTOS.length);
+                          setAlbumLightboxIndex(prev => (prev - 1 + clubMemoriesPhotos.length) % clubMemoriesPhotos.length);
                         } else if (info.offset.x < -swipeThreshold) {
-                          setAlbumLightboxIndex(prev => (prev + 1) % OTHER_PHOTOS.length);
+                          setAlbumLightboxIndex(prev => (prev + 1) % clubMemoriesPhotos.length);
                         }
                       }}
                       className="max-h-[68vh] max-w-full object-contain rounded-xl cursor-grab active:cursor-grabbing"
@@ -786,7 +833,7 @@ const Gallery = () => {
 
                 {/* Next Button */}
                 <button
-                  onClick={() => setAlbumLightboxIndex(prev => (prev + 1) % OTHER_PHOTOS.length)}
+                  onClick={() => setAlbumLightboxIndex(prev => (prev + 1) % clubMemoriesPhotos.length)}
                   className="absolute right-2 md:right-4 z-10 w-12 h-12 rounded-full bg-surface-container-low/80 hover:bg-primary text-on-surface hover:text-on-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all outline-none"
                 >
                   <span className="material-symbols-outlined text-2xl">chevron_right</span>
@@ -795,7 +842,7 @@ const Gallery = () => {
 
               {/* Thumbnails Footer */}
               <div className="w-full max-w-7xl mx-auto py-4 overflow-x-auto flex justify-start md:justify-center gap-2 border-t border-outline-variant/10 scrollbar-none">
-                {OTHER_PHOTOS.map((photo, idx) => (
+                {clubMemoriesPhotos.map((photo, idx) => (
                   <button
                     key={idx}
                     onClick={() => setAlbumLightboxIndex(idx)}
@@ -811,10 +858,6 @@ const Gallery = () => {
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Footer Decoration */}
-
-
       </div>
       <Footer />
     </div>
