@@ -8,7 +8,7 @@ import Footer from '../components/Footer';
 import tournamentImg from '../assets/chess_tournament_gallery_1775821881801.png';
 import workshopImg from '../assets/chess_workshop_gallery_1775821901249.png';
 import socialImg from '../assets/chess_social_gallery_1775821917712.png';
-
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5000";
 const CATEGORIES = ['All', 'Tournaments', 'Workshops', 'Socials'];
 
 const Gallery = () => {
@@ -113,7 +113,57 @@ useEffect(() => {
   
   fetchImages();
 }, []);
+const handleDeletePhoto = async (index, photoUrl) => {
+  alert("Delete button was clicked!");
+    if (!window.confirm("Delete this photo from the archives?")) return;
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/gallery/memories`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ image_url: photoUrl, index: index })
+      });
+      if (response.ok) {
+        setClubMemoriesPhotos(prev => prev.filter((_, i) => i !== index));
+      } else {
+        alert("Failed to delete photo.");
+      }
+    } catch (error) {
+      console.error("Error deleting photo:", error);
+    }
+  };
 
+  const handleReplacePhoto = async (index, oldPhotoUrl, file) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('new_image', file);
+    formData.append('old_image_url', oldPhotoUrl);
+    formData.append('index', index);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/gallery/memories/replace`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}` 
+        },
+        body: formData
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setClubMemoriesPhotos(prev => {
+          const newPhotos = [...prev];
+          newPhotos[index] = data.new_image_url;
+          return newPhotos;
+        });
+      } else {
+        alert("Failed to replace photo.");
+      }
+    } catch (error) {
+      console.error("Error replacing photo:", error);
+    }
+  };
   const handleSaveFeatured = async () => {
     // Add these right before the try/catch block
 
@@ -299,6 +349,9 @@ useEffect(() => {
 
     return (
       <div className="absolute inset-0 bg-[#fbf9f4] text-zinc-800 p-4 flex flex-col justify-between shadow-inner select-none border border-zinc-300/30">
+        
+        
+
         {/* Photo Container */}
         <div className="flex-1 w-full bg-zinc-900 rounded-lg overflow-hidden border border-zinc-400/25 shadow-md flex items-center justify-center p-1.5">
           <img
@@ -322,7 +375,6 @@ useEffect(() => {
       </div>
     );
   };
-
   const handleSpotlightClick = () => {
     // 1. If the database has no photos, do nothing
     if (carouselImages.length === 0) return;
@@ -762,7 +814,11 @@ useEffect(() => {
                 </button>
 
                 <button
-                  onClick={() => setIsAlbumLightboxOpen(true)}
+                  onClick={() => {
+                    setIsAlbumLightboxOpen(true);
+
+                  }}
+                  
                   className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-low border border-outline-variant/20 hover:border-primary/50 text-on-surface flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl outline-none"
                   title="Fullscreen View"
                 >
@@ -915,17 +971,44 @@ useEffect(() => {
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 md:p-8 outline-none"
             >
-              {/* Header Controls */}
+             {/* Header Controls */}
               <div className="flex justify-between items-center w-full max-w-7xl mx-auto h-12">
                 <div className="text-on-surface/75 text-xs md:text-sm font-label uppercase tracking-widest">
                   Club Memories Capture ({albumLightboxIndex + 1} / {clubMemoriesPhotos.length})
                 </div>
-                <button
-                  onClick={() => setIsAlbumLightboxOpen(false)}
-                  className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary transition-colors text-on-surface hover:text-on-primary flex items-center justify-center outline-none shadow-lg"
-                >
-                  <span className="material-symbols-outlined text-xl">close</span>
-                </button>
+                
+                {/* Top Right Controls Group */}
+                <div className="flex items-center gap-3 sm:gap-4">
+                  
+                  {/* --- THE ADMIN OVERLAY --- */}
+                  {isAdmin && (
+                    <div className="flex gap-2">
+                      <label className="bg-yellow-500 text-black px-3 py-1.5 sm:px-4 rounded text-[10px] sm:text-xs font-bold cursor-pointer hover:bg-yellow-400 transition-colors shadow-lg flex items-center">
+                        Replace
+                        <input 
+                          type="file" 
+                          className="hidden" 
+                          accept="image/*"
+                          onChange={(e) => handleReplacePhoto(albumLightboxIndex, clubMemoriesPhotos[albumLightboxIndex], e.target.files[0])} 
+                        />
+                      </label>
+                      <button 
+                        onClick={() => handleDeletePhoto(albumLightboxIndex, clubMemoriesPhotos[albumLightboxIndex])}
+                        className="bg-red-600 text-white px-3 py-1.5 sm:px-4 rounded text-[10px] sm:text-xs font-bold hover:bg-red-500 transition-colors shadow-lg outline-none"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Close Button */}
+                  <button
+                    onClick={() => setIsAlbumLightboxOpen(false)}
+                    className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary transition-colors text-on-surface hover:text-on-primary flex items-center justify-center outline-none shadow-lg shrink-0"
+                  >
+                    <span className="material-symbols-outlined text-xl">close</span>
+                  </button>
+                </div>
               </div>
 
               {/* Main Photo Area */}

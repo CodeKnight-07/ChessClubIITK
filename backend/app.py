@@ -235,7 +235,89 @@ def get_featured_config():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/gallery/memories', methods=['DELETE'])
+@token_required 
+def delete_memory():
+    data = request.get_json()
+    image_url_to_delete = data.get('image_url')
+    
+    if not image_url_to_delete:
+        return jsonify({"error": "No image URL provided"}), 400
 
+    # 1. Update your database/JSON file to remove this URL from the array
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+        
+    # Delete the record that has this specific image URL
+    cursor.execute("DELETE FROM gallery WHERE image_url = %s", (image_url_to_delete,))
+        
+    conn.commit()
+    cursor.close()
+    conn.close()
+        # ---------------------
+
+    # 2. (Optional but recommended) Delete the actual file from your uploads folder
+    try:
+        # Extract the filename from the URL and delete it from the static/uploads folder
+        filename = image_url_to_delete.split('/')[-1]
+        file_path = os.path.join(app.root_path, 'static', 'uploads', filename)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+    except Exception as e:
+        print(f"Error deleting file: {e}")
+
+    return jsonify({"message": "Photo deleted successfully"}), 200
+
+
+@app.route('/api/gallery/memories/replace', methods=['POST'])
+@token_required 
+def replace_memory():
+    if 'new_image' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+        
+    file = request.files['new_image']
+    old_image_url = request.form.get('old_image_url')
+    index = request.form.get('index')
+
+    if file.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+
+    if file:
+        # 1. Save the new file
+        filename = secure_filename(file.filename)
+        # Make sure this path matches exactly where you save your other uploads!
+        save_path = os.path.join(app.root_path, 'static', 'uploads', filename) 
+        file.save(save_path)
+        
+        new_image_url = f"{request.host_url}static/uploads/{filename}"
+
+        # 2. Update your database/JSON file to swap the old URL with the new_image_url at the specific index
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Find the row with the old URL and overwrite it with the new URL
+        cursor.execute(
+            "UPDATE gallery SET image_url = %s WHERE image_url = %s", 
+            (new_image_url, old_image_url)
+        )
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        # ---------------------
+
+        # 3. (Optional) Delete the old file from the server to save space
+        try:
+            old_filename = old_image_url.split('/')[-1]
+            old_file_path = os.path.join(app.root_path, 'static', 'uploads', old_filename)
+            if os.path.exists(old_file_path):
+                os.remove(old_file_path)
+        except Exception as e:
+            print(f"Error deleting old file: {e}")
+
+        return jsonify({"message": "Photo replaced", "new_image_url": new_image_url}), 200
 # 2. PROTECTED ROUTE: Only Admins can save changes
 @app.route('/api/config/featured', methods=['PUT'])
 @token_required # <-- The Vault Door is ONLY on the PUT request now!
