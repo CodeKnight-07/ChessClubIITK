@@ -4,7 +4,7 @@ import fresherImg from '../assets/fresher_league_recap_1775765383248.png';
 import grandSwissImg from '../assets/grand_swiss_recap_1775765397656.png';
 import fideImg from '../assets/fide.png';
 import featuredEventImg from '../assets/featured_event.png';
-import lolImg from '../Gallery/LOL.png';
+import lolImg from "../assets/lol.png";
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import SliderMaskText from '../components/SliderMaskText';

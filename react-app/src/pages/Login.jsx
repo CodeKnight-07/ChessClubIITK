@@ -24,7 +24,8 @@ const Login = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          email: email, 
+          email : email,
+          username: email, // Python is looking for 'username', so we pass the email state here
           password: password 
         }),
       });
@@ -32,13 +33,22 @@ const Login = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        // This catches the "Invalid email or password" error from Python
         setError(data.error || 'Failed to login');
       } else {
-        // Success! Log the user in through your Context and send them home
-        localStorage.setItem('logged_in_user_email', data.user.email);
-        login(data.user); // Passing the user data to your context
-        navigate('/');
+        
+        
+        // 2. Grab the token safely
+        const theToken = data.token;
+        
+
+        
+        localStorage.setItem('chess-club-jwt', theToken);
+        localStorage.setItem('chess-club-role', data.role); // <-- This tells React if they are a secretary!
+        localStorage.setItem('logged_in_user_email', email);
+        // 4. Log in and redirect
+        login(theToken); 
+
+        navigate('/'); 
       }
     } catch (err) {
       console.error("Login Error:", err);
