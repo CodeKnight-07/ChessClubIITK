@@ -80,7 +80,7 @@ const UserProfile = () => {
   };
 
   if (!profile) {
-    return <div className="text-center p-12 text-on-surface">Loading Chess Sanctum Profile...</div>;
+    return <div className="text-center p-12 text-on-surface">Loading Profile...</div>;
   }
 
   return (
