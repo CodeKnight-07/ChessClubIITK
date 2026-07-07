@@ -1,3 +1,4 @@
+from fileinput import filename
 import os
 import jwt
 import datetime
@@ -9,13 +10,12 @@ from config.db import get_db_connection
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 import bcrypt
-
+from google.cloud import storage
 
 # Load your local .env file BEFORE anything else
 load_dotenv()
 
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 # Import your blueprints
 from routes.auth import auth_bp
 from routes.blogs import blogs_bp
@@ -155,14 +155,16 @@ def upload_carousel_image():
             
         file = request.files['image']
         
-        # 2. Clean the filename to prevent hacking, then save it
         filename = secure_filename(file.filename)
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
-        file.save(filepath)
-        
-        # 3. Save the local path to your SQL database
-        # We save it as '/static/uploads/filename.jpg' so React can read it
-        db_path = f"/static/uploads/{filename}" 
+
+        # Upload straight to Google Cloud
+        storage_client = storage.Client()
+        bucket = storage_client.bucket('chess-club-iitk-media')
+        blob = bucket.blob(f"Gallery/{filename}")
+        blob.upload_from_string(file.read(), content_type=file.content_type)
+
+        # Save the permanent cloud URL to your database
+        db_path = blob.public_url
         
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -237,7 +239,96 @@ def get_featured_config():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/gallery/memories', methods=['DELETE'])
+@token_required 
+def delete_memory():
+    data = request.get_json()
+    image_url_to_delete = data.get('image_url')
+    
+    if not image_url_to_delete:
+        return jsonify({"error": "No image URL provided"}), 400
 
+    # 1. Update your database/JSON file to remove this URL from the array
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+        
+    # Delete the record that has this specific image URL
+    cursor.execute("DELETE FROM gallery WHERE image_url = %s", (image_url_to_delete,))
+        
+    conn.commit()
+    cursor.close()
+    conn.close()
+        # ---------------------
+
+    # 2. (Optional but recommended) Delete the actual file from your uploads folder
+    try:
+        filename = image_url_to_delete.split('/')[-1]
+        storage_client = storage.Client()
+        bucket = storage_client.bucket('chess-club-iitk-media')
+        blob = bucket.blob(f"Gallery/{filename}")
+
+        if blob.exists():
+            blob.delete()
+    except Exception as e:
+        print(f"Error deleting file: {e}")
+
+    return jsonify({"message": "Photo deleted successfully"}), 200
+
+
+@app.route('/api/gallery/memories/replace', methods=['POST'])
+@token_required 
+def replace_memory():
+    if 'new_image' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+        
+    file = request.files['new_image']
+    old_image_url = request.form.get('old_image_url')
+    index = request.form.get('index')
+
+    if file.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+
+    if file:
+        # 1. Save the new file
+        filename = secure_filename(file.filename)
+
+        storage_client = storage.Client()
+        bucket = storage_client.bucket('chess-club-iitk-media')
+        new_blob = bucket.blob(f"Gallery/{filename}")
+        new_blob.upload_from_string(file.read(), content_type=file.content_type)
+
+        new_image_url = new_blob.public_url
+
+        # 2. Update your database/JSON file to swap the old URL with the new_image_url at the specific index
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Find the row with the old URL and overwrite it with the new URL
+        cursor.execute(
+            "UPDATE gallery SET image_url = %s WHERE image_url = %s", 
+            (new_image_url, old_image_url)
+        )
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        # ---------------------
+
+        # 3. (Optional) Delete the old file from the server to save space
+        try:
+            old_filename = old_image_url.split('/')[-1]
+            storage_client = storage.Client()
+            bucket = storage_client.bucket('chess-club-iitk-media')
+            old_blob = bucket.blob(f"Gallery/{old_filename}")
+
+            if old_blob.exists():
+                old_blob.delete()
+        except Exception as  e:
+            print(f"Error deleting old file: {e}")
+
+        return jsonify({"message": "Photo replaced", "new_image_url": new_image_url}), 200
 # 2. PROTECTED ROUTE: Only Admins can save changes
 @app.route('/api/config/featured', methods=['PUT'])
 @token_required # <-- The Vault Door is ONLY on the PUT request now!

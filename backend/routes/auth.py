@@ -7,6 +7,7 @@ import bcrypt
 import pymysql
 import requests
 from config.db import get_db_connection
+from google.cloud import storage
 
 # 1. ALWAYS initialize the Blueprint first!
 auth_bp = Blueprint('auth', __name__)
