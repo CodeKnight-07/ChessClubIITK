@@ -18,6 +18,7 @@ UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # Import your blueprints
 from routes.auth import auth_bp
+from routes.blogs import blogs_bp
 
 app = Flask(__name__)
 
@@ -31,6 +32,7 @@ CORS(
 )
 
 app.register_blueprint(auth_bp, url_prefix='/api')
+app.register_blueprint(blogs_bp, url_prefix='/api')
 
 
 import bcrypt # <--- MUST BE AT THE TOP OF app.py
@@ -67,7 +69,7 @@ def login():
             payload = {
                 'user_id': user[0],
                 'role': user_role, # <--- The token now remembers if they are a secretary or a member
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+                'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
             }
             
             token = jwt.encode(payload, 'JWT_SECRET', algorithm='HS256')

@@ -7,7 +7,9 @@
 2) In the repository, go to backend->app.py. Under CORS, replace the url in the origins with the url of your host domain. Only this URL will be allowed to access the service. PS: if you go to inspect -> console on the website, you'll see a error message with CORS on it if it's setup incorrectly. Make sure there are no trailing backslashes. In future, maybe this can also be turned into an environment variable.
 3) In Google Run, I have added several environment variables, mostly those in the .env file in the local repo. Change this only if required.
 
-Note: I formatted the code a lot during backend deployment. The below instructions for local testing may or may not work as I might have hardcoded a few variables.
+**Note 1: The service on Google run is linked with my repository. Hence any changes to the backend should be notified to me. Only when I sync this fork will the backend get updated**
+
+Note 2: I formatted the code a lot during backend deployment. The below instructions for local testing may or may not work as I might have hardcoded a few variables.
 
 # ♟️ Chess Club IITK - Developer Setup Guide for local testing
 
