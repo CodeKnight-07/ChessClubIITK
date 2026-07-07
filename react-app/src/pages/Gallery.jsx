@@ -493,7 +493,9 @@ const handleDeletePhoto = async (index, photoUrl) => {
                         <motion.img
                           // We use modulo (%) so the index loops safely without crashing if an image is deleted
                           key={carouselImages[slideshowIndex % carouselImages.length].id}
-                          src={`${API_BASE_URL}${carouselImages[slideshowIndex % carouselImages.length].image_url}`}
+                          src={carouselImages[slideshowIndex % carouselImages.length]?.image_url?.startsWith('http') 
+  ? carouselImages[slideshowIndex % carouselImages.length].image_url 
+  : `${API_BASE_URL}${carouselImages[slideshowIndex % carouselImages.length]?.image_url}`}
                           alt={featuredTitle}
                           initial={{ opacity: 0, zIndex: 2 }}
                           animate={{ opacity: 1, zIndex: 2 }}
@@ -922,7 +924,9 @@ const handleDeletePhoto = async (index, photoUrl) => {
             <motion.img
               key={lightboxIndex}
 
-              src={`${API_BASE_URL}${carouselImages[lightboxIndex]?.image_url}`}
+              src={carouselImages[lightboxIndex]?.image_url?.startsWith('http') 
+  ? carouselImages[lightboxIndex]?.image_url 
+  : `${API_BASE_URL}${carouselImages[lightboxIndex]?.image_url}`}
               alt={`FIDE Rated Tournament Photo ${lightboxIndex + 1}`}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -954,7 +958,11 @@ const handleDeletePhoto = async (index, photoUrl) => {
               }`}
           >
             {/* Same backend URL setup for the thumbnails */}
-            <img src={`${API_BASE_URL}${photo.image_url}`} alt="" className="w-full h-full object-cover" />
+            <img 
+  src={photo.image_url?.startsWith('http') ? photo.image_url : `${API_BASE_URL}${photo.image_url}`} 
+  alt="" 
+  className="w-full h-full object-cover" 
+/>
           </button>
         ))}
       </div>

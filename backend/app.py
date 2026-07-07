@@ -1,3 +1,4 @@
+from fileinput import filename
 import os
 import jwt
 import datetime
@@ -9,13 +10,12 @@ from config.db import get_db_connection
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 import bcrypt
-
+from google.cloud import storage
 
 # Load your local .env file BEFORE anything else
 load_dotenv()
 
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 # Import your blueprints
 from routes.auth import auth_bp
 from routes.blogs import blogs_bp
@@ -155,14 +155,16 @@ def upload_carousel_image():
             
         file = request.files['image']
         
-        # 2. Clean the filename to prevent hacking, then save it
         filename = secure_filename(file.filename)
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
-        file.save(filepath)
-        
-        # 3. Save the local path to your SQL database
-        # We save it as '/static/uploads/filename.jpg' so React can read it
-        db_path = f"/static/uploads/{filename}" 
+
+        # Upload straight to Google Cloud
+        storage_client = storage.Client()
+        bucket = storage_client.bucket('chess-club-iitk-media')
+        blob = bucket.blob(f"Gallery/{filename}")
+        blob.upload_from_string(file.read(), content_type=file.content_type)
+
+        # Save the permanent cloud URL to your database
+        db_path = blob.public_url
         
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -261,11 +263,13 @@ def delete_memory():
 
     # 2. (Optional but recommended) Delete the actual file from your uploads folder
     try:
-        # Extract the filename from the URL and delete it from the static/uploads folder
         filename = image_url_to_delete.split('/')[-1]
-        file_path = os.path.join(app.root_path, 'static', 'uploads', filename)
-        if os.path.exists(file_path):
-            os.remove(file_path)
+        storage_client = storage.Client()
+        bucket = storage_client.bucket('chess-club-iitk-media')
+        blob = bucket.blob(f"Gallery/{filename}")
+
+        if blob.exists():
+            blob.delete()
     except Exception as e:
         print(f"Error deleting file: {e}")
 
@@ -288,11 +292,13 @@ def replace_memory():
     if file:
         # 1. Save the new file
         filename = secure_filename(file.filename)
-        # Make sure this path matches exactly where you save your other uploads!
-        save_path = os.path.join(app.root_path, 'static', 'uploads', filename) 
-        file.save(save_path)
-        
-        new_image_url = f"{request.host_url}static/uploads/{filename}"
+
+        storage_client = storage.Client()
+        bucket = storage_client.bucket('chess-club-iitk-media')
+        new_blob = bucket.blob(f"Gallery/{filename}")
+        new_blob.upload_from_string(file.read(), content_type=file.content_type)
+
+        new_image_url = new_blob.public_url
 
         # 2. Update your database/JSON file to swap the old URL with the new_image_url at the specific index
         
@@ -313,10 +319,13 @@ def replace_memory():
         # 3. (Optional) Delete the old file from the server to save space
         try:
             old_filename = old_image_url.split('/')[-1]
-            old_file_path = os.path.join(app.root_path, 'static', 'uploads', old_filename)
-            if os.path.exists(old_file_path):
-                os.remove(old_file_path)
-        except Exception as e:
+            storage_client = storage.Client()
+            bucket = storage_client.bucket('chess-club-iitk-media')
+            old_blob = bucket.blob(f"Gallery/{old_filename}")
+
+            if old_blob.exists():
+                old_blob.delete()
+        except Exception as  e:
             print(f"Error deleting old file: {e}")
 
         return jsonify({"message": "Photo replaced", "new_image_url": new_image_url}), 200
