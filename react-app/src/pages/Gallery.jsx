@@ -3,12 +3,12 @@ import { useAuth } from '../context/AuthContext';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from '../components/Footer';
+import { API_BASE_URL } from '../config';
 
 // Keep your static UI assets
 import tournamentImg from '../assets/chess_tournament_gallery_1775821881801.png';
 import workshopImg from '../assets/chess_workshop_gallery_1775821901249.png';
 import socialImg from '../assets/chess_social_gallery_1775821917712.png';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5000";
 const CATEGORIES = ['All', 'Tournaments', 'Workshops', 'Socials'];
 
 const Gallery = () => {
@@ -66,7 +66,7 @@ const Gallery = () => {
   useEffect(() => {
     const fetchGallery = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/gallery'); 
+        const response = await fetch(`${API_BASE_URL}/api/gallery`);
         const data = await response.json();
         
         // Split the database rows into your two arrays
@@ -82,7 +82,7 @@ const Gallery = () => {
         setClubMemoriesPhotos(memories);
         setGalleryCards(data);
         setIsLoading(false);
-        const configResponse = await fetch('http://127.0.0.1:5000/api/config/featured');
+        const configResponse = await fetch(`${API_BASE_URL}/api/config/featured`);
         if (configResponse.ok) {
           const configData = await configResponse.json();
           setFeaturedTitle(configData.featured_title);
@@ -101,7 +101,7 @@ const Gallery = () => {
 useEffect(() => {
   const fetchImages = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/carousel');
+      const response = await fetch(`${API_BASE_URL}/api/carousel`);
       const data = await response.json();
       if (response.ok) {
         setCarouselImages(data);
@@ -168,7 +168,7 @@ const handleDeletePhoto = async (index, photoUrl) => {
     // Add these right before the try/catch block
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/config/featured', {
+      const response = await fetch(`${API_BASE_URL}/api/config/featured`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -493,7 +493,7 @@ const handleDeletePhoto = async (index, photoUrl) => {
                         <motion.img
                           // We use modulo (%) so the index loops safely without crashing if an image is deleted
                           key={carouselImages[slideshowIndex % carouselImages.length].id}
-                          src={`http://127.0.0.1:5000${carouselImages[slideshowIndex % carouselImages.length].image_url}`}
+                          src={`${API_BASE_URL}${carouselImages[slideshowIndex % carouselImages.length].image_url}`}
                           alt={featuredTitle}
                           initial={{ opacity: 0, zIndex: 2 }}
                           animate={{ opacity: 1, zIndex: 2 }}
@@ -510,7 +510,7 @@ const handleDeletePhoto = async (index, photoUrl) => {
                             const imgId = carouselImages[slideshowIndex % carouselImages.length].id;
                             if (window.confirm("Are you sure you want to delete this photo?")) {
                               try {
-                                const response = await fetch(`http://127.0.0.1:5000/api/carousel/${imgId}`, {
+                                const response = await fetch(`${API_BASE_URL}/api/carousel/${imgId}`, {
                                   method: 'DELETE',
                                   headers: {
                                     'Authorization': `Bearer ${localStorage.getItem('chess-club-jwt')}`
@@ -620,7 +620,7 @@ const handleDeletePhoto = async (index, photoUrl) => {
 
           try {
             // Send it to your Python backend
-            const response = await fetch('http://127.0.0.1:5000/api/carousel', {
+            const response = await fetch(`${API_BASE_URL}/api/carousel`, {
               method: 'POST',
               headers: {
                 'Authorization': `Bearer ${localStorage.getItem('chess-club-jwt')}`
@@ -922,7 +922,7 @@ const handleDeletePhoto = async (index, photoUrl) => {
             <motion.img
               key={lightboxIndex}
 
-              src={`http://127.0.0.1:5000${carouselImages[lightboxIndex]?.image_url}`}
+              src={`${API_BASE_URL}${carouselImages[lightboxIndex]?.image_url}`}
               alt={`FIDE Rated Tournament Photo ${lightboxIndex + 1}`}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -954,7 +954,7 @@ const handleDeletePhoto = async (index, photoUrl) => {
               }`}
           >
             {/* Same backend URL setup for the thumbnails */}
-            <img src={`http://127.0.0.1:5000${photo.image_url}`} alt="" className="w-full h-full object-cover" />
+            <img src={`${API_BASE_URL}${photo.image_url}`} alt="" className="w-full h-full object-cover" />
           </button>
         ))}
       </div>
