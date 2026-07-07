@@ -16,7 +16,7 @@ const BlogPost = () => {
   
   // To avoid crashes, we treat them as admin ONLY if context says so, 
   // or if they have a real email session going during local tests
-  const isAdmin = user?.is_admin === 1 || user?.is_admin === true || (localEmail && !user);
+  const isAdmin = user?.is_admin === 1 || user?.is_admin === true;
 
   console.log("Current Auth Context Data:", authContext);
   console.log("Resolved User Object:", user);
