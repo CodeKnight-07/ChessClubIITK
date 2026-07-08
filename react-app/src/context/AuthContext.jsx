@@ -47,13 +47,13 @@ export const AuthProvider = ({ children }) => {
       
       const decoded = decodeTokenPayload(storedToken);
       if (decoded) {
-        const tokenSaysAdmin = decoded.is_admin || decoded.isAdmin || decoded.admin || decoded.role === 'admin';
+        const tokenSaysAdmin = decoded.is_admin === 1 || decoded.is_admin === true || decoded.isAdmin === true || decoded.admin === true || decoded.role === 'admin' || decoded.role === 'secretary';
         setUser({
           email: decoded.email || storedEmail,
-          is_admin: tokenSaysAdmin || !!storedEmail 
+          is_admin: tokenSaysAdmin 
         });
-      } else if (storedEmail) {
-        setUser({ email: storedEmail, is_admin: true });
+      } else {
+        setUser(null);
       }
     }
   }, []);
@@ -68,13 +68,13 @@ export const AuthProvider = ({ children }) => {
     const storedEmail = localStorage.getItem('logged_in_user_email');
     
     if (decoded) {
-      const tokenSaysAdmin = decoded.is_admin || decoded.isAdmin || decoded.admin || decoded.role === 'admin';
+      const tokenSaysAdmin = decoded.is_admin === 1 || decoded.is_admin === true || decoded.isAdmin === true || decoded.admin === true || decoded.role === 'admin' || decoded.role === 'secretary';
       setUser({
         email: decoded.email || storedEmail,
-        is_admin: tokenSaysAdmin || !!storedEmail
+        is_admin: tokenSaysAdmin
       });
-    } else if (storedEmail) {
-      setUser({ email: storedEmail, is_admin: true });
+    } else {
+      setUser(null);
     }
   };
 

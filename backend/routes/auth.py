@@ -8,6 +8,7 @@ import pymysql
 import requests
 from config.db import get_db_connection
 from google.cloud import storage
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 # 1. ALWAYS initialize the Blueprint first!
 auth_bp = Blueprint('auth', __name__)
@@ -222,7 +223,13 @@ def reset_password():
             connection.close()
 
 @auth_bp.route('/user/profile/<email>', methods=['GET'])
+@jwt_required()
 def get_user_profile(email):
+    #Extract true identity from jwt
+    current_authenticated_user=get_jwt_identity()
+    #Cross-reference them
+    if current_authenticated_user!=email:
+        return jsonify({"error": "Unauthorized cross-profile read blocked"}), 403
     """Fetches user identity dimensions for the profile interface"""
     connection = None
     try:
@@ -246,6 +253,8 @@ def get_user_profile(email):
 
 
 @auth_bp.route('/user/profile/update', methods=['PUT'])
+@jwt_required()
+
 def update_user_profile():
     """Applies modified user identity details to the persistent database layer, explicitly locking email and chess_username"""
     data = request.get_json()
@@ -259,6 +268,9 @@ def update_user_profile():
     if not email:
         return jsonify({"error": "Tracking identity string is missing."}), 400
 
+    current_authenticated_user=get_jwt_identity()
+    if current_authenticated_user!=email:
+        return jsonify({"error": "Unauthorized cross-profile modifications blocked"}), 403
     connection = None
     try:
         connection = get_db_connection()

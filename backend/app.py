@@ -11,7 +11,7 @@ from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 import bcrypt
 from google.cloud import storage
-
+from flask_jwt_extended import JWTManager, create_access_token
 # Load your local .env file BEFORE anything else
 load_dotenv()
 
@@ -21,6 +21,10 @@ from routes.auth import auth_bp
 from routes.blogs import blogs_bp
 
 app = Flask(__name__)
+app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET")
+app.config["JWT_SECRET"] = os.environ.get("JWT_SECRET")
+jwt_manager=JWTManager(app)
 
 # Allow your local React app and production site to connect
 CORS(
@@ -66,14 +70,16 @@ def login():
             user_role = 'secretary' if user[1] else 'member'
                 
             # 4. Generate the JWT with their specific role!
-            payload = {
-                'user_id': user[0],
-                'role': user_role, # <--- The token now remembers if they are a secretary or a member
-                'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
-            }
+            # payload = {
+            #     'user_id': user[0],
+            #     'role': user_role, # <--- The token now remembers if they are a secretary or a member
+            #     'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
+            # }
             
-            token = jwt.encode(payload, 'JWT_SECRET', algorithm='HS256')
-            
+            # token = jwt.encode(payload, 'JWT_SECRET', algorithm='HS256')
+            user_email = username if '@' in username else ""
+            additional_claims = {"role": user_role, "is_admin": user[1], "user_id": user[0]}
+            token = create_access_token(identity=user_email, additional_claims=additional_claims)
             # Optional: We can also send the role back in the JSON so React knows instantly
             return jsonify({'token': token, 'role': user_role}), 200
             
@@ -129,11 +135,14 @@ def token_required(f):
             return jsonify({'error': 'Token is missing! Access denied.'}), 401
             
         try:
-            # 2. Try to decode the token using the SAME hardcoded secret key
-            data = jwt.decode(token, 'JWT_SECRET', algorithms=['HS256'])
+            # 2. Use app.config["JWT_SECRET_KEY"] so it matches your .env file signature
+            data = jwt.decode(token, app.config["JWT_SECRET_KEY"], algorithms=['HS256'])
             
-            # 3. Check if they have the right role
-            if data['role'] != 'secretary':
+            # Flask-JWT-Extended nests claims inside a top-level property dictionary
+            claims = data.get('sub') or data
+            role_to_check = data.get('role')
+            
+            if role_to_check != 'secretary':
                 return jsonify({'error': 'Admin privileges required.'}), 403
                 
         except jwt.ExpiredSignatureError:

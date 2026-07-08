@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { API_BASE_URL } from '../config'; 
+import { useAuth } from '../context/AuthContext';
 import userAvatar from '../assets/new_user_avatar.png';
 
 const UserProfile = () => {
@@ -9,13 +10,26 @@ const UserProfile = () => {
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
 
-  // Extract the authenticated session email dynamically rather than hardcoding it
-  const userEmail = localStorage.getItem('logged_in_user_email') || "student@iitk.ac.in";
+  // Extract the authenticated session email dynamically from context rather than localstorage
+  const { user } = useAuth();
+  const userEmail = user?.email;
 
   useEffect(() => {
+    if (!userEmail) {
+      setError("Please log in to view your profile properties.");
+      return;
+    }
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/user/profile/${userEmail}`);
+        const token = localStorage.getItem('chess-club-jwt');
+        const response = await fetch(`${API_BASE_URL}/api/user/profile/${userEmail}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // 🔒 Pass the bearer authorization key safely here!
+          }
+        });
+        
         if (!response.ok) throw new Error("Could not retrieve profile properties");
         
         const data = await response.json();
@@ -51,10 +65,15 @@ const UserProfile = () => {
   }, [userEmail]);
 
   const handleSave = async () => {
+    const token = localStorage.getItem('chess-club-jwt');
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/user/profile/update`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+         },
         body: JSON.stringify(profile),
       });
 
@@ -78,7 +97,15 @@ const UserProfile = () => {
       reader.readAsDataURL(file);
     }
   };
-
+  if (error) {
+  return (
+    <div className="px-12 py-12 max-w-md mx-auto text-center">
+      <div className="text-red-500 text-sm bg-red-500/10 p-4 rounded-xl font-semibold border border-red-500/20">
+        {error}
+      </div>
+    </div>
+  );
+  }
   if (!profile) {
     return <div className="text-center p-12 text-on-surface">Loading Profile...</div>;
   }
