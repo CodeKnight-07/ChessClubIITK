@@ -61,6 +61,7 @@ DB_PASSWORD="<ASK_SIDDHANT_FOR_PASSWORD>"
 # Email Setup for OTPs
 EMAIL_SENDER="mysterymaninyourarea@gmail.com"
 EMAIL_PASSWORD="<ASK_SIDDHANT_FOR_APP_PASSWORD>"
+JWT_SECRET="<ASK_SIDDHANT/DIVYESH>"
 Step 3: Setup the React Frontend
 Open a new terminal tab in the react-app folder:
 
