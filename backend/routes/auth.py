@@ -40,19 +40,24 @@ def send_custom_email(receiver_email, subject, body):
 @auth_bp.route('/send-otp', methods=['POST'])
 def generate_otp():
     data = request.get_json()
-    email = data.get('email')
+    primary_email = data.get('email')
+    secondary_email = data.get('secondary_email')
 
-    if not email or not email.endswith('@iitk.ac.in'):
+    if not primary_email or not primary_email.endswith('@iitk.ac.in'):
         return jsonify({"error": "You must use a valid @iitk.ac.in email address."}), 400
+    
+    if not primary_email or not secondary_email:
+        return jsonify({"error": "Both primary and secondary emails are required."}), 400
 
-    otp = str(random.randint(100000, 999999))
+    primary_otp = str(random.randint(100000, 999999))
+    secondary_otp=str(random.randint(100000, 999999))
 
     connection = None
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:
             # Check if user already exists
-            cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+            cursor.execute("SELECT id FROM users WHERE email = %s", (primary_email,))
             if cursor.fetchone():
                 return jsonify({"error": "This email is already registered."}), 409
 
@@ -62,12 +67,22 @@ def generate_otp():
                 VALUES (%s, %s) 
                 ON DUPLICATE KEY UPDATE otp = VALUES(otp), created_at = CURRENT_TIMESTAMP
             """
-            cursor.execute(sql, (email, otp))
+            cursor.execute(sql, (primary_email, primary_otp))
+            cursor.execute(sql, (secondary_email, secondary_otp))
             connection.commit()
 
-        email_body = f"Welcome to the Sanctum!\n\nYour verification code is: {otp}\n\nUse this to complete your registration."
-        if send_custom_email(email, 'Chess Club IITK - Verification Code', email_body):
-            return jsonify({"message": "OTP sent successfully!"}), 200
+        # print(f"\n--- [DEV TEST TOOL: OTP SECURITY DISPATCH] ---")
+        # print(f"▸ PRIMARY OTP ({primary_email}): {primary_otp}")
+        # print(f"▸ SECONDARY OTP ({secondary_email}): {secondary_otp}")
+        # print(f"-----------------------------------------------\n")
+        # return jsonify({"message": "OTPs sent successfully!"}), 200
+        
+        email_body_1 = f"Welcome to the Sanctum!\n\nYour verification code is: {primary_otp}\n\nUse this to complete your registration."
+        email_body_2 = f"Welcome to the Sanctum!\n\nYour verification code is: {secondary_otp}\n\nUse this to complete your registration."
+        primary_sent = send_custom_email(primary_email, 'Chess Club IITK - Verification Code', email_body_1)
+        secondary_sent = send_custom_email(secondary_email, 'Chess Club IITK - Verification Code', email_body_2)
+        if primary_sent and secondary_sent:
+            return jsonify({"message": "OTPs sent successfully!"}), 200
         else:
             return jsonify({"error": "Failed to send email. Try again."}), 500
 
@@ -83,11 +98,16 @@ def generate_otp():
 def verify_and_register():
     data = request.get_json()
     email = data.get('email')
-    user_otp = data.get('otp')
+    secondary_email = data.get('secondary_email')
+    primary_user_otp = data.get('primary_otp')
+    secondary_user_otp = data.get('secondary_otp')
     password = data.get('password')
     chess_username = data.get('chess_username')
+    name = data.get('name')
+    roll_no = data.get('rollNo')
+    contact = data.get('contact')
 
-    if not all([email, user_otp, password, chess_username]):
+    if not all([email, secondary_email, primary_user_otp, secondary_user_otp, password, chess_username, name, roll_no, contact]):
         return jsonify({"error": "All fields are required."}), 400
 
     # 1. Validate Chess.com Username existence
@@ -109,22 +129,28 @@ def verify_and_register():
         with connection.cursor() as cursor:
             # 2. Confirm OTP matches database
             cursor.execute("SELECT otp FROM pending_otps WHERE email = %s", (email,))
-            record = cursor.fetchone()
+            p_record = cursor.fetchone()
 
-            if not record or record[0] != user_otp:
-                return jsonify({"error": "Invalid or expired OTP."}), 401
+            if not p_record or p_record[0] != primary_user_otp:
+                return jsonify({"error": "Invalid or expired primary email confirmation OTP."}), 401
+            
+            cursor.execute("SELECT otp FROM pending_otps WHERE email = %s", (secondary_email,))
+            s_record = cursor.fetchone()
+
+            if not s_record or s_record[0] != secondary_user_otp:
+                return jsonify({"error": "Invalid or expired secondary email confirmation OTP."}), 401
 
             # 3. Hash secret credentials safely
             salt = bcrypt.gensalt()
             password_hash = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
             
             cursor.execute(
-                "INSERT INTO users (email, chess_username, password_hash) VALUES (%s, %s, %s)",
-                (email, chess_username, password_hash)
+                "INSERT INTO users (email, chess_username, password_hash, name, roll_no, contact, secondary_email) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                (email, chess_username, password_hash, name, roll_no, contact, secondary_email)
             )
             
             # 4. Clean up transient database entries
-            cursor.execute("DELETE FROM pending_otps WHERE email = %s", (email,))
+            cursor.execute("DELETE FROM pending_otps WHERE email IN (%s, %s)", (email, secondary_email))
             connection.commit()
             
             return jsonify({"message": "Account created successfully!"}), 201
@@ -235,7 +261,7 @@ def get_user_profile(email):
     try:
         connection = get_db_connection()
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            sql = "SELECT name, roll_no AS rollNo, contact, email, chess_username AS chesscom, avatar FROM users WHERE email = %s"
+            sql = "SELECT name, roll_no AS rollNo, contact, email, chess_username AS chesscom, avatar, secondary_email FROM users WHERE email = %s"
             cursor.execute(sql, (email,))
             profile = cursor.fetchone()
 
@@ -289,6 +315,54 @@ def update_user_profile():
     except Exception as e:
         print(f"Profile Update Failure: {e}")
         return jsonify({"error": "Internal server error."}), 500
+    finally:
+        if connection and connection.open:
+            connection.close()
+
+# --- DELETE REQUEST ---
+@auth_bp.route('/user/profile/delete', methods=['DELETE'])
+@jwt_required()
+def delete_user_account():
+    """Verifies user password and purges their account profile permanently from the database"""
+    data = request.get_json()
+    password = data.get('password')
+    email = data.get('email')
+
+    if not password or not email:
+        return jsonify({"error": "Password and identity verification strings are required."}), 400
+
+    # Safety Guard: Ensure the user is deleting their OWN account, not someone else's
+    current_authenticated_user = get_jwt_identity()
+    if current_authenticated_user != email:
+        return jsonify({"error": "Unauthorized cross-profile deletion attack blocked."}), 403
+
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            # 1. Fetch the user's password hash from the database
+            cursor.execute("SELECT password_hash FROM users WHERE email = %s", (email,))
+            user_record = cursor.fetchone()
+
+            if not user_record:
+                return jsonify({"error": "Account records not found."}), 404
+
+            # 2. Check if the input password matches the stored hash
+            if not bcrypt.checkpw(password.encode('utf-8'), user_record[0].encode('utf-8')):
+                return jsonify({"error": "Incorrect password. Deletion aborted."}), 401
+
+            # 3. Purge the user from the users master data grid
+            cursor.execute("DELETE FROM users WHERE email = %s", (email,))
+            
+            # (Optional) Clean up any dangling pending OTP records for this email
+            cursor.execute("DELETE FROM pending_otps WHERE email = %s", (email,))
+            
+            connection.commit()
+            return jsonify({"message": "Account purged successfully."}), 200
+
+    except Exception as e:
+        print(f"Critical Account Deletion Error: {e}")
+        return jsonify({"error": "Internal server error during account erasure."}), 500
     finally:
         if connection and connection.open:
             connection.close()

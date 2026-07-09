@@ -7,9 +7,17 @@ const Signup = () => {
   
   // Form Data
   const [email, setEmail] = useState('');
+  const [secondaryEmail, setSecondaryEmail] = useState('');
   const [chessUsername, setChessUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [otp, setOtp] = useState('');
+  
+  const [primaryOtp, setPrimaryOtp] = useState('');
+  const [secondaryOtp, setSecondaryOtp] = useState('');
+
+  // 💡 NEW STATE HOOKS: Added tracking states for core profile fields
+  const [name, setName] = useState('');
+  const [rollNo, setRollNo] = useState('');
+  const [contact, setContact] = useState('');
   
   // UI States
   const [showPassword, setShowPassword] = useState(false);
@@ -20,17 +28,26 @@ const Signup = () => {
   const navigate = useNavigate();
 
   // --- STEP 1: Send the OTP ---
-  const handleSendOtp = async (e) => {
+  const handleSendDualOtp = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
     setIsLoading(true);
 
+    if (email.toLowerCase() === secondaryEmail.toLowerCase()) {
+      setError("Secondary email must be different from your primary IITK email.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email }),
+        body: JSON.stringify({
+          email: email,
+          secondary_email: secondaryEmail
+         }),
       });
 
       const data = await response.json();
@@ -62,9 +79,14 @@ const Signup = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           email: email, 
-          otp: otp,
+          secondary_email: secondaryEmail,
+          primary_otp: primaryOtp,
+          secondary_otp: secondaryOtp,
           password: password,
-          chess_username: chessUsername
+          chess_username: chessUsername,
+          name: name,
+          rollNo: rollNo,
+          contact: contact
         }),
       });
 
@@ -98,11 +120,11 @@ const Signup = () => {
         <div>
           <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-surface-container-high border border-outline-variant/20 shadow-inner mb-6">
             <span className="material-symbols-outlined text-3xl text-primary font-light">
-              {step === 1 ? 'person_add' : 'mark_email_read'}
+              {step === 1 ? 'person_add' : 'stacked_email'}
             </span>
           </div>
           <h2 className="text-center text-3xl font-serif font-bold tracking-tight text-on-surface">
-            {step === 1 ? 'Join the ' : 'Verify '}
+            {step === 1 ? 'Join the ' : 'Dual Verify '}
             <span className="italic text-primary">Sanctum</span>
           </h2>
         </div>
@@ -120,8 +142,49 @@ const Signup = () => {
 
         {/* --- FORM STEP 1: Details --- */}
         {step === 1 && (
-          <form className="mt-8 space-y-6" onSubmit={handleSendOtp}>
-            <div className="space-y-5 rounded-md shadow-sm">
+          <form className="mt-8 space-y-5" onSubmit={handleSendDualOtp}>
+            <div className="space-y-4 rounded-md shadow-sm">
+              <div>
+                <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-1.5 ml-1" htmlFor="full-name">Full Name</label>
+                <input
+                  id="full-name"
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="appearance-none relative block w-full px-4 py-3 border border-outline-variant/20 bg-surface-container-lowest placeholder-on-surface-variant/30 text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-colors"
+                  placeholder="Your Name"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-1.5 ml-1" htmlFor="roll-number">Roll Number</label>
+                  <input
+                    id="roll-number"
+                    type="text"
+                    required
+                    value={rollNo}
+                    onChange={(e) => setRollNo(e.target.value)}
+                    className="appearance-none relative block w-full px-4 py-3 border border-outline-variant/20 bg-surface-container-lowest placeholder-on-surface-variant/30 text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-colors"
+                    placeholder="220123"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-1.5 ml-1" htmlFor="contact-number">Contact No</label>
+                  <input
+                    id="contact-number"
+                    type="tel"
+                    required
+                    value={contact}
+                    onChange={(e) => setContact(e.target.value)}
+                    className="appearance-none relative block w-full px-4 py-3 border border-outline-variant/20 bg-surface-container-lowest placeholder-on-surface-variant/30 text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-colors"
+                    placeholder="9876543210"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-2 ml-1" htmlFor="email-address">Email Address</label>
                 <input
@@ -132,6 +195,19 @@ const Signup = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none relative block w-full px-4 py-3.5 border border-outline-variant/20 bg-surface-container-lowest placeholder-on-surface-variant/30 text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary focus:z-10 sm:text-sm transition-colors"
                   placeholder="student@iitk.ac.in"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-1.5 ml-1" htmlFor="secondary-email-address">Secondary Recovery Email</label>
+                <input
+                  id="secondary-email-address"
+                  type="email"
+                  required
+                  value={secondaryEmail}
+                  onChange={(e) => setSecondaryEmail(e.target.value)}
+                  className="appearance-none relative block w-full px-4 py-3 border border-outline-variant/20 bg-surface-container-lowest placeholder-on-surface-variant/30 text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-colors"
+                  placeholder="personal_mail@gmail.com"
                 />
               </div>
 
@@ -179,7 +255,7 @@ const Signup = () => {
                 disabled={isLoading}
                 className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-on-primary bg-primary hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(242,202,80,0.3)] disabled:opacity-50 transition-all duration-300"
               >
-                {isLoading ? 'Sending Code...' : 'Create Account'}
+                {isLoading ? 'Sending Codes...' : 'Create Account'}
               </button>
               <p className="text-center text-sm text-on-surface-variant mt-4">
                 Already have an account?{' '}
@@ -191,24 +267,42 @@ const Signup = () => {
           </form>
         )}
 
-        {/* --- FORM STEP 2: OTP Verification --- */}
+        {/* --- FORM STEP 2: Dual OTP Verification --- */}
         {step === 2 && (
           <form className="mt-8 space-y-6" onSubmit={handleVerifyAndRegister}>
             <div className="space-y-5 rounded-md shadow-sm">
               <p className="text-center text-sm text-on-surface-variant mb-6">
-                We sent a 6-digit verification code to <span className="font-bold text-primary">{email}</span>.
+                We sent two different 6-digit verification code to both your primary and secondary emails. Check both mails to continue.
               </p>
+              {/* Primary Email OTP field */}
               <div>
-                <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-2 ml-1" htmlFor="otp">Verification Code</label>
+                <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.15em] mb-2 ml-1">
+                  Primary Code ({email})
+                </label>
                 <input
-                  id="otp"
                   type="text"
                   maxLength="6"
                   required
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className="appearance-none relative block w-full px-4 py-3.5 border border-outline-variant/20 bg-surface-container-lowest placeholder-on-surface-variant/30 text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary focus:z-10 sm:text-sm text-center tracking-[0.5em] font-mono text-xl transition-colors"
-                  placeholder="123456"
+                  value={primaryOtp}
+                  onChange={(e) => setPrimaryOtp(e.target.value)}
+                  className="appearance-none relative block w-full px-4 py-2.5 border border-outline-variant/20 bg-surface-container-lowest placeholder-on-surface-variant/30 text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-center tracking-[0.4em] font-mono font-bold transition-colors"
+                  placeholder="000000"
+                />
+              </div>
+
+              {/* Secondary Email OTP field */}
+              <div>
+                <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.15em] mb-2 ml-1">
+                  Secondary Code ({secondaryEmail})
+                </label>
+                <input
+                  type="text"
+                  maxLength="6"
+                  required
+                  value={secondaryOtp}
+                  onChange={(e) => setSecondaryOtp(e.target.value)}
+                  className="appearance-none relative block w-full px-4 py-2.5 border border-outline-variant/20 bg-surface-container-lowest placeholder-on-surface-variant/30 text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-center tracking-[0.4em] font-mono font-bold transition-colors"
+                  placeholder="000000"
                 />
               </div>
             </div>
