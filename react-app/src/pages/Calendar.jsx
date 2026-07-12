@@ -41,6 +41,35 @@ const PRE_SCHEDULED_EVENTS = [
   { id: 'pre-32', type: 'tournament', title: 'IITK Chess Cup', location: 'TBD', time: 'TBD', date: '2027-04-02' },
   { id: 'pre-33', type: 'workshop', title: 'End-Term Report', location: 'TBD', time: 'TBD', date: '2027-04-10' }
 ];
+// A dictionary to map event types to their specific colors
+const eventTheme = {
+  tournament: { 
+    border: 'border-[#f2ca50]', 
+    bg: 'bg-[#f2ca50]/10', 
+    text: 'text-[#f2ca50]' 
+  },
+  workshop: { 
+    border: 'border-[#e5e2e1]', 
+    bg: 'bg-[#e5e2e1]/5', 
+    text: 'text-white' 
+  },
+  league: { 
+    border: 'border-purple-500', 
+    bg: 'bg-purple-500/10', 
+    text: 'text-purple-400' 
+  },
+  casual: { 
+    border: 'border-green-500', 
+    bg: 'bg-green-500/10', 
+    text: 'text-green-400' 
+  },
+  // The fallback color if an event type doesn't match the ones above
+  default: { 
+    border: 'border-[#60a5fa]', 
+    bg: 'bg-[#60a5fa]/10', 
+    text: 'text-blue-400' 
+  }
+};
 
 const Calendar = () => {
   const { isLoggedIn } = useAuth();
@@ -333,38 +362,34 @@ return (
                           </div>
 
                           <div className="flex-1 space-y-1 overflow-y-auto min-h-0 disable-scrollbar">
-                            {dayEvents.map((evt, eIdx) => (
-                              <div
-                                key={eIdx}
-                                title={evt.title} // <-- Bonus! Added the tooltip here!
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate('/events');
-                                }}
-                                className={`cursor-pointer rounded border-l-[3px] px-1.5 py-1 text-left hover:opacity-80 transition-opacity ${
-                                  evt.type === 'tournament'
-                                    ? 'border-[#f2ca50] bg-primary/10'
-                                    : evt.type === 'workshop'
-                                    ? 'border-[#e5e2e1] bg-[#e5e2e1]/5'
-                                    : 'border-[#60a5fa] bg-[#60a5fa]/10'
-                                }`}
-                              >
+                            {dayEvents.map((evt, eIdx) => {
+                              
+                              // 1. Grab the colors for this specific event type (or use default)
+                              const theme = eventTheme[evt.type] || eventTheme.default;
+
+                              return (
                                 <div
-                                  className={`truncate text-[9px] font-bold uppercase leading-tight tracking-tight ${
-                                    evt.type === 'tournament'
-                                      ? 'text-primary'
-                                      : evt.type === 'workshop'
-                                      ? 'text-on-surface'
-                                      : 'text-blue-400'
-                                  }`}
+                                  key={eIdx}
+                                  title={evt.title}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate('/events');
+                                  }}
+                                  // 2. Inject the dynamic border and background colors
+                                  className={`cursor-pointer rounded border-l-[3px] px-1.5 py-1 text-left hover:opacity-80 transition-opacity ${theme.border} ${theme.bg}`}
                                 >
-                                  {evt.title}
+                                  <div
+                                    // 3. Inject the dynamic text color
+                                    className={`truncate text-[9px] font-bold uppercase leading-tight tracking-tight ${theme.text}`}
+                                  >
+                                    {evt.title}
+                                  </div>
+                                  <div className="mt-0.5 truncate text-[8px] text-on-surface-variant">
+                                    {evt.location} • {evt.time}
+                                  </div>
                                 </div>
-                                <div className="mt-0.5 truncate text-[8px] text-on-surface-variant">
-                                  {evt.location} • {evt.time}
-                                </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </div>
                       );
