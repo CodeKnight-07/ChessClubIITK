@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import Footer from '../components/Footer';
-
+import { API_BASE_URL } from '../config';
 export const OFFICIAL_EVENTS = [
   {
   id: 6,
@@ -251,7 +251,7 @@ const Events = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
         const response = await fetch(`${API_BASE_URL}/api/events`);
         
         if (response.ok) {
@@ -336,7 +336,7 @@ const Events = () => {
     if (isDbEvent) {
       const realId = eventId.replace('db-', '');
       try {
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
         await fetch(`${API_BASE_URL}/api/events/${realId}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${token}` }
@@ -353,7 +353,7 @@ const Events = () => {
   // 7. Admin Submit Handler
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
     
     const isDbEvent = editingEventId && String(editingEventId).startsWith('db-');
     const realId = isDbEvent ? editingEventId.replace('db-', '') : null;

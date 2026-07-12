@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
+import { API_BASE_URL } from '../config';
 
 const PRE_SCHEDULED_EVENTS = [
   { id: 'pre-1', type: 'workshop', title: 'Interviews', location: 'Online/Offline', time: 'TBD', date: '2026-05-22' },
@@ -94,7 +95,7 @@ const Calendar = () => {
   useEffect(() => {
     const fetchCalendarEvents = async () => {
       try {
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
         const response = await fetch(`${API_BASE_URL}/api/events`);
         
         if (response.ok) {
