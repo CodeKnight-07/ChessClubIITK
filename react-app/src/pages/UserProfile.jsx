@@ -19,7 +19,7 @@ const UserProfile = () => {
   const navigate = useNavigate();
 
   // Extract the authenticated session email dynamically from context rather than localstorage
-  const { user } = useAuth();
+  const { user,token } = useAuth();
   const userEmail = user?.email;
 
   useEffect(() => {

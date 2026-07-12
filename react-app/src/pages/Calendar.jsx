@@ -3,6 +3,7 @@ import AddEventModal from '../components/AddEventModal';
 import ViewDayModal from '../components/ViewDayModal';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 
 const PRE_SCHEDULED_EVENTS = [
@@ -43,65 +44,72 @@ const PRE_SCHEDULED_EVENTS = [
 
 const Calendar = () => {
   const { isLoggedIn } = useAuth();
+  const navigate = useNavigate(); // Initialize the router navigation
 
   const [currentDate, setCurrentDate] = useState(
     new Date(new Date().getFullYear(), new Date().getMonth(), 1)
   );
-  const [events, setEvents] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [editingEvent, setEditingEvent] = useState(null);
-  const [viewDateEvents, setViewDateEvents] = useState([]);
-  const [selectedDate, setSelectedDate] = useState('');
+  
+  // 1. New states for database events
+  const [dbEvents, setDbEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // We can kill the modal states for events since we are redirecting now!
   const [viewMode, setViewMode] = useState(window.innerWidth < 768 ? 'list' : 'calendar');
 
+  // Keep filters if you want to keep the checkboxes, otherwise they can be removed too
   const [showTournaments, setShowTournaments] = useState(true);
   const [showWorkshops, setShowWorkshops] = useState(true);
-  const [showMatches, setShowMatches] = useState(true);
 
+  // 2. Fetch from your new API!
   useEffect(() => {
-    const saved = localStorage.getItem('chess-club-user-events');
-    if (saved) {
+    const fetchCalendarEvents = async () => {
       try {
-        setEvents(JSON.parse(saved));
-      } catch (e) {
-        console.error('Could not parse saved events');
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+        const response = await fetch(`${API_BASE_URL}/api/events`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Map backend data to what the calendar grid expects
+          const formattedEvents = data.map(evt => {
+             // Ensure the date is perfectly formatted as YYYY-MM-DD for the grid filter
+             const yyyyMmDd = new Date(evt.event_date).toISOString().split('T')[0];
+             
+             return {
+               id: `db-${evt.id}`,
+               title: evt.title,
+               date: yyyyMmDd,
+               type: evt.event_type.toLowerCase(), // e.g., 'tournament', 'workshop'
+               time: evt.event_time,
+               location: evt.location
+             };
+          });
+          
+          setDbEvents(formattedEvents);
+        }
+      } catch (error) {
+        console.error("Failed to fetch events for calendar:", error);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
+
+    fetchCalendarEvents();
   }, []);
 
-  const handleAddEvent = (newEvent) => {
-    const updatedEvents = [...events, newEvent];
-    setEvents(updatedEvents);
-    localStorage.setItem('chess-club-user-events', JSON.stringify(updatedEvents));
-  };
-
-  const handleEditEvent = (updatedEvent) => {
-    const updatedEvents = events.map((e) =>
-      e.id === updatedEvent.id ? updatedEvent : e
-    );
-    setEvents(updatedEvents);
-    localStorage.setItem('chess-club-user-events', JSON.stringify(updatedEvents));
-    setEditingEvent(null);
-  };
-
-  const handleDeleteEvent = (eventId) => {
-    const updatedEvents = events.filter((e) => e.id !== eventId);
-    setEvents(updatedEvents);
-    localStorage.setItem('chess-club-user-events', JSON.stringify(updatedEvents));
-    setEditingEvent(null);
-  };
-
+  // 3. Merge the hardcoded events with the dynamic database events
   const allEvents = [
-    ...(showWorkshops || showTournaments
-      ? PRE_SCHEDULED_EVENTS.filter(
-          (e) =>
-             (e.type === 'tournament' && showTournaments) ||
-             (e.type === 'workshop' && showWorkshops)
-        )
-      : []),
-    ...(showMatches && isLoggedIn ? events : [])
-  ];
+    ...PRE_SCHEDULED_EVENTS,
+    ...dbEvents
+  ].filter(e => {
+    // Apply your filters based on the unified 'type'
+    if (e.type === 'tournament' && !showTournaments) return false;
+    if (e.type === 'workshop' && !showWorkshops) return false;
+    return true;
+  });
+
+  
 
   const handlePrevMonth = () => {
     setCurrentDate(
@@ -127,6 +135,8 @@ const Calendar = () => {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const daysInPrevMonth = new Date(year, month, 0).getDate();
   const monthName = currentDate.toLocaleString('default', { month: 'long' });
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
   const calendarCells = [];
 
@@ -153,8 +163,7 @@ const Calendar = () => {
     setSelectedDate(dateStr);
     setIsModalOpen(true);
   };
-
-  return (
+return (
     <>
       <motion.main
         initial={{ opacity: 0, y: 50 }}
@@ -174,8 +183,8 @@ const Calendar = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-12 lg:col-span-9">
+        {/* Removed the 12-column grid to let the calendar take 100% width! */}
+        <div className="w-full">
             <div className={`flex flex-col overflow-hidden rounded-2xl border border-outline-variant/10 bg-surface-container-low ${viewMode === 'calendar' ? 'min-h-[720px]' : ''}`}>
               <div className="flex shrink-0 items-center justify-between border-b border-outline-variant/10 px-4 py-4 sm:px-6">
                 <h3 className="text-2xl font-serif font-bold text-on-surface sm:text-3xl">
@@ -211,6 +220,7 @@ const Calendar = () => {
                 </div>
               </div>
 
+              {/* LIST VIEW */}
               {viewMode === 'list' ? (
                 <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 max-h-[640px] disable-scrollbar">
                   {currentMonthEvents.length === 0 ? (
@@ -230,11 +240,8 @@ const Calendar = () => {
                       return (
                         <div
                           key={idx}
-                          onClick={() => {
-                            setSelectedDate(evt.date);
-                            setViewDateEvents([evt]);
-                            setIsViewModalOpen(true);
-                          }}
+                          // Redirect to events page instead of opening a modal
+                          onClick={() => navigate('/events')}
                           className={`p-4 rounded-xl border-l-[4px] bg-surface-container-high transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer hover:border-primary/50 hover:bg-surface-container-highest ${
                             evt.type === 'tournament' ? 'border-[#f2ca50]' : 
                             evt.type === 'workshop' ? 'border-[#e5e2e1]' : 
@@ -251,7 +258,7 @@ const Calendar = () => {
                                 evt.type === 'workshop' ? 'bg-[#e5e2e1]/15 text-[#e5e2e1]' : 
                                 'bg-[#60a5fa]/15 text-blue-400'
                               }`}>
-                                {evt.type === 'user' ? 'Match' : evt.type}
+                                {evt.type}
                               </span>
                             </div>
                             <h4 className="text-base sm:text-lg font-serif font-bold text-on-surface truncate">{evt.title}</h4>
@@ -273,6 +280,7 @@ const Calendar = () => {
                   )}
                 </div>
               ) : (
+                /* CALENDAR VIEW */
                 <>
                   <div className="grid shrink-0 grid-cols-7 text-center border-b border-outline-variant/10">
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => (
@@ -288,60 +296,52 @@ const Calendar = () => {
                   <div className="grid flex-1 grid-cols-7 auto-rows-fr">
                     {calendarCells.map((cell, idx) => {
                       const isCurrent = cell.type === 'current';
+                      const isToday = isCurrent && cell.dateStr === todayStr; // <-- NEW: Check if this cell is today!
+                      
                       const dayEvents = isCurrent
                         ? allEvents.filter((e) => e.date === cell.dateStr)
                         : [];
 
                       const baseClass =
                         'group relative flex min-h-[110px] flex-col overflow-hidden border-b border-r border-outline-variant/5 p-2 sm:p-3';
+                      
+                      // NEW: Add a faint gold background to today's box
                       const bgClass = isCurrent
-                        ? 'cursor-pointer bg-transparent transition-colors hover:bg-surface-container-high'
+                        ? isToday 
+                          ? 'bg-primary/5 transition-colors hover:bg-primary/10' 
+                          : 'bg-transparent transition-colors hover:bg-surface-container-high'
                         : 'bg-surface-container-lowest opacity-30';
 
                       return (
                         <div
                           key={idx}
                           className={`${baseClass} ${bgClass}`}
-                          onClick={() => {
-                            if (isCurrent) {
-                              setViewDateEvents(dayEvents);
-                              setSelectedDate(cell.dateStr);
-                              setIsViewModalOpen(true);
-                            }
-                          }}
                         >
-                          <span
-                            className={`text-sm ${
-                              dayEvents.length > 0
-                                ? 'font-bold text-primary'
-                                : 'font-medium text-on-surface/80'
-                            }`}
-                          >
-                            {cell.day}
-                          </span>
+                          {/* NEW: The day number wrapper. If it's today, make it a solid gold circle! */}
+                          <div className="mb-1 flex items-start">
+                            <span
+                              className={`flex h-6 w-6 items-center justify-center rounded-full text-sm ${
+                                isToday
+                                  ? 'bg-primary text-black font-bold' // Solid circle for today
+                                  : dayEvents.length > 0
+                                  ? 'font-bold text-primary'
+                                  : 'font-medium text-on-surface/80'
+                              }`}
+                            >
+                              {cell.day}
+                            </span>
+                          </div>
 
-                          {isCurrent && isLoggedIn && (
-                            <div className="absolute right-2 top-2 z-10 opacity-0 transition-opacity group-hover:opacity-100">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedDate(cell.dateStr);
-                                  setIsModalOpen(true);
-                                }}
-                                className="outline-none"
-                              >
-                                <span className="material-symbols-outlined text-[14px] text-on-surface-variant hover:text-primary">
-                                  add
-                                </span>
-                              </button>
-                            </div>
-                          )}
-
-                          <div className="mt-1 flex-1 space-y-1 overflow-y-auto min-h-0 disable-scrollbar">
+                          <div className="flex-1 space-y-1 overflow-y-auto min-h-0 disable-scrollbar">
                             {dayEvents.map((evt, eIdx) => (
                               <div
                                 key={eIdx}
-                                className={`rounded border-l-[3px] px-1.5 py-1 text-left ${
+                                title={evt.title} // <-- Bonus! Added the tooltip here!
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate('/events');
+                                }}
+                                className={`cursor-pointer rounded border-l-[3px] px-1.5 py-1 text-left hover:opacity-80 transition-opacity ${
                                   evt.type === 'tournament'
                                     ? 'border-[#f2ca50] bg-primary/10'
                                     : evt.type === 'workshop'
@@ -373,148 +373,11 @@ const Calendar = () => {
                 </>
               )}
             </div>
-          </div>
-
-          <div className="col-span-12 flex flex-col gap-6 lg:col-span-3">
-            <div className="rounded-2xl border border-outline-variant/10 bg-surface-container-low p-5">
-              <h4 className="mb-4 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">
-                Filter Events
-              </h4>
-
-              <div className="space-y-3">
-                <label
-                  className="group flex cursor-pointer items-center gap-3"
-                  onClick={() => setShowTournaments(!showTournaments)}
-                >
-                  <div
-                    className={`flex h-3.5 w-3.5 items-center justify-center rounded-sm transition-colors ${
-                      showTournaments
-                        ? 'border border-[#f2ca50] bg-[#f2ca50]'
-                        : 'border border-outline-variant bg-transparent'
-                    }`}
-                  >
-                    {showTournaments && (
-                      <span className="material-symbols-outlined text-[10px] text-[#3c2f00]">
-                        check
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs text-on-surface transition-colors group-hover:text-primary">
-                    Tournaments
-                  </span>
-                </label>
-
-                <label
-                  className="group flex cursor-pointer items-center gap-3"
-                  onClick={() => setShowWorkshops(!showWorkshops)}
-                >
-                  <div
-                    className={`flex h-3.5 w-3.5 items-center justify-center rounded-sm transition-colors ${
-                      showWorkshops
-                        ? 'border border-[#e5e2e1] bg-[#e5e2e1]'
-                        : 'border border-outline-variant bg-transparent'
-                    }`}
-                  >
-                    {showWorkshops && (
-                      <span className="material-symbols-outlined text-[10px] text-[#131313]">
-                        check
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs text-on-surface transition-colors group-hover:text-[#e5e2e1]">
-                    Club Workshops
-                  </span>
-                </label>
-
-                {isLoggedIn && (
-                  <label
-                    className="group flex cursor-pointer items-center gap-3"
-                    onClick={() => setShowMatches(!showMatches)}
-                  >
-                    <div
-                      className={`flex h-3.5 w-3.5 items-center justify-center rounded-sm transition-colors ${
-                        showMatches
-                          ? 'border border-blue-400 bg-blue-400'
-                          : 'border border-outline-variant bg-transparent'
-                      }`}
-                    >
-                      {showMatches && (
-                        <span className="material-symbols-outlined text-[10px] text-black">
-                          check
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-xs text-on-surface transition-colors group-hover:text-blue-400">
-                      Your Matches
-                    </span>
-                  </label>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-2xl border border-outline-variant/10 bg-surface-container-low p-4">
-                <p className="mb-1 text-[9px] uppercase tracking-widest text-on-surface-variant">
-                  Active
-                </p>
-                <p className="text-xl font-serif text-primary">{events.length}</p>
-              </div>
-
-              <div className="rounded-2xl border border-outline-variant/10 bg-surface-container-low p-4">
-                <p className="mb-1 text-[9px] uppercase tracking-widest text-on-surface-variant">
-                  Events
-                </p>
-                <p className="text-xl font-serif text-primary">
-                  {PRE_SCHEDULED_EVENTS.length}
-                </p>
-              </div>
-            </div>
-          </div>
         </div> 
       </motion.main>
 
-
       <Footer />
-
-
-
-      {isLoggedIn && (
-        <button
-          onClick={handleScheduleClick}
-          className="fixed bottom-8 right-8 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-on-primary shadow-2xl outline-none transition-all hover:scale-110"
-        >
-          <span className="material-symbols-outlined text-2xl">add</span>
-          <span className="pointer-events-none absolute right-16 whitespace-nowrap rounded-lg border border-outline-variant/20 bg-surface-container-highest px-3 py-1.5 text-[10px] uppercase tracking-widest text-[#e5e2e1] opacity-0 transition-opacity group-hover:opacity-100">
-            Schedule Match
-          </span>
-        </button>
-      )}
-
-      <AddEventModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setEditingEvent(null);
-        }}
-        onAddEvent={handleAddEvent}
-        initialDate={selectedDate}
-        editEvent={editingEvent}
-        onEditEvent={handleEditEvent}
-        onDeleteEvent={handleDeleteEvent}
-      />
-
-      <ViewDayModal
-        isOpen={isViewModalOpen}
-        onClose={() => setIsViewModalOpen(false)}
-        dateStr={selectedDate}
-        events={viewDateEvents}
-        onEditClick={(evt) => {
-          setEditingEvent(evt);
-          setIsModalOpen(true);
-        }}
-      />
     </>
   );
 };
-
 export default Calendar;

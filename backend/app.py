@@ -19,12 +19,14 @@ load_dotenv()
 # Import your blueprints
 from routes.auth import auth_bp
 from routes.blogs import blogs_bp
+from routes.events import events_bp
 
 app = Flask(__name__)
 app.config["JWT_TOKEN_LOCATION"] = ["headers"]
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET")
 app.config["JWT_SECRET"] = os.environ.get("JWT_SECRET")
 jwt_manager=JWTManager(app)
+
 
 # Allow your local React app and production site to connect
 CORS(
@@ -37,7 +39,7 @@ CORS(
 
 app.register_blueprint(auth_bp, url_prefix='/api')
 app.register_blueprint(blogs_bp, url_prefix='/api')
-
+app.register_blueprint(events_bp)
 
 import bcrypt # <--- MUST BE AT THE TOP OF app.py
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -210,202 +210,394 @@ export const OFFICIAL_EVENTS = [
 ];
 
 const Events = () => {
-  const { isLoggedIn } = useAuth();
+  // 1. Pull auth context and token for admin verification and API calls
+  const { isLoggedIn, token } = useAuth();
   const [expandedId, setExpandedId] = useState(null);
 
+  // 2. The Ultimate Bouncer: Admin Check Logic
+  let isAdmin = false;
+  if (isLoggedIn && token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.role === 'admin' || payload.role === 'secretary') {
+        isAdmin = true;
+      }
+    } catch (error) {
+      console.error("Could not decode token for admin check:", error);
+    }
+  }
+
+  // 3. State for fetched events from database
+  const [events, setEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 4. Modal and Form State for Admin Creation
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    event_type: 'Tournament',
+    short_description: '',
+    event_briefing: '',
+    event_date: '',
+    event_time: '',
+    location: '',
+    format: '',
+    register_link: ''
+  });
+
+  const [editingEventId, setEditingEventId] = useState(null);
+
+  // 5. Fetch Events from Backend on Mount
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+        const response = await fetch(`${API_BASE_URL}/api/events`);
+        
+        if (response.ok) {
+          const dbEvents = await response.json();
+          
+          // Format the database events to match OFFICIAL_EVENTS
+          const formattedDbEvents = dbEvents.map(dbEvent => ({
+             id: `db-${dbEvent.id}`, // Ensure unique IDs
+             title: dbEvent.title,
+             date: dbEvent.event_date,
+             tag: dbEvent.event_type,
+             time: dbEvent.event_time,
+             location: dbEvent.location,
+             format: dbEvent.format,
+             shortDesc: dbEvent.short_description,
+             fullDesc: dbEvent.event_briefing,
+             register_link: dbEvent.register_link,
+             // The old hardcoded events had arrays for schedules, you can leave this blank 
+             // for DB events or handle it conditionally in your JSX
+             schedule: [] 
+          }));
+
+          // Combine the hardcoded events and the new database events!
+          setEvents([...OFFICIAL_EVENTS, ...formattedDbEvents]);
+        } else {
+          // If the DB fails, at least show the hardcoded ones
+          setEvents([...OFFICIAL_EVENTS]);
+        }
+      } catch (error) {
+        console.error("Error fetching events:", error);
+        setEvents([...OFFICIAL_EVENTS]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  // 6. UI Interaction Handlers
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);
   };
 
-  return (
-    <>
-      <main className="mx-auto min-h-screen max-w-6xl px-6 py-10 sm:px-8 md:px-10 lg:px-12 lg:py-12">
-        <div className="mb-10 md:mb-12">
-          <h1 className="m-0 text-4xl font-serif leading-tight tracking-tight text-on-surface sm:text-5xl">
-            Upcoming Events
-          </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-on-surface-variant sm:text-base">
-            The curated schedule of major club events, workshops, and tournaments.
-            For your personal match schedule, please consult the Calendar.
-          </p>
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Triggered when the "Edit" button is clicked
+  const openEditModal = (event) => {
+    setEditingEventId(event.id);
+    
+    // Format the date properly for the <input type="date"> (YYYY-MM-DD)
+    let formattedDate = event.date;
+    try {
+      formattedDate = new Date(event.date).toISOString().split('T')[0];
+    } catch(e) {}
+
+    // Populate the form with the event's current details
+    setFormData({
+      title: event.title,
+      event_type: event.tag,
+      short_description: event.shortDesc,
+      event_briefing: event.fullDesc,
+      event_date: formattedDate,
+      event_time: event.time,
+      location: event.location,
+      format: event.format,
+      register_link: event.register_link || ''
+    });
+    
+    setIsModalOpen(true);
+  };
+
+  // Triggered when the "Delete" button is clicked
+  const handleDelete = async (eventId) => {
+    if (!window.confirm("Are you sure you want to permanently delete this event?")) return;
+
+    // Check if it's a database event (starts with 'db-')
+    const isDbEvent = String(eventId).startsWith('db-');
+    
+    if (isDbEvent) {
+      const realId = eventId.replace('db-', '');
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+        await fetch(`${API_BASE_URL}/api/events/${realId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      } catch (error) {
+        console.error("Failed to delete from database:", error);
+      }
+    }
+
+    // Immediately remove it from the screen for a snappy UI
+    setEvents(prev => prev.filter(e => e.id !== eventId));
+    setExpandedId(null);
+  };
+  // 7. Admin Submit Handler
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+    
+    const isDbEvent = editingEventId && String(editingEventId).startsWith('db-');
+    const realId = isDbEvent ? editingEventId.replace('db-', '') : null;
+    
+    // If we are editing, use PUT and attach the ID. Otherwise, use POST.
+    const method = editingEventId ? 'PUT' : 'POST';
+    const endpoint = realId ? `/api/events/${realId}` : '/api/events';
+
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        alert(`Event ${editingEventId ? 'updated' : 'created'} successfully!`);
+        setIsModalOpen(false);
+        setEditingEventId(null); // Reset edit state
+        
+        // Re-fetch events to show the updated data
+        const updatedResponse = await fetch(`${API_BASE_URL}/api/events`);
+        if (updatedResponse.ok) {
+           const dbEvents = await updatedResponse.json();
+           const formattedDbEvents = dbEvents.map(dbEvent => ({
+             id: `db-${dbEvent.id}`,
+             title: dbEvent.title,  
+             date: dbEvent.event_date,
+             tag: dbEvent.event_type,
+             time: dbEvent.event_time,
+             location: dbEvent.location,
+             format: dbEvent.format,
+             shortDesc: dbEvent.short_description,
+             fullDesc: dbEvent.event_briefing,
+             register_link: dbEvent.register_link,
+             schedule: [] 
+          }));
+          setEvents([...OFFICIAL_EVENTS, ...formattedDbEvents]);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to save event:", error);
+    }
+  };
+
+
+return (
+    <div className="min-h-screen bg-[#111111] text-white pt-24 font-sans relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 relative">
+        
+        {/* Header Section */}
+        <div className="flex justify-between items-end border-b border-gray-800 pb-8 mb-12">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl md:text-5xl font-serif text-gray-100 mb-4">
+              Upcoming Events
+            </h1>
+            <p className="text-gray-400 text-lg">
+              The curated schedule of major club events, workshops, and tournaments. 
+              For your personal match schedule, please consult the Calendar.
+            </p>
+          </div>
+
+          {/* Admin Create Event Button */}
+          {isAdmin && (
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="bg-yellow-400 text-black px-6 py-2 rounded-md font-bold text-sm hover:bg-yellow-500 transition-colors shadow-lg"
+            >
+              + Create Event
+            </button>
+          )}
         </div>
 
-        <div className="space-y-5">
-          {OFFICIAL_EVENTS.map((event, idx) => {
-            const isExpanded = expandedId === event.id;
-
-            return (
-              <motion.div
+        {/* Loading State */}
+        {isLoading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400"></div>
+          </div>
+        ) : (
+          /* Events List */
+          <div className="space-y-6">
+            {events.map((event) => (
+              <motion.div 
                 key={event.id}
-                initial={{ opacity: 0, y: 60 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.8, delay: (idx % 3) * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                className={`overflow-hidden rounded-2xl border transition-all duration-500 ${
-                  isExpanded
-                    ? 'border-primary/40 bg-surface-container shadow-[0_12px_36px_rgba(212,175,55,0.08)]'
-                    : 'border-outline-variant/15 bg-surface-container-low hover:border-outline-variant/35 hover:bg-surface-container'
-                }`}
+                viewport={{ once: true }}
+                className="bg-[#1a1a1a] border border-gray-800 rounded-xl overflow-hidden hover:border-gray-700 transition-colors"
               >
-                <button
-                  type="button"
+                {/* Event Header (Always Visible) */}
+                <div 
+                  className="p-6 md:p-8 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-6"
                   onClick={() => toggleExpand(event.id)}
-                  className="w-full cursor-pointer px-5 py-5 text-left sm:px-6 sm:py-6 md:px-8 md:py-7"
                 >
-                  <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-                    <div className="flex-1">
-                      <div className="mb-3 flex flex-wrap items-center gap-3 text-[10px] font-bold uppercase tracking-widest font-label">
-                        {event.tag && (
-                          <>
-                            <span
-                              className={
-                                event.tag === 'Tournament'
-                                  ? 'text-primary'
-                                  : event.tag === 'Workshop'
-                                  ? 'text-on-surface'
-                                  : 'text-blue-400'
-                              }
-                            >
-                              {event.tag}
-                            </span>
-                            <span className="text-on-surface-variant/40">•</span>
-                          </>
-                        )}
-                        <span className="text-on-surface-variant">{event.date}</span>
-                      </div>
-
-                      <h3 className="m-0 text-2xl font-serif text-on-surface sm:text-[28px]">
-                        {event.title}
-                      </h3>
-
-                      <p className="mt-3 max-w-3xl text-sm leading-relaxed text-on-surface-variant">
-                        {event.shortDesc}
-                      </p>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 text-xs font-bold tracking-widest text-gray-500 mb-3 uppercase">
+                      <span className="text-yellow-400">{event.tag}</span> {/* Changed from event_type */}
+                      <span>•</span>
+                      <span>{new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span> {/* Changed from event_date */}
                     </div>
-
-                    <div className="flex items-center justify-between gap-5 border-t border-outline-variant/10 pt-4 md:justify-end md:border-t-0 md:pt-0">
-                      <div className="text-left md:text-right">
-                        <p className="m-0 mb-1 text-[10px] font-label uppercase tracking-widest text-on-surface-variant">
-                          Time
-                        </p>
-                        <p className="m-0 text-xs font-bold text-on-surface">
-                          {event.time}
-                        </p>
-                      </div>
-
-                      <div
-                        className={`flex h-10 w-10 items-center justify-center rounded-full border shadow-inner transition-all duration-300 ${
-                          isExpanded
-                            ? 'rotate-180 border-primary bg-primary text-[#3c2f00]'
-                            : 'border-outline-variant/30 bg-[#2a2828] text-[#e5e2e1]'
-                        }`}
-                      >
-                        <span className="material-symbols-outlined text-xl">
-                          expand_more
-                        </span>
-                      </div>
-                    </div>
+                    <h3 className="text-2xl font-serif text-gray-100 mb-3">{event.title}</h3>
+                    <p className="text-gray-400 leading-relaxed max-w-3xl">
+                      {event.shortDesc} {/* Changed from short_description */}
+                    </p>
                   </div>
-                </button>
-
-                <div
-                  className={`grid transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-                    isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-                  }`}
-                >
-                  <div className="overflow-hidden">
-                    <div className="border-t border-outline-variant/10 px-5 pb-6 pt-4 sm:px-6 md:px-8 md:pb-8">
-                      <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-10">
-                        <div className="md:col-span-8">
-                          <h4 className="mb-4 text-[10px] font-label uppercase tracking-widest text-primary">
-                            Event Briefing
-                          </h4>
-                          <p className="mb-8 text-sm leading-relaxed text-on-surface-variant">
-                            {event.fullDesc}
-                          </p>
-
-                          <h4 className="mb-4 text-[10px] font-label uppercase tracking-widest text-primary">
-                            Agenda Overview
-                          </h4>
-
-                          <div className="space-y-3 rounded-xl border border-outline-variant/10 bg-[#131313] p-4 sm:p-5">
-                            {event.schedule.map((item, idx) => (
-                              <div key={idx} className="flex items-center gap-4">
-                                <span className="w-24 shrink-0 text-xs font-bold text-on-surface-variant">
-                                  {item.time}
-                                </span>
-                                <span className="h-2 w-2 rounded-full bg-primary/50"></span>
-                                <span className="text-xs text-on-surface sm:text-sm">
-                                  {item.activity}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="space-y-5 md:col-span-4">
-                          <div className="rounded-xl border border-outline-variant/10 bg-[#131313] p-5">
-                            <h4 className="mb-2 flex items-center gap-2 text-[10px] font-label uppercase tracking-widest text-on-surface-variant">
-                              <span className="material-symbols-outlined text-[14px]">
-                                location_on
-                              </span>
-                              Location
-                            </h4>
-                            <p className="m-0 text-sm font-bold text-on-surface">
-                              {event.location}
-                            </p>
-                          </div>
-
-                          {event.format && (
-                            <div className="rounded-xl border border-outline-variant/10 bg-[#131313] p-5">
-                              <h4 className="mb-2 flex items-center gap-2 text-[10px] font-label uppercase tracking-widest text-on-surface-variant">
-                                <span className="material-symbols-outlined text-[14px] text-primary">
-                                  sports_esports
-                                </span>
-                                Match Format
-                              </h4>
-                              <p className="m-0 text-sm font-bold text-on-surface">
-                                {event.format}
-                              </p>
-                            </div>
-                          )}
-
-                          <div className="rounded-xl border border-[#f2ca50]/20 bg-[#131313] p-5">
-                            <h4 className="mb-2 flex items-center gap-2 text-[10px] font-label uppercase tracking-widest text-on-surface-variant">
-                              <span className="material-symbols-outlined text-[14px] text-primary">
-                                emoji_events
-                              </span>
-                              Honors
-                            </h4>
-                            <p className="m-0 text-sm font-bold text-primary">
-                              {event.prizes}
-                            </p>
-                          </div>
-
-                          {isLoggedIn && (
-                            <Link
-                              to={`/events/register/${event.id}`}
-                              className="mt-2 block w-full rounded-xl bg-gradient-to-r from-[#f2ca50] to-[#d4af37] px-4 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-[#3c2f00] shadow-lg outline-none transition-transform hover:scale-[1.02]"
-                            >
-                              Register
-                            </Link>
-                          )}
-                        </div>
-                      </div>
+                  
+                  <div className="flex items-center justify-between md:flex-col md:items-end gap-4 min-w-[140px]">
+                    <div className="text-left md:text-right">
+                      <div className="text-xs text-gray-500 tracking-wider mb-1 uppercase">Time</div>
+                      <div className="font-medium text-gray-200">{event.time}</div> {/* Changed from event_time */}
                     </div>
+                    <button 
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                        expandedId === event.id ? 'bg-yellow-400 text-black' : 'bg-gray-800 text-white hover:bg-gray-700'
+                      }`}
+                    >
+                      <svg 
+                        className={`w-5 h-5 transition-transform duration-300 ${expandedId === event.id ? 'rotate-180' : ''}`} 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
-              </motion.div>
-            );
-          })}
 
-        </div>
-      </main>
+                {/* Expanded Details Section */}
+                {expandedId === event.id && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="border-t border-gray-800 bg-[#161616] p-6 md:p-8"
+                  >
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                      <div className="lg:col-span-2">
+                        <h4 className="text-xs font-bold tracking-widest text-yellow-400 mb-4 uppercase">Event Briefing</h4>
+                        <p className="text-gray-300 leading-relaxed">
+                          {event.fullDesc} {/* Changed from event_briefing */}
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-6">
+                        {event.location && (
+                          <div className="bg-[#111111] p-5 rounded-lg border border-gray-800">
+                            <h4 className="text-xs font-bold tracking-widest text-gray-500 mb-2 uppercase flex items-center gap-2">
+                              Location
+                            </h4>
+                            <p className="text-gray-200">{event.location}</p>
+                          </div>
+                        )}
+                        
+                        {event.format && (
+                          <div className="bg-[#111111] p-5 rounded-lg border border-gray-800">
+                            <h4 className="text-xs font-bold tracking-widest text-gray-500 mb-2 uppercase flex items-center gap-2">
+                              Match Format
+                            </h4>
+                            <p className="text-gray-200">{event.format}</p>
+                          </div>
+                        )}
+
+                        {event.register_link && (
+                          <a 
+                            href={event.register_link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="block w-full text-center bg-yellow-400 text-black py-3 rounded-lg font-bold hover:bg-yellow-500 transition-colors"
+                          >
+                            REGISTER
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                    {/* Admin Edit/Delete Controls */}
+                    {isAdmin && (
+                      <div className="mt-8 pt-6 border-t border-gray-800 flex flex-wrap items-center gap-4">
+                        <button 
+                          onClick={() => openEditModal(event)}
+                          className="bg-gray-800 text-yellow-400 px-5 py-2 rounded-md font-bold text-sm hover:bg-gray-700 transition-colors"
+                        >
+                          Edit Event
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(event.id)}
+                          className="bg-red-900/50 text-red-400 border border-red-900 px-5 py-2 rounded-md font-bold text-sm hover:bg-red-900 hover:text-red-200 transition-colors"
+                        >
+                          Delete Event
+                        </button>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <Footer />
 
+      {/* Admin Creation Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4">
+          <div className="bg-[#1a1a1a] p-8 rounded-xl max-w-2xl w-full border border-gray-700 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <h2 className="text-2xl text-yellow-400 mb-6 font-serif font-bold">Create New Event</h2>
+            
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5 text-gray-200">
+              <input name="title" value={formData.title} placeholder="Event Title" required onChange={handleChange} className="p-3 bg-[#111111] rounded-md border border-gray-800 focus:border-yellow-400 focus:outline-none transition-colors" />
+              
+              <div className="flex flex-col md:flex-row gap-5">
+                <select name="event_type" value={formData.event_type} onChange={handleChange} className="p-3 bg-[#111111] rounded-md border border-gray-800 focus:border-yellow-400 focus:outline-none flex-1">
+                  <option value="Tournament">Tournament</option>
+                  <option value="Workshop">Workshop</option>
+                  <option value="Social">Social</option>
+                </select>
+                <input type="date" name="event_date" value={formData.event_date} required onChange={handleChange} className="p-3 bg-[#111111] rounded-md border border-gray-800 focus:border-yellow-400 focus:outline-none flex-1 [color-scheme:dark]" />
+              </div>
 
-    </>
+              <div className="flex flex-col md:flex-row gap-5">
+                <input name="event_time" value={formData.event_time} placeholder="Time (e.g., 9:00 PM Onwards)" required onChange={handleChange} className="p-3 bg-[#111111] rounded-md border border-gray-800 focus:border-yellow-400 focus:outline-none flex-1" />
+                <input name="location" value={formData.location} placeholder="Location (e.g., chess.com or LH7)" onChange={handleChange} className="p-3 bg-[#111111] rounded-md border border-gray-800 focus:border-yellow-400 focus:outline-none flex-1" />
+              </div>
+
+              <div className="flex flex-col md:flex-row gap-5">
+                <input name="format" value={formData.format} placeholder="Format (e.g., 3+0 Knockouts)" onChange={handleChange} className="p-3 bg-[#111111] rounded-md border border-gray-800 focus:border-yellow-400 focus:outline-none flex-1" />
+                <input name="register_link" value={formData.register_link} placeholder="Registration URL" onChange={handleChange} className="p-3 bg-[#111111] rounded-md border border-gray-800 focus:border-yellow-400 focus:outline-none flex-1" />
+              </div>
+
+              <textarea name="short_description" value={formData.short_description} placeholder="Short Description (for the header)" rows="2" onChange={handleChange} className="p-3 bg-[#111111] rounded-md border border-gray-800 focus:border-yellow-400 focus:outline-none"></textarea>
+              <textarea name="event_briefing" value={formData.event_briefing} placeholder="Full Event Briefing" rows="5" onChange={handleChange} className="p-3 bg-[#111111] rounded-md border border-gray-800 focus:border-yellow-400 focus:outline-none"></textarea>
+
+              <div className="flex justify-end gap-4 mt-2">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 bg-gray-800 rounded-md hover:bg-gray-700 transition-colors font-medium">Cancel</button>
+                <button type="submit" className="px-5 py-2.5 bg-yellow-400 text-black font-bold rounded-md hover:bg-yellow-500 transition-colors">Save Event</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
