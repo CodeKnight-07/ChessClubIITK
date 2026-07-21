@@ -137,6 +137,12 @@ const Landing = () => {
       <section className="py-16 px-6 md:px-12 lg:px-20 bg-surface-container-lowest">
         <div className="max-w-5xl mx-auto mb-10 text-center">
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-serif text-on-surface">About Chess Club</h2>
+          <p className="mt-6 text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+            Welcome to the Chess Club IIT Kanpur. Our mission is to foster intellectual growth, strategic thinking, and camaraderie through the timeless game of chess. We invite you to explore our upcoming schedules, participate in our organised events.
+          </p>
+          <p className="mt-6 text-primary font-bold text-lg sm:text-xl md:text-2xl tracking-[0.2em] uppercase font-label">
+            Discover your next move.
+          </p>
         </div>
 
         <motion.div
@@ -147,28 +153,25 @@ const Landing = () => {
           className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 pt-8"
         >
           {[
-            { id: 1, title: "Play" },
-            { id: 2, title: "Learn" },
-            { id: 3, title: "Compete" }
+            { 
+              id: 1, 
+              title: "Play and Grow", 
+              desc: "We believe that mastery begins with consistent practice. Our club provides a welcoming environment where players of all experience levels can engage in regular over-the-board play, participate in casual match analysis, and benefit from peer-led mentorship designed to steadily elevate your game." 
+            },
+            { 
+              id: 2, 
+              title: "Competitive Environment", 
+              desc: "The club hosts regular online and over-the-board campus tournaments open to all skill levels. We invite everyone to join this competitive environment, designed to foster creative tactical thinking, sharpen strategic skills, and help players flourish. Discover your potential and test your limits against peers in structured, official matchplay." 
+            },
+            { 
+              id: 3, 
+              title: "Exclusive Events & Talk Shows", 
+              desc: "The club hosts premier events, including the Chess Masters Premier League (CMPL) and official FIDE-rated tournaments. Additionally, we feature exclusive talk shows and masterclasses with renowned global chess personalities, including World Champion GM Gukesh Dommaraju, GM Arjun Erigaisi, ChessBase India's Sagar Shah, and Chess.com CEO Erik Allebest." 
+            }
           ].map((card, idx) => (
-            <div key={card.id} className="relative group cursor-pointer">
-              {/* Protruding Tab - Half Curved Rectangle */}
-              <motion.div
-                initial={{ x: "-50%", y: 0, opacity: 0 }}
-                whileInView={{ x: "-50%", y: -26, opacity: 1 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{
-                  duration: 0.5,
-                  delay: 0.8 + idx * 0.15, // Pops out right after the main card settles in place
-                  ease: "easeOut"
-                }}
-                className="absolute top-0 left-1/2 z-0 w-36 text-center bg-gradient-to-t from-[#1a1919] to-[#252424] border-t border-x border-outline-variant/20 py-1.5 rounded-t-xl text-[10px] font-bold uppercase tracking-widest text-primary shadow-lg group-hover:from-[#f2ca50] group-hover:to-[#d4af37] group-hover:text-[#3c2f00] group-hover:border-primary/45 group-hover:shadow-[0_-4px_16px_rgba(242,202,80,0.15)] transition-all duration-500"
-              >
-                {card.title}
-              </motion.div>
-
+            <div key={card.id} className="relative group cursor-pointer h-full">
               {/* Main Card Body */}
-              <div className="relative z-10 rounded-2xl border border-outline-variant/15 bg-gradient-to-br from-surface-container-high/60 to-surface-container/20 backdrop-blur-md p-6 min-h-[350px] flex flex-col overflow-hidden group-hover:scale-[1.02] group-hover:border-primary/40 group-hover:shadow-[0_12px_36px_rgba(242,202,80,0.12)] transition-all duration-500">
+              <div className="relative z-10 rounded-2xl border border-outline-variant/15 bg-gradient-to-br from-surface-container-high/60 to-surface-container/20 backdrop-blur-md p-8 h-full min-h-[350px] flex flex-col justify-between overflow-hidden group-hover:scale-[1.02] group-hover:border-primary/40 group-hover:shadow-[0_12px_36px_rgba(242,202,80,0.12)] transition-all duration-500">
                 {/* Golden Hover Fill Overlay with directional transfer illusion */}
                 <div className="absolute inset-0 bg-[#f2ca50] scale-x-0 group-hover:scale-x-100 transition-transform origin-right group-hover:origin-left duration-500 ease-in-out z-0 pointer-events-none"></div>
 
@@ -177,6 +180,27 @@ const Landing = () => {
 
                 {/* Decorative grid pattern in background */}
                 <div className="absolute inset-0 bg-[radial-gradient(#ffffff03_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none z-10"></div>
+
+                {/* Card Content */}
+                <div className="relative z-20 flex flex-col h-full flex-1">
+                  {/* Heading of the card at the top */}
+                  <div className="w-full flex flex-col items-center">
+                    <div className="h-20 flex items-center justify-center w-full">
+                      <h3 className="text-xl sm:text-2xl font-serif text-on-surface group-hover:text-[#131313] transition-colors duration-500 leading-snug text-center w-full">
+                        {card.title}
+                      </h3>
+                    </div>
+                    {/* Centered Divider Line */}
+                    <div className="w-16 h-[1.5px] bg-[#d4af37]/30 group-hover:bg-[#3c2f00]/40 mt-3 transition-colors duration-500"></div>
+                  </div>
+
+                  {/* Description of the card below the heading */}
+                  {card.desc && (
+                    <p className="mt-6 text-xs sm:text-sm text-on-surface-variant group-hover:text-[#251a00]/80 transition-colors duration-500 leading-relaxed text-center">
+                      {card.desc}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           ))}
