@@ -1,20 +1,18 @@
-from fileinput import filename
 import os
 import jwt
 import datetime
 from functools import wraps
-from flask import Flask, jsonify , request
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 from config.db import get_db_connection
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 import bcrypt
-from google.cloud import storage
 from flask_jwt_extended import JWTManager, create_access_token
+
 # Load your local .env file BEFORE anything else
 load_dotenv()
-
 
 # Import your blueprints
 from routes.auth import auth_bp
@@ -25,8 +23,15 @@ app = Flask(__name__)
 app.config["JWT_TOKEN_LOCATION"] = ["headers"]
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET")
 app.config["JWT_SECRET"] = os.environ.get("JWT_SECRET")
-jwt_manager=JWTManager(app)
+jwt_manager = JWTManager(app)
 
+# --- LOCAL UPLOAD DIRECTORY SETUP ---
+# Defines the path: backend/static/uploads
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'uploads')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Automatically create the folder if it doesn't exist yet
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Allow your local React app and production site to connect
 CORS(
@@ -41,7 +46,6 @@ app.register_blueprint(auth_bp, url_prefix='/api')
 app.register_blueprint(blogs_bp, url_prefix='/api')
 app.register_blueprint(events_bp)
 
-import bcrypt # <--- MUST BE AT THE TOP OF app.py
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -71,24 +75,17 @@ def login():
             # user[1] is the is_admin column from your SQL database
             user_role = 'secretary' if user[1] else 'member'
                 
-            # 4. Generate the JWT with their specific role!
-            # payload = {
-            #     'user_id': user[0],
-            #     'role': user_role, # <--- The token now remembers if they are a secretary or a member
-            #     'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
-            # }
-            
-            # token = jwt.encode(payload, 'JWT_SECRET', algorithm='HS256')
             user_email = username if '@' in username else ""
             additional_claims = {"role": user_role, "is_admin": user[1], "user_id": user[0]}
             token = create_access_token(identity=user_email, additional_claims=additional_claims)
-            # Optional: We can also send the role back in the JSON so React knows instantly
+            
             return jsonify({'token': token, 'role': user_role}), 200
             
         return jsonify({'error': 'Invalid username or password.'}), 401
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 @app.route("/health")
 def health():
     return {"status": "ok"}
@@ -105,7 +102,6 @@ def db_test():
 def get_gallery():
     try:
         conn = get_db_connection()
-        # Remove the dictionary=True argument
         cursor = conn.cursor() 
         
         cursor.execute("SELECT id, image_url, category, album_type, title, description FROM gallery ORDER BY created_at DESC")
@@ -130,14 +126,12 @@ def token_required(f):
         
         # 1. Check if the frontend sent a token in the headers
         if 'Authorization' in request.headers:
-            # Tokens are usually sent as "Bearer <token>"
             token = request.headers['Authorization'].split(" ")[1]
             
         if not token:
             return jsonify({'error': 'Token is missing! Access denied.'}), 401
             
         try:
-            # 2. Use app.config["JWT_SECRET_KEY"] so it matches your .env file signature
             data = jwt.decode(token, app.config["JWT_SECRET_KEY"], algorithms=['HS256'])
             
             # Flask-JWT-Extended nests claims inside a top-level property dictionary
@@ -160,31 +154,41 @@ def token_required(f):
 @token_required
 def upload_carousel_image():
     try:
-        # 1. Grab the physical file from the request
         if 'image' not in request.files:
             return jsonify({"error": "No image provided"}), 400
             
         file = request.files['image']
         
+        if file.filename == '':
+            return jsonify({"error": "No selected file"}), 400
+
         filename = secure_filename(file.filename)
+        
+        # --- LOCAL FILE UPLOAD ---
+        # 1. Construct the physical path on your laptop/server
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        
+        # 2. Save the file directly to the static/uploads folder
+        file.save(file_path)
 
-        # Upload straight to Google Cloud
-        storage_client = storage.Client()
-        bucket = storage_client.bucket('chess-club-iitk-media')
-        blob = bucket.blob(f"Gallery/{filename}")
-        blob.upload_from_string(file.read(), content_type=file.content_type)
-
-        # Save the permanent cloud URL to your database
-        db_path = blob.public_url
+        # 3. Create the relative URL path to save in your SQL database
+        db_path = f"/static/uploads/{filename}"
         
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("INSERT INTO featured_carousel (image_url) VALUES (%s)", (db_path,))
+        # Get the ID of the newly inserted row to return to the frontend
+        new_id = cursor.lastrowid 
         conn.commit()
         cursor.close()
         conn.close()
         
-        return jsonify({"message": "Image uploaded successfully!", "url": db_path}), 200
+        # Return the new image object so React can display it instantly without refreshing
+        return jsonify({
+            "message": "Image uploaded successfully!", 
+            "id": new_id,
+            "image_url": db_path
+        }), 200
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -196,10 +200,8 @@ def get_carousel_images():
         conn = get_db_connection()
         cursor = conn.cursor() 
         
-        # Grab all the saved images
         cursor.execute("SELECT id, image_url FROM featured_carousel ORDER BY id DESC")
         
-        # Safely and universally convert the SQL rows into a JSON dictionary
         row_headers = [x[0] for x in cursor.description]
         images = [dict(zip(row_headers, row)) for row in cursor.fetchall()]
         
@@ -209,7 +211,7 @@ def get_carousel_images():
         return jsonify(images), 200
         
     except Exception as e:
-        print(f"GET CAROUSEL ERROR: {e}") # This will print the exact crash reason to your terminal!
+        print(f"GET CAROUSEL ERROR: {e}") 
         return jsonify({"error": str(e)}), 500
     
 @app.route('/api/carousel/<int:image_id>', methods=['DELETE'])
@@ -219,9 +221,21 @@ def delete_carousel_image(image_id):
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Note: In a production app, you would also use os.remove() here 
-        # to delete the physical file from the static/uploads folder. 
-        # For now, we just remove it from the database so it disappears from the website!
+        # 1. Fetch the image URL first so we know what physical file to delete
+        cursor.execute("SELECT image_url FROM featured_carousel WHERE id = %s", (image_id,))
+        row = cursor.fetchone()
+        
+        if row:
+            image_url = row[0] # e.g., "/static/uploads/Cat.jpeg"
+            
+            # --- LOCAL FILE DELETION ---
+            # Remove the leading slash to make it a valid path for os.remove
+            file_path_to_delete = os.path.join(os.getcwd(), image_url.lstrip('/'))
+            
+            if os.path.exists(file_path_to_delete):
+                os.remove(file_path_to_delete)
+        
+        # 2. Delete the record from the database
         cursor.execute("DELETE FROM featured_carousel WHERE id = %s", (image_id,))
         
         conn.commit()
@@ -231,7 +245,7 @@ def delete_carousel_image(image_id):
         return jsonify({"message": "Image deleted successfully!"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-# 1. PUBLIC ROUTE: Anyone can read the text (No @token_required here)
+
 @app.route('/api/config/featured', methods=['GET'])
 def get_featured_config():
     try:
@@ -241,7 +255,6 @@ def get_featured_config():
         cursor.execute("SELECT config_key, config_value FROM site_config WHERE config_key IN ('featured_title', 'featured_desc')")
         rows = cursor.fetchall()
         
-        # Convert tuples to dictionary
         config_dict = {row[0]: row[1] for row in rows}
         
         cursor.close()
@@ -259,30 +272,25 @@ def delete_memory():
     if not image_url_to_delete:
         return jsonify({"error": "No image URL provided"}), 400
 
-    # 1. Update your database/JSON file to remove this URL from the array
-    
+    # --- LOCAL FILE DELETION ---
+    try:
+        # e.g., if URL is "/static/uploads/image.jpg", remove leading slash
+        file_path_to_delete = os.path.join(os.getcwd(), image_url_to_delete.lstrip('/'))
+        
+        if os.path.exists(file_path_to_delete):
+            os.remove(file_path_to_delete)
+    except Exception as e:
+        print(f"Error deleting physical file: {e}")
+
+    # Delete from Database
     conn = get_db_connection()
     cursor = conn.cursor()
         
-    # Delete the record that has this specific image URL
     cursor.execute("DELETE FROM gallery WHERE image_url = %s", (image_url_to_delete,))
         
     conn.commit()
     cursor.close()
     conn.close()
-        # ---------------------
-
-    # 2. (Optional but recommended) Delete the actual file from your uploads folder
-    try:
-        filename = image_url_to_delete.split('/')[-1]
-        storage_client = storage.Client()
-        bucket = storage_client.bucket('chess-club-iitk-media')
-        blob = bucket.blob(f"Gallery/{filename}")
-
-        if blob.exists():
-            blob.delete()
-    except Exception as e:
-        print(f"Error deleting file: {e}")
 
     return jsonify({"message": "Photo deleted successfully"}), 200
 
@@ -295,28 +303,23 @@ def replace_memory():
         
     file = request.files['new_image']
     old_image_url = request.form.get('old_image_url')
-    index = request.form.get('index')
 
     if file.filename == '':
         return jsonify({"error": "No file selected"}), 400
 
     if file:
-        # 1. Save the new file
+        # --- LOCAL FILE UPLOAD & DELETE ---
+        # 1. Save the new file locally
         filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
 
-        storage_client = storage.Client()
-        bucket = storage_client.bucket('chess-club-iitk-media')
-        new_blob = bucket.blob(f"Gallery/{filename}")
-        new_blob.upload_from_string(file.read(), content_type=file.content_type)
+        new_image_url = f"/static/uploads/{filename}"
 
-        new_image_url = new_blob.public_url
-
-        # 2. Update your database/JSON file to swap the old URL with the new_image_url at the specific index
-        
+        # 2. Update Database with the new local path
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Find the row with the old URL and overwrite it with the new URL
         cursor.execute(
             "UPDATE gallery SET image_url = %s WHERE image_url = %s", 
             (new_image_url, old_image_url)
@@ -325,24 +328,20 @@ def replace_memory():
         conn.commit()
         cursor.close()
         conn.close()
-        # ---------------------
 
-        # 3. (Optional) Delete the old file from the server to save space
+        # 3. Delete the old physical file to save space
         try:
-            old_filename = old_image_url.split('/')[-1]
-            storage_client = storage.Client()
-            bucket = storage_client.bucket('chess-club-iitk-media')
-            old_blob = bucket.blob(f"Gallery/{old_filename}")
-
-            if old_blob.exists():
-                old_blob.delete()
-        except Exception as  e:
-            print(f"Error deleting old file: {e}")
+            if old_image_url:
+                old_file_path = os.path.join(os.getcwd(), old_image_url.lstrip('/'))
+                if os.path.exists(old_file_path):
+                    os.remove(old_file_path)
+        except Exception as e:
+            print(f"Error deleting old physical file: {e}")
 
         return jsonify({"message": "Photo replaced", "new_image_url": new_image_url}), 200
-# 2. PROTECTED ROUTE: Only Admins can save changes
+
 @app.route('/api/config/featured', methods=['PUT'])
-@token_required # <-- The Vault Door is ONLY on the PUT request now!
+@token_required 
 def update_featured_config():
     try:
         data = request.json
@@ -359,11 +358,7 @@ def update_featured_config():
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
 
-    
-
-# This MUST be at the very bottom of the file
 if __name__ == "__main__":
     # Local development settings with auto-reload enabled
     app.run(debug=True)
