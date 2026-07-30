@@ -38,7 +38,7 @@ const Footer = () => {
           <ul className="space-y-3 text-sm text-on-surface-variant">
             <li>
               <Link to="/previous-teams" className="cursor-pointer transition-colors hover:text-primary">
-                Previous Teams
+                Our History
               </Link>
             </li>
             <li>
