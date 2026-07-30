@@ -2,38 +2,51 @@ import os
 import jwt
 import datetime
 from functools import wraps
-from flask import Flask, jsonify , request
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 from config.db import get_db_connection
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 import bcrypt
-
+from flask_jwt_extended import JWTManager, create_access_token
 
 # Load your local .env file BEFORE anything else
 load_dotenv()
 
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # Import your blueprints
 from routes.auth import auth_bp
+from routes.blogs import blogs_bp
+from routes.events import events_bp
 
 app = Flask(__name__)
+app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET")
+app.config["JWT_SECRET"] = os.environ.get("JWT_SECRET")
+jwt_manager = JWTManager(app)
+
+# --- LOCAL UPLOAD DIRECTORY SETUP ---
+# Defines the path: backend/static/uploads
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'uploads')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Automatically create the folder if it doesn't exist yet
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Allow your local React app and production site to connect
 CORS(
     app,
     origins=[
         "http://localhost:5173",
-        "https://chess-club-iitk-myfork.vercel.app"
+        "https://chess-club-iitk-myfork.vercel.app",
+        "https://chess-club-iitk-w7u5.vercel.app"
     ]
 )
 
 app.register_blueprint(auth_bp, url_prefix='/api')
+app.register_blueprint(blogs_bp, url_prefix='/api')
+app.register_blueprint(events_bp)
 
-
-import bcrypt # <--- MUST BE AT THE TOP OF app.py
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -63,22 +76,17 @@ def login():
             # user[1] is the is_admin column from your SQL database
             user_role = 'secretary' if user[1] else 'member'
                 
-            # 4. Generate the JWT with their specific role!
-            payload = {
-                'user_id': user[0],
-                'role': user_role, # <--- The token now remembers if they are a secretary or a member
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-            }
+            user_email = username if '@' in username else ""
+            additional_claims = {"role": user_role, "is_admin": user[1], "user_id": user[0]}
+            token = create_access_token(identity=user_email, additional_claims=additional_claims)
             
-            token = jwt.encode(payload, 'JWT_SECRET', algorithm='HS256')
-            
-            # Optional: We can also send the role back in the JSON so React knows instantly
             return jsonify({'token': token, 'role': user_role}), 200
             
         return jsonify({'error': 'Invalid username or password.'}), 401
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 @app.route("/health")
 def health():
     return {"status": "ok"}
@@ -95,7 +103,6 @@ def db_test():
 def get_gallery():
     try:
         conn = get_db_connection()
-        # Remove the dictionary=True argument
         cursor = conn.cursor() 
         
         cursor.execute("SELECT id, image_url, category, album_type, title, description FROM gallery ORDER BY created_at DESC")
@@ -120,18 +127,19 @@ def token_required(f):
         
         # 1. Check if the frontend sent a token in the headers
         if 'Authorization' in request.headers:
-            # Tokens are usually sent as "Bearer <token>"
             token = request.headers['Authorization'].split(" ")[1]
             
         if not token:
             return jsonify({'error': 'Token is missing! Access denied.'}), 401
             
         try:
-            # 2. Try to decode the token using the SAME hardcoded secret key
-            data = jwt.decode(token, 'JWT_SECRET', algorithms=['HS256'])
+            data = jwt.decode(token, app.config["JWT_SECRET_KEY"], algorithms=['HS256'])
             
-            # 3. Check if they have the right role
-            if data['role'] != 'secretary':
+            # Flask-JWT-Extended nests claims inside a top-level property dictionary
+            claims = data.get('sub') or data
+            role_to_check = data.get('role')
+            
+            if role_to_check != 'secretary':
                 return jsonify({'error': 'Admin privileges required.'}), 403
                 
         except jwt.ExpiredSignatureError:
@@ -147,29 +155,41 @@ def token_required(f):
 @token_required
 def upload_carousel_image():
     try:
-        # 1. Grab the physical file from the request
         if 'image' not in request.files:
             return jsonify({"error": "No image provided"}), 400
             
         file = request.files['image']
         
-        # 2. Clean the filename to prevent hacking, then save it
+        if file.filename == '':
+            return jsonify({"error": "No selected file"}), 400
+
         filename = secure_filename(file.filename)
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
-        file.save(filepath)
         
-        # 3. Save the local path to your SQL database
-        # We save it as '/static/uploads/filename.jpg' so React can read it
-        db_path = f"/static/uploads/{filename}" 
+        # --- LOCAL FILE UPLOAD ---
+        # 1. Construct the physical path on your laptop/server
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        
+        # 2. Save the file directly to the static/uploads folder
+        file.save(file_path)
+
+        # 3. Create the relative URL path to save in your SQL database
+        db_path = f"/static/uploads/{filename}"
         
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("INSERT INTO featured_carousel (image_url) VALUES (%s)", (db_path,))
+        # Get the ID of the newly inserted row to return to the frontend
+        new_id = cursor.lastrowid 
         conn.commit()
         cursor.close()
         conn.close()
         
-        return jsonify({"message": "Image uploaded successfully!", "url": db_path}), 200
+        # Return the new image object so React can display it instantly without refreshing
+        return jsonify({
+            "message": "Image uploaded successfully!", 
+            "id": new_id,
+            "image_url": db_path
+        }), 200
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -181,10 +201,8 @@ def get_carousel_images():
         conn = get_db_connection()
         cursor = conn.cursor() 
         
-        # Grab all the saved images
         cursor.execute("SELECT id, image_url FROM featured_carousel ORDER BY id DESC")
         
-        # Safely and universally convert the SQL rows into a JSON dictionary
         row_headers = [x[0] for x in cursor.description]
         images = [dict(zip(row_headers, row)) for row in cursor.fetchall()]
         
@@ -194,7 +212,7 @@ def get_carousel_images():
         return jsonify(images), 200
         
     except Exception as e:
-        print(f"GET CAROUSEL ERROR: {e}") # This will print the exact crash reason to your terminal!
+        print(f"GET CAROUSEL ERROR: {e}") 
         return jsonify({"error": str(e)}), 500
     
 @app.route('/api/carousel/<int:image_id>', methods=['DELETE'])
@@ -204,9 +222,21 @@ def delete_carousel_image(image_id):
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Note: In a production app, you would also use os.remove() here 
-        # to delete the physical file from the static/uploads folder. 
-        # For now, we just remove it from the database so it disappears from the website!
+        # 1. Fetch the image URL first so we know what physical file to delete
+        cursor.execute("SELECT image_url FROM featured_carousel WHERE id = %s", (image_id,))
+        row = cursor.fetchone()
+        
+        if row:
+            image_url = row[0] # e.g., "/static/uploads/Cat.jpeg"
+            
+            # --- LOCAL FILE DELETION ---
+            # Remove the leading slash to make it a valid path for os.remove
+            file_path_to_delete = os.path.join(os.getcwd(), image_url.lstrip('/'))
+            
+            if os.path.exists(file_path_to_delete):
+                os.remove(file_path_to_delete)
+        
+        # 2. Delete the record from the database
         cursor.execute("DELETE FROM featured_carousel WHERE id = %s", (image_id,))
         
         conn.commit()
@@ -216,7 +246,7 @@ def delete_carousel_image(image_id):
         return jsonify({"message": "Image deleted successfully!"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-# 1. PUBLIC ROUTE: Anyone can read the text (No @token_required here)
+
 @app.route('/api/config/featured', methods=['GET'])
 def get_featured_config():
     try:
@@ -226,7 +256,6 @@ def get_featured_config():
         cursor.execute("SELECT config_key, config_value FROM site_config WHERE config_key IN ('featured_title', 'featured_desc')")
         rows = cursor.fetchall()
         
-        # Convert tuples to dictionary
         config_dict = {row[0]: row[1] for row in rows}
         
         cursor.close()
@@ -235,10 +264,85 @@ def get_featured_config():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/gallery/memories', methods=['DELETE'])
+@token_required 
+def delete_memory():
+    data = request.get_json()
+    image_url_to_delete = data.get('image_url')
+    
+    if not image_url_to_delete:
+        return jsonify({"error": "No image URL provided"}), 400
 
-# 2. PROTECTED ROUTE: Only Admins can save changes
+    # --- LOCAL FILE DELETION ---
+    try:
+        # e.g., if URL is "/static/uploads/image.jpg", remove leading slash
+        file_path_to_delete = os.path.join(os.getcwd(), image_url_to_delete.lstrip('/'))
+        
+        if os.path.exists(file_path_to_delete):
+            os.remove(file_path_to_delete)
+    except Exception as e:
+        print(f"Error deleting physical file: {e}")
+
+    # Delete from Database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+        
+    cursor.execute("DELETE FROM gallery WHERE image_url = %s", (image_url_to_delete,))
+        
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Photo deleted successfully"}), 200
+
+
+@app.route('/api/gallery/memories/replace', methods=['POST'])
+@token_required 
+def replace_memory():
+    if 'new_image' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+        
+    file = request.files['new_image']
+    old_image_url = request.form.get('old_image_url')
+
+    if file.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+
+    if file:
+        # --- LOCAL FILE UPLOAD & DELETE ---
+        # 1. Save the new file locally
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+
+        new_image_url = f"/static/uploads/{filename}"
+
+        # 2. Update Database with the new local path
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute(
+            "UPDATE gallery SET image_url = %s WHERE image_url = %s", 
+            (new_image_url, old_image_url)
+        )
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        # 3. Delete the old physical file to save space
+        try:
+            if old_image_url:
+                old_file_path = os.path.join(os.getcwd(), old_image_url.lstrip('/'))
+                if os.path.exists(old_file_path):
+                    os.remove(old_file_path)
+        except Exception as e:
+            print(f"Error deleting old physical file: {e}")
+
+        return jsonify({"message": "Photo replaced", "new_image_url": new_image_url}), 200
+
 @app.route('/api/config/featured', methods=['PUT'])
-@token_required # <-- The Vault Door is ONLY on the PUT request now!
+@token_required 
 def update_featured_config():
     try:
         data = request.json
@@ -255,11 +359,7 @@ def update_featured_config():
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
 
-    
-
-# This MUST be at the very bottom of the file
 if __name__ == "__main__":
     # Local development settings with auto-reload enabled
     app.run(debug=True)

@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config'; 
+import { useAuth } from '../context/AuthContext';
 import userAvatar from '../assets/new_user_avatar.png';
 
 const UserProfile = () => {
@@ -9,13 +11,33 @@ const UserProfile = () => {
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
 
-  // Extract the authenticated session email dynamically rather than hardcoding it
-  const userEmail = localStorage.getItem('logged_in_user_email') || "student@iitk.ac.in";
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { logout } = useAuth();
+
+  const navigate = useNavigate();
+
+  // Extract the authenticated session email dynamically from context rather than localstorage
+  const { user,token } = useAuth();
+  const userEmail = user?.email;
 
   useEffect(() => {
+    if (!userEmail) {
+      setError("Please log in to view your profile properties.");
+      return;
+    }
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/user/profile/${userEmail}`);
+        const token = localStorage.getItem('chess-club-jwt');
+        const response = await fetch(`${API_BASE_URL}/api/user/profile/${userEmail}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // 🔒 Pass the bearer authorization key safely here!
+          }
+        });
+        
         if (!response.ok) throw new Error("Could not retrieve profile properties");
         
         const data = await response.json();
@@ -51,10 +73,15 @@ const UserProfile = () => {
   }, [userEmail]);
 
   const handleSave = async () => {
+    const token = localStorage.getItem('chess-club-jwt');
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/user/profile/update`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+         },
         body: JSON.stringify(profile),
       });
 
@@ -79,8 +106,57 @@ const UserProfile = () => {
     }
   };
 
+  const handleDeleteAccount = async (e) => {
+    e.preventDefault();
+    setError('');
+    setIsDeleting(true);
+    
+    const token = localStorage.getItem('chess-club-jwt');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/user/profile/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          email: userEmail,
+          password: deletePassword
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Failed to delete account.");
+        setIsDeleting(false);
+      } else {
+        // Clear out the modal layout configurations
+        setShowDeleteModal(false);
+        // Log the user out immediately since their credentials no longer exist
+        logout(); 
+        navigate('/login');
+      }
+    } catch (err) {
+      console.error("Deletion Error:", err);
+      setError("Failed to connect to the authentication server.");
+      setIsDeleting(false);
+    }
+  };
+
+
+  if (error) {
+  return (
+    <div className="px-12 py-12 max-w-md mx-auto text-center">
+      <div className="text-red-500 text-sm bg-red-500/10 p-4 rounded-xl font-semibold border border-red-500/20">
+        {error}
+      </div>
+    </div>
+  );
+  }
   if (!profile) {
-    return <div className="text-center p-12 text-on-surface">Loading Chess Sanctum Profile...</div>;
+    return <div className="text-center p-12 text-on-surface">Loading Profile...</div>;
   }
 
   return (
@@ -163,6 +239,19 @@ const UserProfile = () => {
                       />
                       <span className="absolute right-2 bottom-1.5 text-[14px] text-on-surface-variant/30 material-symbols-outlined">lock</span>
                     </div>
+
+                    {/*SECONDARY EMAIL INPUT: Locked down with 'disabled flag'*/}
+                    <div className="w-full relative">
+                      <input 
+                        type="email" 
+                        value={profile.secondary_email || ''}
+                        disabled
+                        className="text-[11px] font-label uppercase tracking-widest bg-transparent border-b border-outline-variant/10 text-on-surface-variant/40 pb-1 focus:outline-none w-full text-center cursor-not-allowed select-none"
+                        placeholder="Secondary Email ID"
+                      />
+                      <span className="absolute right-2 bottom-1.5 text-[14px] text-on-surface-variant/30 material-symbols-outlined">lock</span>
+                    </div>
+
                     {/* CHESS.COM INPUT: Locked down with 'disabled' flag */}
                     <div className="w-full relative">
                       <input 
@@ -189,9 +278,18 @@ const UserProfile = () => {
                       <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Email</span>
                       <span className="text-[11px] text-on-surface font-mono flex-shrink truncate max-w-[140px]">{profile.email || "-"}</span>
                     </div>
-                    <div className="flex justify-between items-center text-left pt-2 border-t border-outline-variant/10">
-                      <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Chess.com</span>
-                      <span className="text-xs text-primary font-mono tracking-widest">{profile.chesscom || "-"}</span>
+                    <div className="flex justify-between items-center text-left">
+                      <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Secondary Email</span>
+                      <span className="text-[11px] text-on-surface font-mono flex-shrink truncate max-w-[140px]">{profile.secondary_email || "-"}</span>
+                    </div>
+                    <div className="flex justify-between items-center gap-4 text-left pt-2 border-t border-outline-variant/10 min-w-0">
+                      <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold flex-shrink-0">Chess.com</span>
+                      <span 
+                        title={profile.chesscom} // Native browser hover tooltip helper
+                        className="text-xs text-primary font-mono tracking-widest truncate max-w-[160px] text-right"
+                      >
+                        {profile.chesscom || "-"}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -210,6 +308,14 @@ const UserProfile = () => {
                   className="w-full bg-[#f2ca50] hover:bg-[#d4af37] text-[#3c2f00] py-3.5 rounded-xl font-bold text-sm tracking-widest uppercase shadow-lg hover:-translate-y-1 transition-all outline-none"
                 >
                   Edit Profile
+                </button>
+              )}
+              {!isEditing && (
+                <button 
+                  onClick={() => setShowDeleteModal(true)}
+                  className="w-full mt-4 bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-500/20 py-2.5 rounded-xl font-bold text-xs tracking-widest uppercase transition-all outline-none"
+                >
+                  Delete Account
                 </button>
               )}
             </div>
@@ -262,6 +368,54 @@ const UserProfile = () => {
           </button>
         </div>
       </div>
+      {/* --- DANGER ZONE: ACCOUNT ERASURE MODAL COMPONENT --- */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="bg-[#1c1b1b] max-w-md w-full rounded-2xl p-8 border border-red-500/20 shadow-2xl space-y-6">
+            <div className="text-center">
+              <span className="material-symbols-outlined text-red-500 text-5xl mb-2 animate-pulse">warning</span>
+              <h3 className="text-xl font-serif font-bold text-white">Irreversible Action</h3>
+              <p className="text-xs text-on-surface-variant/70 mt-2 leading-relaxed">
+                This will permanently delete your Chess Club profile, history, and credentials. This transaction cannot be undone.
+              </p>
+            </div>
+
+            <form onSubmit={handleDeleteAccount} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-bold text-red-400 uppercase tracking-[0.15em] mb-2 ml-1">
+                  Type password to confirm
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  className="appearance-none block w-full px-4 py-3 border border-outline-variant/20 bg-surface-container-lowest text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 text-center text-sm transition-colors"
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <button
+                  type="button"
+                  disabled={isDeleting}
+                  onClick={() => { setShowDeleteModal(false); setDeletePassword(''); }}
+                  className="w-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface py-3 rounded-xl font-bold text-xs tracking-widest uppercase transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isDeleting}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-bold text-xs tracking-widest uppercase shadow-lg shadow-red-600/10 disabled:opacity-50 transition-all"
+                >
+                  {isDeleting ? 'Processing...' : 'Delete Permanently'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

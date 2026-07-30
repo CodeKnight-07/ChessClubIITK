@@ -77,7 +77,7 @@ const SECRETARIES = [
     name: "Aarush Waghmare",
     role: "Secretary",
     funnyDescription: `"En croissant"`,
-    email: "aarushw25@iitk.ac.in",
+
     image: aarushWaghImg,
   },
   {
@@ -85,7 +85,7 @@ const SECRETARIES = [
     name: "Aditya Dum",
     role: "Secretary",
     funnyDescription: `"I am high on chess,let's play and enjoy this addiction!!"`,
-    email: "aditya.dum@iitk.ac.in",
+
     image: adityaImg,
   },
   {
@@ -93,7 +93,7 @@ const SECRETARIES = [
     name: "Akshat Joshi",
     role: "Secretary",
     funnyDescription: `"The plan was perfect until I played it"`,
-    email: "akshatj25@iitk.ac.in",
+
     image: akshatImg,
   },
   {
@@ -101,7 +101,7 @@ const SECRETARIES = [
     name: "Anant Singh",
     role: "Secretary",
     funnyDescription: `"Still looking for the best move"`,
-    email: "anantsi25@iitk.ac.in",
+
     image: anantImg,
   },
   {
@@ -109,7 +109,7 @@ const SECRETARIES = [
     name: "Arham Nadeem",
     role: "Secretary",
     funnyDescription: `"After every blunder, there is a great move !"`,
-    email: "arhamn25@iitk.ac.in",
+
     image: arhamImg,
   },
   {
@@ -117,7 +117,7 @@ const SECRETARIES = [
     name: "Arush Jain",
     role: "Secretary",
     funnyDescription: `"My opening preparation lasts longer than my actual games."`,
-    email: "arush.jain@iitk.ac.in",
+
     image: arushImg,
   },
   {
@@ -125,7 +125,7 @@ const SECRETARIES = [
     name: "Aryan Kurade",
     role: "Secretary",
     funnyDescription: `"My opponents fear my unpredictability, so do I."`,
-    email: "skaryan25@iitk.ac.in",
+
     image: aryanImg,
   },
   {
@@ -133,7 +133,7 @@ const SECRETARIES = [
     name: "B Madhav Krishna",
     role: "Secretary",
     funnyDescription: `"Chess is my number one priority"`,
-    email: "bmadhav@iitk.ac.in",
+
     image: madhavImg,
   },
   {
@@ -141,7 +141,7 @@ const SECRETARIES = [
     name: "Chaitanya Malhotra",
     role: "Secretary",
     funnyDescription: `"Everything was satisfying until a bishop ruined my smoothered mate :-("`,
-    email: "cmalhotra25@iitk.ac.in",
+
     image: chaitanyaImg,
   },
   {
@@ -149,7 +149,7 @@ const SECRETARIES = [
     name: "Dipin Pandey",
     role: "Secretary",
     funnyDescription: `"In my defence, the knight jumped out of nowhere."`,
-    email: "dipinp25@iitk.ac.in",
+
     image: dipinImg,
   },
   {
@@ -157,7 +157,7 @@ const SECRETARIES = [
     name: "Divyesh Bhattacharyya",
     role: "Secretary",
     funnyDescription: `"Arguing with idiots is like playing chess with a pigeon. No matter how good you are the bird is going to shit on the board"`,
-    email: "divyeshb25@iitk.ac.in",
+
     image: divyeshImg,
   },
   {
@@ -165,7 +165,7 @@ const SECRETARIES = [
     name: "Furzaan S. Ullah",
     role: "Secretary",
     funnyDescription: `"Every game is a new puzzle to solve."`,
-    email: "furzaan25@iitk.ac.in",
+
     image: furzaanImg,
   },
   {
@@ -173,7 +173,7 @@ const SECRETARIES = [
     name: "Hariom Mishra",
     role: "Secretary",
     funnyDescription: `"Chess taught me patience. My clock says otherwise"`,
-    email: "mhariom25@iitk.ac.in",
+
     image: hariomImg,
   },
   {
@@ -181,7 +181,7 @@ const SECRETARIES = [
     name: "K Dheeraj",
     role: "Secretary",
     funnyDescription: `"One brilliant move outweighs thousand horrible blunders"`,
-    email: "deerajsatya25@iitk.ac.in",
+
     image: kdheerajImg,
   },
   {
@@ -189,23 +189,16 @@ const SECRETARIES = [
     name: "Kratagya Jain",
     role: "Secretary",
     funnyDescription: `"Discovering creative ways not to win at chess"`,
-    email: "kratagyaj25@iitk.ac.in",
+
     image: kratagyaImg,
   },
-  {
-    id: "sec-15",
-    name: "Lakshya Agarwal",
-    role: "Secretary",
-    funnyDescription: `"Tick tock tick tock always keep an eye on your clock!"`,
-    email: "lakshyaag25@iitk.ac.in",
-    image: lakshyaImg,
-  },
+  
   {
     id: "sec-16",
     name: "Mayank Bhakhand",
     role: "Secretary",
     funnyDescription: `"it is always better to sacrifice your opponent's pieces"`,
-    email: "mayankb25@iitk.ac.in",
+
     image: mayankBhakhandImg,
   },
   {
@@ -213,7 +206,7 @@ const SECRETARIES = [
     name: "Mayank Gautam",
     role: "Secretary",
     funnyDescription: `"I can spot tactics instantly—after the game."`,
-    email: "mayank.gautam@iitk.ac.in",
+
     image: mayankGautamImg,
   },
   {
@@ -221,7 +214,7 @@ const SECRETARIES = [
     name: "Mishthy Khatwa",
     role: "Secretary",
     funnyDescription: `"My pieces have trust issues with me"`,
-    email: "mishthy25@iitk.ac.in",
+
     image: mishthyImg,
   },
   {
@@ -229,7 +222,7 @@ const SECRETARIES = [
     name: "Nishant",
     role: "Secretary",
     funnyDescription: `"Chess has made me redefine beauty!"`,
-    email: "nishantkr25@iitk.ac.in",
+
     image: nishantImg,
   },
   {
@@ -237,7 +230,7 @@ const SECRETARIES = [
     name: "Piyush Agarwal",
     role: "Secretary",
     funnyDescription: `"The only thing I calculate accurately is how much rating I'm about to lose."`,
-    email: "piyusha25@iitk.ac.in",
+
     image: piyushImg,
   },
   {
@@ -245,7 +238,7 @@ const SECRETARIES = [
     name: "Prajwal Ravi Rai",
     role: "Secretary",
     funnyDescription: `"I am better than magnus carlsen"`,
-    email: "raipr25@iitk.ac.in",
+
     image: prajwalImg,
   },
   {
@@ -253,7 +246,7 @@ const SECRETARIES = [
     name: "Pratik Dhanuka",
     role: "Secretary",
     funnyDescription: `"I enjoy playing chess, chess enjoys playing with my emotions."`,
-    email: "pratikd25@iitk.ac.in",
+
     image: pratikImg,
   },
   {
@@ -261,7 +254,7 @@ const SECRETARIES = [
     name: "Shaoni Mukherjee",
     role: "Secretary",
     funnyDescription: `"Life is like chess. I don't know how to play chess."`,
-    email: "shaonim25@iitk.ac.in",
+
     image: shaoniImg,
   },
   {
@@ -269,7 +262,7 @@ const SECRETARIES = [
     name: "Siddhant Ghate",
     role: "Secretary",
     funnyDescription: `"My favourite chess opening is the one where my opponent doesn't show up."`,
-    email: "siddhantg25@iitk.ac.in",
+
     image: siddhantImg,
   },
   {
@@ -277,16 +270,12 @@ const SECRETARIES = [
     name: "Swayam Krishna Manohari",
     role: "Secretary",
     funnyDescription: `"I’m not a bad chess player, I’m the biggest philanthropist in the community. I generously donate my pieces to needy opponents every single game."`,
-    email: "mkswayam25@iitk.ac.in",
+
     image: swayamImg,
   }
 ];
-const ContactCard = ({ person, index }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 60 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-50px" }}
-    transition={{ duration: 0.8, delay: (index % 5) * 0.08, ease: [0.16, 1, 0.3, 1] }}
+const ContactCard = ({ person }) => (
+  <div
     className="group relative bg-surface-container-low rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_20px_40px_rgba(242,202,80,0.15)] transition-all duration-500 hover:-translate-y-2 flex flex-col h-full border border-outline-variant/5 hover:border-primary/30 cursor-pointer"
   >
     <div className="relative h-72 overflow-hidden flex-shrink-0">
@@ -314,7 +303,7 @@ const ContactCard = ({ person, index }) => (
         {person.funnyDescription}
       </p>
     </div>
-  </motion.div>
+  </div>
 );
 
 const Contact = () => {
