@@ -283,12 +283,8 @@ const SECRETARIES = [
     image: swayamImg,
   }
 ];
-const ContactCard = ({ person, index }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 60 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-50px" }}
-    transition={{ duration: 0.8, delay: (index % 5) * 0.08, ease: [0.16, 1, 0.3, 1] }}
+const ContactCard = ({ person }) => (
+  <div
     className="group relative bg-surface-container-low rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_20px_40px_rgba(242,202,80,0.15)] transition-all duration-500 hover:-translate-y-2 flex flex-col h-full border border-outline-variant/5 hover:border-primary/30 cursor-pointer"
   >
     <div className="relative h-72 overflow-hidden flex-shrink-0">
@@ -316,7 +312,7 @@ const ContactCard = ({ person, index }) => (
         {person.funnyDescription}
       </p>
     </div>
-  </motion.div>
+  </div>
 );
 
 const Contact = () => {
