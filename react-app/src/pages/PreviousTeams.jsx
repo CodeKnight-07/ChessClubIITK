@@ -86,7 +86,7 @@ const PreviousTeams = () => {
             {/* Right Column: Team Members Grid */}
             <div className="w-full md:w-3/4">
               <div className="mb-6 flex items-center justify-center border-b border-outline-variant/20 pb-4 text-center">
-                <h3 className="text-2xl font-serif font-bold text-on-surface">
+                <h3 className="text-4xl font-serif font-bold text-on-surface">
                   Coordinators
                 </h3>
               </div>
