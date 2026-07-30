@@ -27,15 +27,10 @@ const TEAMS_DATA = {
     { name: "Pranshu Gaur", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." },
     { name: "Prem Milind Gujrathi", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." },
     { name: "Vaibhav Waghmare", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." }
-  ],
-  '21-22 Team': [
-    { name: "Akash Kar", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 21-22 team." },
-    { name: "Anirudha Brahma", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 21-22 team." },
-    { name: "Maryam Raza Khan", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 21-22 team." }
   ]
 };
 
-const TEAMS = ['25-26 Team', '24-25 Team', '23-24 Team', '22-23 Team', '21-22 Team'];
+const TEAMS = ['25-26 Team', '24-25 Team', '23-24 Team', '22-23 Team'];
 
 const MemberCard = ({ person }) => (
   <div className="group relative bg-surface-container-low rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_20px_40px_rgba(242,202,80,0.15)] transition-all duration-500 hover:-translate-y-2 flex flex-col h-full border border-outline-variant/5 hover:border-primary/30 cursor-pointer">
@@ -51,13 +46,6 @@ const MemberCard = ({ person }) => (
         <h5 className="text-xl font-serif font-bold text-on-surface mb-1 drop-shadow-md group-hover:text-primary transition-colors duration-300">{person.name}</h5>
         <a href={`mailto:${person.email}`} className="text-[10px] font-mono text-primary hover:text-primary/70 transition-colors tracking-wider block opacity-0 group-hover:opacity-100 duration-500 delay-100 ease-out">{person.email}</a>
       </div>
-    </div>
-    
-    <div className="p-4 pt-5 bg-surface-container-lowest flex-grow flex flex-col justify-between relative overflow-hidden border-t border-outline-variant/10">
-      <span className="absolute -bottom-6 -right-3 text-7xl font-serif text-on-surface-variant/5 select-none group-hover:text-primary/5 transition-colors duration-500">"</span>
-      <p className="text-xs text-on-surface-variant leading-relaxed relative z-10 group-hover:text-on-surface/90 transition-colors duration-500">
-        {person.funnyDescription}
-      </p>
     </div>
   </div>
 );
