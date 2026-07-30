@@ -2,10 +2,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import profileImg from '../assets/profile_image.webp';
 import ineshImg from "../assets/coordinators/inesh.jpeg";
-import lakshImg from "../assets/coordinators/laksh.png";
-import rishiImg from "../assets/coordinators/rishi.png";
-import rudraImg from "../assets/coordinators/rudra.png";
-import shauryaImg from "../assets/coordinators/shaurya.png";
+import lakshImg from "../assets/coordinators/laksh.jpeg";
+import rishiImg from "../assets/coordinators/rishi.jpeg";
+import rudraImg from "../assets/coordinators/rudra.jpeg";
+import shauryaImg from "../assets/coordinators/shaurya.jpeg";
 import aarushWaghImg from "../assets/secretaries/aarush_wagh.jpg";
 import adityaImg from "../assets/secretaries/aditya.jpg";
 import akshatImg from "../assets/secretaries/akshat.jpeg";
@@ -35,29 +35,30 @@ import lakshyaImg from "../assets/secretaries/lakshya.jpg";
 import Footer from '../components/Footer';
 const COORDINATORS = [
   {
-    id: 'coord-0',
+    id: 'coord-1',
     name: "Inesh Aggarwal",
     role: "Coordinator",
-    funnyDescription: `"I wake up and eat parathas with samosational level of enthusiasm"`,
-    email: `ineshag24@iitk.ac.in`,
+    funnyDescription: "I wake up and eat parathas with samosational level of enthusiasm",
+    email: "ineshag24@iitk.ac.in",
     image: ineshImg
+
   },
   {
     id: 'coord-1',
     name: "Laksh Dhir",
     role: "Coordinator",
-    funnyDescription: `"If you find a bottle or ID card at random places on campus, there’s a decent chance it’s mine.."`,
-    email: `laksh24@iitk.ac.in`,
+    funnyDescription: "If you find a bottle or ID card at random places on campus, there’s a decent chance it’s mine..",
+    email: "laksh24@iitk.ac.in",
     image: lakshImg
   },
   {
     id: 'coord-2',
     name: "Rishi Gupta",
     role: "Coordinator",
-    funnyDescription: `"Achievement:
+     funnyDescription: `"Achievement:
  Got a 1-month Diamond membership on Samay’s stream after Guki became the World Champ!
 "`,
-    email: `rishi24@iitk.ac.in`,
+    email: "rishi24@iitk.ac.in",
     image: rishiImg
   },
   {
@@ -66,7 +67,7 @@ const COORDINATORS = [
     role: "Coordinator",
     funnyDescription: `"I look strict to juniors. Then I start talking...
 It gets worse."`,
-    email: `rudra24@iitk.ac.in`,
+    email: "rudra24@iitk.ac.in",
     image: rudraImg
   },
   {
