@@ -4,7 +4,8 @@ import smtplib
 from email.mime.text import MIMEText
 from flask import Blueprint, request, jsonify
 import bcrypt
-import pymysql
+import psycopg
+from psycopg.rows import dict_row
 import requests
 from config.db import get_db_connection
 from google.cloud import storage
@@ -65,7 +66,7 @@ def generate_otp():
             sql = """
                 INSERT INTO pending_otps (email, otp) 
                 VALUES (%s, %s) 
-                ON DUPLICATE KEY UPDATE otp = VALUES(otp), created_at = CURRENT_TIMESTAMP
+                ON CONFLICT (email) DO UPDATE SET otp = EXCLUDED.otp, created_at = CURRENT_TIMESTAMP
             """
             cursor.execute(sql, (primary_email, primary_otp))
             cursor.execute(sql, (secondary_email, secondary_otp))
@@ -90,7 +91,7 @@ def generate_otp():
         print(f"OTP Generation Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 
@@ -159,7 +160,7 @@ def verify_and_register():
         print(f"Registration Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 
@@ -189,7 +190,7 @@ def forgot_password():
             otp = str(random.randint(100000, 999999))
             sql = """
                 INSERT INTO pending_otps (email, otp) VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE otp = VALUES(otp), created_at = CURRENT_TIMESTAMP
+                ON CONFLICT (email) DO UPDATE SET otp = EXCLUDED.otp, created_at = CURRENT_TIMESTAMP
             """
             cursor.execute(sql, (email, otp))
             connection.commit()
@@ -205,7 +206,7 @@ def forgot_password():
         print(f"Forgot Password Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 
@@ -245,7 +246,7 @@ def reset_password():
         print(f"Reset Password Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 @auth_bp.route('/user/profile/<email>', methods=['GET'])
@@ -260,7 +261,7 @@ def get_user_profile(email):
     connection = None
     try:
         connection = get_db_connection()
-        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
             sql = "SELECT name, roll_no AS rollNo, contact, email, chess_username AS chesscom, avatar, secondary_email FROM users WHERE email = %s"
             cursor.execute(sql, (email,))
             profile = cursor.fetchone()
@@ -274,7 +275,7 @@ def get_user_profile(email):
         print(f"Profile Retrieval Failure: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 
@@ -316,7 +317,7 @@ def update_user_profile():
         print(f"Profile Update Failure: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 # --- DELETE REQUEST ---
@@ -364,5 +365,5 @@ def delete_user_account():
         print(f"Critical Account Deletion Error: {e}")
         return jsonify({"error": "Internal server error during account erasure."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
