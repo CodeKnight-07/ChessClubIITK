@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
@@ -36,24 +37,19 @@ const Footer = () => {
           </h5>
           <ul className="space-y-3 text-sm text-on-surface-variant">
             <li>
-              <span className="cursor-pointer transition-colors hover:text-primary">
+              <Link to="/previous-teams" className="cursor-pointer transition-colors hover:text-primary">
                 Our History
-              </span>
+              </Link>
             </li>
             <li>
-              <span className="cursor-pointer transition-colors hover:text-primary">
+              <Link to="/contact" className="cursor-pointer transition-colors hover:text-primary">
                 Core Committee
-              </span>
+              </Link>
             </li>
             <li>
-              <span className="cursor-pointer transition-colors hover:text-primary">
+              <Link to="/previous-teams" className="cursor-pointer transition-colors hover:text-primary">
                 Alumni Network
-              </span>
-            </li>
-            <li>
-              <span className="cursor-pointer transition-colors hover:text-primary">
-                Hall of Fame
-              </span>
+              </Link>
             </li>
           </ul>
         </motion.div>

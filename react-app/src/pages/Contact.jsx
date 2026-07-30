@@ -17,7 +17,6 @@ import chaitanyaImg from "../assets/secretaries/chaitanya.jpg";
 import divyeshImg from "../assets/secretaries/divyesh.jpeg";
 import furzaanImg from "../assets/secretaries/furzaan.png";
 import hariomImg from "../assets/secretaries/hariom.jpg";
-import kdheerajImg from "../assets/secretaries/kdheeraj.png";
 import kratagyaImg from "../assets/secretaries/kratagya.jpg";
 import madhavImg from "../assets/secretaries/madhav.jpg";
 import mayankBhakhandImg from "../assets/secretaries/mayank_bhakhand.jpeg";
@@ -184,14 +183,6 @@ const SECRETARIES = [
     funnyDescription: `"Chess taught me patience. My clock says otherwise"`,
 
     image: hariomImg,
-  },
-  {
-    id: "sec-13",
-    name: "K Dheeraj",
-    role: "Secretary",
-    funnyDescription: `"One brilliant move outweighs thousand horrible blunders"`,
-
-    image: kdheerajImg,
   },
   {
     id: "sec-14",
