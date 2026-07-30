@@ -10,7 +10,7 @@ from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 import bcrypt
 from flask_jwt_extended import JWTManager, create_access_token
-
+import bcrypt 
 # Load your local .env file BEFORE anything else
 load_dotenv()
 
@@ -47,6 +47,7 @@ app.register_blueprint(auth_bp, url_prefix='/api')
 app.register_blueprint(blogs_bp, url_prefix='/api')
 app.register_blueprint(events_bp)
 
+# <--- MUST BE AT THE TOP OF app.py
 
 @app.route('/api/login', methods=['POST'])
 def login():
