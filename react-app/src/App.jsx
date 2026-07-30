@@ -10,6 +10,7 @@ import Blogs from './pages/Blogs';
 import BlogPost from './pages/BlogPost';
 import UserProfile from './pages/UserProfile';
 import Contact from './pages/Contact';
+import PreviousTeams from './pages/PreviousTeams';
 import Gallery from './pages/Gallery';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
@@ -30,6 +31,7 @@ function App() {
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/blog/:id" element={<BlogPost />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/previous-teams" element={<PreviousTeams />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/user" element={<UserProfile />} />
             <Route path="/signup" element={<Signup />} />
