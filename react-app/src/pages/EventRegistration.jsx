@@ -64,12 +64,18 @@ const EventRegistration = () => {
 
       <div className="mb-10">
         <h1 className="text-3xl md:text-5xl font-serif text-on-surface leading-tight mb-4">{event.title}</h1>
-        <div className="flex items-center gap-3 text-[10px] font-label uppercase tracking-widest font-bold text-on-surface-variant">
+        <div className="flex flex-wrap items-center gap-3 text-[10px] font-label uppercase tracking-widest font-bold text-on-surface-variant">
           <span className="text-on-surface">{event.date}</span>
           <span>•</span>
           <span>{event.time}</span>
           <span>•</span>
           <span className="truncate">{event.location}</span>
+          {event.format && (
+            <>
+              <span>•</span>
+              <span className="text-primary truncate">{event.format}</span>
+            </>
+          )}
         </div>
       </div>
 

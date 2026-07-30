@@ -21,3 +21,4 @@ h1, h2, h3, h4, h5, h6, .font-serif { font-family: 'Newsreader', serif; }
 .blog-content p { margin-bottom: 1.5rem; line-height: 1.8; color: #d0c5af; }
 .blog-content h3 { font-family: 'Newsreader', serif; font-size: 2rem; margin-top: 3rem; margin-bottom: 1rem; color: #e5e2e1; font-weight: bold; }
 .blog-content blockquote { border-left: 4px solid #f2ca50; padding-left: 1.5rem; margin: 2rem 0; font-family: 'Newsreader', serif; font-style: normal; font-size: 1.5rem; color: #f2ca50; }
+
