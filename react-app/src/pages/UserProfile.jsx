@@ -216,8 +216,8 @@ const UserProfile = () => {
                   <div className="flex flex-col gap-4">
                     <input 
                       type="text" 
-                      value={profile.rollNo}
-                      onChange={(e) => setProfile({...profile, rollNo: e.target.value})}
+                      value={profile.rollno}
+                      onChange={(e) => setProfile({...profile, rollno: e.target.value})}
                       className="text-[11px] font-label uppercase tracking-widest bg-transparent border-b border-outline-variant/30 text-on-surface pb-1 focus:outline-none focus:border-primary w-full transition-colors text-center"
                       placeholder="Roll Number"
                     />
@@ -268,7 +268,7 @@ const UserProfile = () => {
                   <div className="flex flex-col gap-4">
                     <div className="flex justify-between items-center text-left">
                       <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Roll No</span>
-                      <span className="text-[11px] text-on-surface font-mono">{profile.rollNo || "-"}</span>
+                      <span className="text-[11px] text-on-surface font-mono">{profile.rollno || "-"}</span>
                     </div>
                     <div className="flex justify-between items-center text-left">
                       <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Contact</span>
