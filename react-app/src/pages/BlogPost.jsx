@@ -5,6 +5,23 @@ import { useAuth } from '../context/AuthContext';
 import tournamentImg from '../assets/fide.png';
 import fresherImg from '../assets/fcl.png';
 
+// Helper to fix any <img> tags inside HTML content that have raw Base64 src strings
+const formatInjectedContent = (htmlContent) => {
+  if (!htmlContent) return "";
+  
+  // Regex to match <img src="/9j/4AAQ..." and prepend data:image/jpeg;base64, if missing
+  return htmlContent.replace(
+    /<img([^>]+)src=["'](?!\s*data:)([^"']+)["']/g,
+    (match, attributes, src) => {
+      // If the src starts with /9j/ or iVBOR, it is a raw Base64 string
+      if (src.startsWith('/9j/') || src.startsWith('iVBORw0KGgo')) {
+        return `<img${attributes}src="data:image/jpeg;base64,${src}"`;
+      }
+      return match;
+    }
+  );
+};
+
 const BlogPost = () => {
   const { id } = useParams();
   // 1. Get user data from context safely using optional chaining
@@ -113,7 +130,7 @@ const BlogPost = () => {
 };
 
   if (loading) {
-    return <div className="text-center p-20 text-on-surface">Assembling Document View Nodes...</div>;
+    return <div className="text-center p-20 text-on-surface">Loading...</div>;
   }
 
   // ==========================================
@@ -221,7 +238,7 @@ const BlogPost = () => {
             {/* Safely injects the LONGTEXT content string rendering paragraphs/embedded elements */}
             <article 
               className="font-body text-lg text-on-surface-variant space-y-8 blog-dynamic-injected"
-              dangerouslySetInnerHTML={{ __html: dbPost.content }}
+              dangerouslySetInnerHTML={{ __html: formatInjectedContent(dbPost.content) }}
             />
           </>
         )}

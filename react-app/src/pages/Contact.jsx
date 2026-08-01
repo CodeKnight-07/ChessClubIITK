@@ -34,10 +34,10 @@ import lakshyaImg from "../assets/secretaries/lakshya.jpg";
 import Footer from '../components/Footer';
 const COORDINATORS = [
   {
-    id: 'coord-1',
+    id: 'coord-0',
     name: "Inesh Aggarwal",
     role: "Coordinator",
-    funnyDescription: "I wake up and eat parathas with samosational level of enthusiasm",
+    funnyDescription: `"I wake up and eat parathas with samosational level of enthusiasm"`,
     email: "ineshag24@iitk.ac.in",
     image: ineshImg
 
@@ -46,7 +46,7 @@ const COORDINATORS = [
     id: 'coord-1',
     name: "Laksh Dhir",
     role: "Coordinator",
-    funnyDescription: "If you find a bottle or ID card at random places on campus, there’s a decent chance it’s mine..",
+    funnyDescription: `"If you find a bottle or ID card at random places on campus, there’s a decent chance it’s mine.."`,
     email: "laksh24@iitk.ac.in",
     image: lakshImg
   },
@@ -286,9 +286,7 @@ const ContactCard = ({ person }) => (
       />
       <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent transition-opacity duration-500 opacity-90 group-hover:opacity-60"></div>
 
-      <div className="absolute top-4 left-4 z-20">
-        <span className="bg-surface-container-highest/80 backdrop-blur-md border border-outline-variant/20 px-3 py-1 text-[9px] font-bold tracking-[0.2em] uppercase text-on-surface rounded-full shadow-lg transition-colors group-hover:bg-primary group-hover:text-on-primary group-hover:border-primary">{person.role}</span>
-      </div>
+      
 
       <div className="absolute bottom-0 left-0 w-full p-6 translate-y-6 group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
         <h5 className="text-2xl font-serif font-bold text-on-surface mb-1 drop-shadow-md group-hover:text-primary transition-colors duration-300">{person.name}</h5>

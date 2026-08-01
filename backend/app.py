@@ -178,9 +178,9 @@ def upload_carousel_image():
         
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO featured_carousel (image_url) VALUES (%s)", (db_path,))
+        cursor.execute("INSERT INTO featured_carousel (image_url) VALUES (%s) RETURNING id", (db_path,))
         # Get the ID of the newly inserted row to return to the frontend
-        new_id = cursor.lastrowid 
+        new_id = cursor.fetchone()[0]
         conn.commit()
         cursor.close()
         conn.close()

@@ -31,7 +31,7 @@ def create_blog():
     connection = None
     try:
         connection = get_db_connection()
-        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+        with connection.cursor(row_factory=dict_row) as cursor:
             if not verify_admin_privileges(cursor, email):
                 return jsonify({"error": "Access Denied: Admin privileges required."}), 403
 
@@ -56,7 +56,7 @@ def get_all_blogs():
     connection = None
     try:
         connection = get_db_connection()
-        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+        with connection.cursor(row_factory=dict_row) as cursor:
             # We now select author_name and author_position directly out of the blogs row record itself!
             sql = """
                 SELECT 
@@ -89,7 +89,7 @@ def delete_blog(blog_id):
     connection = None
     try:
         connection = get_db_connection()
-        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+        with connection.cursor(row_factory=dict_row) as cursor:
             if not verify_admin_privileges(cursor, email):
                 return jsonify({"error": "Access Denied: Admin privileges required."}), 403
 
@@ -121,7 +121,7 @@ def update_blog(blog_id):
     connection = None
     try:
         connection = get_db_connection()
-        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+        with connection.cursor(row_factory=dict_row) as cursor:
             if not verify_admin_privileges(cursor, email):
                 return jsonify({"error": "Access Denied: Admin privileges required."}), 403
 

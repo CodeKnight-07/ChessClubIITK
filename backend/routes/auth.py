@@ -261,7 +261,7 @@ def get_user_profile(email):
     connection = None
     try:
         connection = get_db_connection()
-        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+        with connection.cursor(row_factory=dict_row) as cursor:
             sql = "SELECT name, roll_no AS rollNo, contact, email, chess_username AS chesscom, avatar, secondary_email FROM users WHERE email = %s"
             cursor.execute(sql, (email,))
             profile = cursor.fetchone()
