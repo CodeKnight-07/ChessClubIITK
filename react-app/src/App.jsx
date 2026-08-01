@@ -16,6 +16,8 @@ import Signup from './pages/Signup';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import ScrollToTop from './components/ScrollToTop';
+import ServerError500 from './pages/ServerError500';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   return (
@@ -23,7 +25,8 @@ function App() {
       <Router>
         <ScrollToTop />
         <MainLayout>
-          <Routes>
+          <ErrorBoundary>
+            <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/events" element={<Events />} />
@@ -37,10 +40,12 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/500" element={<ServerError500 />} />
           </Routes>
-        </MainLayout>
-      </Router>
-    </AuthProvider>
+        </ErrorBoundary>
+      </MainLayout>
+    </Router>
+  </AuthProvider>
   );
 }
 
