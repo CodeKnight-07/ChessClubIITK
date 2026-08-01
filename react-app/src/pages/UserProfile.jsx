@@ -5,6 +5,11 @@ import { useAuth } from '../context/AuthContext';
 import userAvatar from '../assets/new_user_avatar.png';
 
 const UserProfile = () => {
+  
+  // Extract the authenticated session email dynamically from context rather than localstorage
+  const { user, token, logout } = useAuth();
+  const userEmail = user?.email;
+  
   const [profile, setProfile] = useState({
     name: "",
     rollno: "",
@@ -14,6 +19,7 @@ const UserProfile = () => {
     chesscom: "",
     avatar: userAvatar
   });
+  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [participations, setParticipations] = useState([]);
   const [error, setError] = useState('');
@@ -22,13 +28,10 @@ const UserProfile = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
-  const { logout } = useAuth();
 
   const navigate = useNavigate();
 
-  // Extract the authenticated session email dynamically from context rather than localstorage
-  const { user,token } = useAuth();
-  const userEmail = user?.email;
+  
 
   const fetchProfile = async () => {
       try {
@@ -46,21 +49,28 @@ const UserProfile = () => {
         const data = await response.json();
         setProfile({
           ...data,
+          rollno: data.rollno || data.roll_no || "",
           avatar: data.avatar || userAvatar
+          
         });
+        setIsLoading(false);
       } catch (err) {
         console.error(err);
         setError("Failed loading profile from server.");
+        setIsLoading(false);
       }
     };
   
   useEffect(() => {
-    if (!userEmail) {
+    const jwtToken = localStorage.getItem('chess-club-jwt');
+    if (!jwtToken) {
       setError("Please log in to view your profile properties.");
+      setIsLoading(false);
       return;
     }
+
     if (userEmail) {
-      fetchProfile();
+      fetchProfile(userEmail);
     }
     
     const savedParts = localStorage.getItem('chess-club-participations');
