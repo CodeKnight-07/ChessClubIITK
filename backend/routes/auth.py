@@ -367,3 +367,65 @@ def delete_user_account():
     finally:
         if connection:
             connection.close()
+
+# --- LEAGUE OF LEGENDS 6.0 EVENT REGISTRATION ---
+
+@auth_bp.route('/register-lol', methods=['POST'])
+@jwt_required()
+def register_lol():
+    data = request.get_json()
+    email = data.get('email')
+    name = data.get('name')
+    roll_no = data.get('roll_no')
+    chess_username = data.get('chess_username')
+    contact = data.get('contact')
+    secondary_email = data.get('secondary_email')
+
+    if not all([email, name, roll_no, chess_username, contact]):
+        return jsonify({"error": "All fields are required."}), 400
+
+    current_user_email = get_jwt_identity()
+    if current_user_email != email:
+        return jsonify({"error": "Unauthorized registration identity mismatch."}), 403
+
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            # Check if user is already registered
+            cursor.execute('SELECT id FROM "lolEntries" WHERE email = %s', (email,))
+            if cursor.fetchone():
+                return jsonify({"error": "You are already registered for this event."}), 409
+
+            # Insert registration record
+            cursor.execute(
+                'INSERT INTO "lolEntries" (email, name, roll_no, chess_username, contact, secondary_email) VALUES (%s, %s, %s, %s, %s, %s)',
+                (email, name, roll_no, chess_username, contact, secondary_email or '')
+            )
+            connection.commit()
+            return jsonify({"message": "Successfully registered for League of Legends 6.0!"}), 201
+
+    except Exception as e:
+        print(f"LoL Registration Error: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+    finally:
+        if connection:
+            connection.close()
+
+@auth_bp.route('/register-lol/status', methods=['GET'])
+@jwt_required()
+def register_lol_status():
+    email = get_jwt_identity()
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT id FROM "lolEntries" WHERE email = %s', (email,))
+            is_registered = cursor.fetchone() is not None
+            return jsonify({"is_registered": is_registered}), 200
+    except Exception as e:
+        print(f"LoL Registration Status Error: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+    finally:
+        if connection:
+            connection.close()

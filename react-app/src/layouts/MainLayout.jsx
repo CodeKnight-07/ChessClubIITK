@@ -5,11 +5,13 @@ import { useAuth } from '../context/AuthContext';
 import { OFFICIAL_EVENTS } from '../pages/Events';
 import Navbar from '../components/Navbar';
 import ScrollToTopButton from '../components/ScrollToTopButton';
+import { API_BASE_URL } from '../config';
 
 const MainLayout = ({ children }) => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, token } = useAuth();
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRegisteredForLol, setIsRegisteredForLol] = useState(false);
 
   // Helper to find the next upcoming event relative to local time
   const getNextEvent = () => {
@@ -32,6 +34,29 @@ const MainLayout = ({ children }) => {
   };
 
   const nextEvent = getNextEvent();
+
+  useEffect(() => {
+    if (isLoggedIn && token && nextEvent?.id === 1) {
+      const checkLolStatus = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/register-lol/status`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setIsRegisteredForLol(data.is_registered);
+          }
+        } catch (e) {
+          console.error("Error checking lol registration status in layout:", e);
+        }
+      };
+      checkLolStatus();
+    } else {
+      setIsRegisteredForLol(false);
+    }
+  }, [isLoggedIn, token, nextEvent]);
 
   useEffect(() => {
     const handleOpenModal = () => setIsModalOpen(true);
@@ -243,13 +268,23 @@ const MainLayout = ({ children }) => {
                   Close
                 </button>
                 {isLoggedIn ? (
-                  <Link
-                    to={`/events/register/${nextEvent.id}`}
-                    onClick={() => setIsModalOpen(false)}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#f2ca50] to-[#d4af37] text-xs font-bold uppercase tracking-wider text-[#3c2f00] shadow-lg transition-transform hover:scale-[1.02]"
-                  >
-                    Register Now
-                  </Link>
+                  isRegisteredForLol && nextEvent.id === 1 ? (
+                    <button
+                      disabled
+                      className="px-6 py-2.5 rounded-xl bg-gray-800 text-gray-500 text-xs font-bold uppercase tracking-wider border border-gray-700 cursor-not-allowed"
+                    >
+                      REGISTERED ✓
+                    </button>
+                  ) : (
+                    <Link
+                      to={nextEvent.id === 1 ? "/events" : `/events/register/${nextEvent.id}`}
+                      state={nextEvent.id === 1 ? { openRegisterLol: true } : undefined}
+                      onClick={() => setIsModalOpen(false)}
+                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#f2ca50] to-[#d4af37] text-xs font-bold uppercase tracking-wider text-[#3c2f00] shadow-lg transition-transform hover:scale-[1.02]"
+                    >
+                      Register Now
+                    </Link>
+                  )
                 ) : (
                   <Link
                     to="/login"
