@@ -23,6 +23,7 @@ app = Flask(__name__)
 app.config["JWT_TOKEN_LOCATION"] = ["headers"]
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET")
 app.config["JWT_SECRET"] = os.environ.get("JWT_SECRET")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(days=30)
 jwt_manager = JWTManager(app)
 
 # --- LOCAL UPLOAD DIRECTORY SETUP ---
