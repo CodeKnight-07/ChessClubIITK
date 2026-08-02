@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE_URL } from '../config';
 import { useAuth } from '../context/AuthContext'; 
+import { globalCache } from '../utils/cache';
 import Footer from '../components/Footer';
 
 import fresherImg from '../assets/fcl.png';
@@ -88,9 +89,7 @@ const Blogs = () => {
   // or if they have a real email session going during local tests
   const isAdmin = user?.is_admin === 1 || user?.is_admin === true;
 
-  console.log("Current Auth Context Data:", authContext);
-  console.log("Resolved User Object:", user);
-  console.log("Is Admin Resolved To:", isAdmin);
+
 
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -112,35 +111,43 @@ const Blogs = () => {
   const [deleteTargetId, setDeleteTargetId] = useState(null);
 
   const fetchAllPosts = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/blogs`);
-    
-    let dbData = [];
-    if (response.ok) {
-      dbData = await response.json();
-    }
-    
-    // 1. COMBINE BOTH: Merge database posts and hardcoded legacy posts together
-    const combined = [...dbData, ...LEGACY_BACKUP_POSTS];
-    
-    // 2. CHRONOLOGICAL SORT: Ensure everything matches layout timelines cleanly
-    combined.sort((a, b) => {
-      const dateA = new Date(a.created_at || a.date);
-      const dateB = new Date(b.created_at || b.date);
-      return dateB - dateA; // Most recent post stays at the top as the Hero headliner!
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/blogs`);
+      
+      let dbData = [];
+      if (response.ok) {
+        dbData = await response.json();
+      }
+      
+      // 1. COMBINE BOTH: Merge database posts and hardcoded legacy posts together
+      const combined = [...dbData, ...LEGACY_BACKUP_POSTS];
+      
+      // 2. CHRONOLOGICAL SORT: Ensure everything matches layout timelines cleanly
+      combined.sort((a, b) => {
+        const dateA = new Date(a.created_at || a.date);
+        const dateB = new Date(b.created_at || b.date);
+        return dateB - dateA; // Most recent post stays at the top as the Hero headliner!
+      });
 
-    setPosts(combined);
-  } catch (err) {
-    console.error("Backend offline. Serving local legacy records safely.");
-    setPosts(LEGACY_BACKUP_POSTS); 
-  } finally {
-    setLoading(false);
-  }
-};
+      setPosts(combined);
+      globalCache.blogs = combined; // Save to global cache!
+    } catch (err) {
+      console.error("Backend offline. Serving local legacy records safely.");
+      setPosts(LEGACY_BACKUP_POSTS); 
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetchAllPosts();
+    if (globalCache.blogs) {
+      setPosts(globalCache.blogs);
+      setLoading(false);
+      // Fetch silently in the background to update cache
+      fetchAllPosts();
+    } else {
+      fetchAllPosts();
+    }
   }, []);
 
   const featuredPost = posts[0];

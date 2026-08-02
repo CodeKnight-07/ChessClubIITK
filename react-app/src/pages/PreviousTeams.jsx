@@ -5,25 +5,26 @@ import profileImg from '../assets/profile_image.webp'; // Using existing image a
 import tanmayImg from "../assets/exCoordinators/tanmay.jpg";
 import akshatImg from "../assets/exCoordinators/akshat.png";
 import kushagraImg from "../assets/exCoordinators/kushagra.jpg";
+import pulkitImg from "../assets/exCoordinators/pulkit.jpg";
 
 // Dummy data structure, will be replaced by user's data
 const TEAMS_DATA = {
   '25-26 Team': [
-    { name: "Akshat Srivastava", email: "placeholder@iitk.ac.in", image: akshatImg, funnyDescription: "Placeholder description for 25-26 team." },
-    { name: "Kushagra Shukla", email: "placeholder@iitk.ac.in", image: kushagraImg, funnyDescription: "Placeholder description for 25-26 team." },
-    { name: "Pulkit Kumar Gajipara", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 25-26 team." },
-    { name: "Tanmay Kavikumar Sahare", email: "placeholder@iitk.ac.in", image: tanmayImg, funnyDescription: "Placeholder description for 25-26 team." }
+    { name: "Akshat Srivastava", email: "akshatsri23@iitk.ac.in", image: akshatImg, funnyDescription: "Placeholder description for 25-26 team." },
+    { name: "Kushagra Shukla", email: "kushagra23@iitk.ac.in", image: kushagraImg, funnyDescription: "Placeholder description for 25-26 team." },
+    { name: "Pulkit Kumar Gajipara", email: "pulkitku23@iitk.ac.in", image: pulkitImg, funnyDescription: "Placeholder description for 25-26 team." },
+    { name: "Tanmay Kavikumar Sahare", email: "tanmayka23@iitk.ac.in", image: tanmayImg, funnyDescription: "Placeholder description for 25-26 team." }
   ],
   '24-25 Team': [
     { name: "Abhishek Kumar", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 24-25 team." },
-    { name: "Parv Goyal", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 24-25 team." },
-    { name: "Prajeet Singh Rawat", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 24-25 team." }
+    { name: "Parv Goyal", email: "parvgoyal22@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 24-25 team." },
+    { name: "Prajeet Singh Rawat", email: "prajeetsr22@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 24-25 team." }
   ],
   '23-24 Team': [
-    { name: "Abhijeet Verma", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 23-24 team." },
-    { name: "Ayush Yadav", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 23-24 team." },
-    { name: "Navankur Shrotriya", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 23-24 team." },
-    { name: "Tejas Goyal", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 23-24 team." }
+    { name: "Abhijeet Verma", email: "abhiteet21@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 23-24 team." },
+    { name: "Ayush Yadav", email: "ayushy21@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 23-24 team." },
+    { name: "Navankur Shrotriya", email: "navankurs21@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 23-24 team." },
+    { name: "Tejas Goyal", email: "tejasg21@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 23-24 team." }
   ],
   '22-23 Team': [
     { name: "Himanshu Beniwal", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." },

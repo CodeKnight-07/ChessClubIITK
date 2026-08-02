@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { OFFICIAL_EVENTS } from '../pages/Events';
+import { OFFICIAL_EVENTS } from '../constants/events';
 import Navbar from '../components/Navbar';
 import ScrollToTopButton from '../components/ScrollToTopButton';
 import { API_BASE_URL } from '../config';

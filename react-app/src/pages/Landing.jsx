@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import fresherImg from '../assets/fresher_league_recap_1775765383248.png';
 import grandSwissImg from '../assets/grand_swiss_recap_1775765397656.png';
@@ -11,10 +11,26 @@ import SliderMaskText from '../components/SliderMaskText';
 import chessboardImg from '../assets/chessboard.jpg';
 import homePgBg from './home-pg-bg.png';
 import Footer from '../components/Footer';
-import { OFFICIAL_EVENTS } from './Events';
+import tanmayImg from "../assets/exCoordinators/tanmay.jpg";
+import akshatImg from "../assets/exCoordinators/akshat.png";
+import kushagraImg from "../assets/exCoordinators/kushagra.jpg";
+import pulkitImg from "../assets/exCoordinators/pulkit.jpg";
+import { OFFICIAL_EVENTS } from '../constants/events';
 
 const Landing = () => {
   const { isLoggedIn } = useAuth();
+
+  useEffect(() => {
+    // Delay preloading by 2 seconds to prioritize main landing page resources
+    const timer = setTimeout(() => {
+      const imagesToPreload = [tanmayImg, akshatImg, kushagraImg, pulkitImg];
+      imagesToPreload.forEach(src => {
+        const img = new Image();
+        img.src = src;
+      });
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Helper to map event ID to image
   const getEventImage = (id) => {

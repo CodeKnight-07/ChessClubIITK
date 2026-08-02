@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { globalCache } from '../utils/cache';
 import Footer from '../components/Footer';
 import { API_BASE_URL } from '../config';
 
@@ -63,64 +64,84 @@ const Gallery = () => {
   
 
   // 3. FETCH DATA FROM YOUR PYTHON BACKEND
-  useEffect(() => {
-    const fetchGallery = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/gallery`);
-        const data = await response.json();
-        
-        // Helper function to handle both external URLs and local static paths
-        const formatUrl = (url) => {
-          if (!url) return '';
-          const cleanUrl = url.replace(/\s/g, '%20');
-          return cleanUrl.startsWith('http') ? cleanUrl : `${API_BASE_URL}${cleanUrl}`;
-        };
+  const fetchGallery = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/gallery`);
+      const data = await response.json();
+      
+      const formatUrl = (url) => {
+        if (!url) return '';
+        const cleanUrl = url.replace(/\s/g, '%20');
+        return cleanUrl.startsWith('http') ? cleanUrl : `${API_BASE_URL}${cleanUrl}`;
+      };
 
-        // Split the database rows into your two arrays and format the URLs
-        const fide = data
-          .filter(img => img.album_type === 'FIDE_RATED')
-          .map(img => formatUrl(img.image_url));
-          
-        const memories = data
-          .filter(img => img.album_type === 'CLUB_MEMORIES')
-          .map(img => formatUrl(img.image_url));
+      const fide = data
+        .filter(img => img.album_type === 'FIDE_RATED')
+        .map(img => formatUrl(img.image_url));
         
-        setFideRatedPhotos(fide);
-        setClubMemoriesPhotos(memories);
-        setGalleryCards(data);
-        setIsLoading(false);
-        
-        const configResponse = await fetch(`${API_BASE_URL}/api/config/featured`);
-        if (configResponse.ok) {
-          const configData = await configResponse.json();
-          setFeaturedTitle(configData.featured_title);
-          setFeaturedDesc(configData.featured_desc);
-        }
-      } catch (error) {
-        console.error("Error fetching gallery images:", error);
-        setIsLoading(false);
+      const memories = data
+        .filter(img => img.album_type === 'CLUB_MEMORIES')
+        .map(img => formatUrl(img.image_url));
+      
+      setFideRatedPhotos(fide);
+      setClubMemoriesPhotos(memories);
+      setGalleryCards(data);
+      
+      const configResponse = await fetch(`${API_BASE_URL}/api/config/featured`);
+      let configData = null;
+      if (configResponse.ok) {
+        configData = await configResponse.json();
+        setFeaturedTitle(configData.featured_title);
+        setFeaturedDesc(configData.featured_desc);
       }
-    };
 
-    fetchGallery();
+      globalCache.gallery = { fide, memories, data, configData };
+    } catch (error) {
+      console.error("Error fetching gallery images:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (globalCache.gallery) {
+      const { fide, memories, data, configData } = globalCache.gallery;
+      setFideRatedPhotos(fide);
+      setClubMemoriesPhotos(memories);
+      setGalleryCards(data);
+      if (configData) {
+        setFeaturedTitle(configData.featured_title);
+        setFeaturedDesc(configData.featured_desc);
+      }
+      setIsLoading(false);
+      fetchGallery();
+    } else {
+      fetchGallery();
+    }
   }, []);
 
-  // The GET request to load images on page load
-useEffect(() => {
   const fetchImages = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/carousel`);
       const data = await response.json();
       if (response.ok) {
         setCarouselImages(data);
+        globalCache.carouselImages = data;
       }
     } catch (err) {
       console.error("Failed to fetch carousel images:", err);
     }
   };
-  
-  fetchImages();
-}, []);
+
+  useEffect(() => {
+    if (globalCache.carouselImages) {
+      setCarouselImages(globalCache.carouselImages);
+      fetchImages();
+    } else {
+      fetchImages();
+    }
+  }, []);
+
 const handleDeletePhoto = async (index, photoUrl) => {
   alert("Delete button was clicked!");
     if (!window.confirm("Delete this photo from the archives?")) return;
@@ -744,7 +765,8 @@ const handleDeletePhoto = async (index, photoUrl) => {
                         width: '50%',
                         transformStyle: 'preserve-3d',
                         originX: 0,
-                        zIndex: 25
+                        zIndex: 25,
+                        willChange: 'transform'
                       }}
                     >
                       {/* Front Face (Facing right initially) */}

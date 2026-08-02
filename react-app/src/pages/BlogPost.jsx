@@ -35,9 +35,7 @@ const BlogPost = () => {
   // or if they have a real email session going during local tests
   const isAdmin = user?.is_admin === 1 || user?.is_admin === true;
 
-  console.log("Current Auth Context Data:", authContext);
-  console.log("Resolved User Object:", user);
-  console.log("Is Admin Resolved To:", isAdmin);
+
 
   const [dbPost, setDbPost] = useState(null);
   const [loading, setLoading] = useState(true);
