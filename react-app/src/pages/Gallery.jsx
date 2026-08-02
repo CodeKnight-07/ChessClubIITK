@@ -19,6 +19,14 @@ import img10 from '../Gallery/SCHOOL VISIT.png';
 const FIDE_IMAGES_GLOB = import.meta.glob('../Gallery/FIDE RATED/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
 const FIDE_RATED_PHOTOS = Object.values(FIDE_IMAGES_GLOB).map(module => module.default);
 
+// Dynamically import all images in the Street Chess folder using Vite's glob import
+const STREET_CHESS_GLOB = import.meta.glob('../assets/Street Chess/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
+const STREET_CHESS_PHOTOS = Object.values(STREET_CHESS_GLOB).map(module => module.default);
+
+// Dynamically import all images in the Grand Swiss folder using Vite's glob import
+const GRAND_SWISS_GLOB = import.meta.glob('../assets/Grand Swiss/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
+const GRAND_SWISS_PHOTOS = Object.values(GRAND_SWISS_GLOB).map(module => module.default);
+
 // Extract the specific 1-indexed photos (1, 3, 13, 15, 17, and the last photo in the folder) for the spotlight slideshow
 const SLIDESHOW_PHOTOS = FIDE_RATED_PHOTOS.length >= 17
   ? [
@@ -37,7 +45,8 @@ const GALLERY_IMAGES = [
     category: 'Tournaments',
     title: 'SBI GIC Ltd. Presents FIDE Rated Open Rapid Chess Tournament 2026',
     image: tournamentImg,
-    description: 'High-stakes tactical battles at IIT Kanpur. Click to view all captures from the event.'
+    photos: FIDE_RATED_PHOTOS,
+    description: 'High-stakes tactical battles at IIT Kanpur. Click the photo to view the full gallery.'
   },
   {
     id: 2,
@@ -58,7 +67,8 @@ const GALLERY_IMAGES = [
     category: 'Tournaments',
     title: 'IITK Grand Swiss',
     image: img4,
-    description: 'The road to the candidates starts here.'
+    photos: GRAND_SWISS_PHOTOS,
+    description: 'The road to the candidates starts here. Click the photo to view the tournament gallery.'
   },
   {
     id: 5,
@@ -72,42 +82,69 @@ const GALLERY_IMAGES = [
     category: 'Socials',
     title: 'Tournament Visits',
     image: img6,
-    description: 'Honoring our graduating legends with one last match.'
+    description: 'Travelling to and participating in regional tournaments to represent the spirit of IIT Kanpur.'
   },
   {
     id: 7,
     category: 'Socials',
     title: 'Torch Relay',
     image: img7,
-    description: 'Honoring our graduating legends with one last match.'
+    description: 'Carrying the flame of sportsmanship across campus during the Udghosh Torch Relay.'
   },
   {
     id: 8,
     category: 'Tournaments',
     title: 'IITK Chess Cup',
     image: img8,
-    description: 'Honoring our graduating legends with one last match.'
+    description: 'The premier annual over-the-board tournament crowning the Chess King of IIT Kanpur.'
   },
   {
     id: 9,
     category: 'Tournaments',
     title: 'Freshers',
     image: img9,
-    description: 'Honoring our graduating legends with one last match.'
+    description: 'Welcoming the incoming batch of novices and enthusiasts with our annual Freshers Tournament.'
   },
   {
     id: 10,
     category: 'Tournaments',
     title: 'Qualifiers|UDGHOSH',
     image: img10,
-    description: 'Honoring our graduating legends with one last match.'
+    description: 'High-tension qualifying matches selecting the official IITK team for the Udghosh Inter-College Festival.'
   },
 ];
 
 const CATEGORIES = ['All', 'Tournaments', 'Workshops', 'Socials'];
 
+// CURRENT_YEAR_EVENTS: Add new active season (2026-2027) events here.
+// When new tournaments or showcases are played, simply add them as an object:
+// { id, title, tag, date, coverImage, photos, description }
+const CURRENT_YEAR_EVENTS = [
+  {
+    id: 'current-street-chess',
+    title: 'Street Chess 2026',
+    tag: 'Street Showcase',
+    date: 'Nov 12, 2026',
+    coverImage: STREET_CHESS_PHOTOS.length > 0 ? STREET_CHESS_PHOTOS[0] : workshopImg,
+    photos: STREET_CHESS_PHOTOS,
+    description: 'Bringing the game of chess to the campus streets! Casual, blitz, and speed matchplays on public tables open for all passersby.'
+  }
+  // Add new events here:
+  /*
+  {
+    id: 'current-next-event',
+    title: 'Your Next Tournament Name',
+    tag: 'Tournament Type',
+    date: 'Date of Event',
+    coverImage: nextEventCoverImage,
+    photos: nextEventPhotosArray,
+    description: 'Brief description of the event.'
+  }
+  */
+];
+
 // 3D Diary Book Single Page Component
-const DiaryPage = ({ event, pageNumber, isLeftPage }) => {
+const DiaryPage = ({ event, pageNumber, isLeftPage, onPhotoClick }) => {
   if (!event) return null;
 
   return (
@@ -123,7 +160,7 @@ const DiaryPage = ({ event, pageNumber, isLeftPage }) => {
         {/* Top Header details */}
         <div className="w-full text-center mb-2 sm:mb-3">
           {event.category && (
-            <div className="mb-1 px-2 py-0.5 rounded border border-red-800/30 text-red-800/80 font-mono text-[8px] sm:text-[10px] font-bold uppercase tracking-widest rotate-[-1deg] inline-block bg-red-500/[0.01]">
+            <div className="mb-1 px-2.5 py-0.5 rounded border-2 border-red-800/40 text-red-800/85 font-mono text-[8px] sm:text-[10px] font-extrabold uppercase tracking-widest rotate-[-2deg] inline-block bg-red-800/[0.04] shadow-[0_0_2px_rgba(153,27,27,0.15)]">
               {event.category}
             </div>
           )}
@@ -133,7 +170,10 @@ const DiaryPage = ({ event, pageNumber, isLeftPage }) => {
         </div>
 
         {/* Polaroid Image */}
-        <div className="bg-white p-2 pb-5 sm:pb-6 rounded shadow-[0_4px_10px_rgba(0,0,0,0.15)] border border-zinc-200/40 w-full max-w-[95%] sm:max-w-[88%] md:max-w-[82%] rotate-[1.5deg] relative my-auto">
+        <div 
+          onClick={() => onPhotoClick && event.photos && onPhotoClick(event.photos, event.title)}
+          className={`bg-white p-2 pb-5 sm:pb-6 rounded shadow-[0_4px_10px_rgba(0,0,0,0.15)] border border-zinc-200/40 w-full max-w-[95%] sm:max-w-[88%] md:max-w-[82%] rotate-[1.5deg] relative my-auto ${event.photos ? 'cursor-zoom-in hover:scale-[1.02] active:scale-[0.98] transition-all duration-300' : ''}`}
+        >
           {/* Taped corners */}
           <div className="absolute w-8 h-3 bg-yellow-100/30 backdrop-blur-[0.5px] border border-white/20 shadow-sm -rotate-45 -top-2 -left-2.5" />
           <div className="absolute w-8 h-3 bg-yellow-100/30 backdrop-blur-[0.5px] border border-white/20 shadow-sm rotate-45 -top-2 -right-2.5" />
@@ -159,8 +199,8 @@ const DiaryPage = ({ event, pageNumber, isLeftPage }) => {
       </div>
 
       {/* Page Number */}
-      <div className={`absolute bottom-2 ${isLeftPage ? 'left-4' : 'right-4'} text-[9px] font-mono text-[#8a7f6e] uppercase tracking-wider`}>
-        {pageNumber}
+      <div className={`absolute bottom-3 ${isLeftPage ? 'left-6' : 'right-6'} font-handwritten text-sm text-[#8a7f6e]/70 select-none`}>
+        — {pageNumber} —
       </div>
     </div>
   );
@@ -177,6 +217,8 @@ const Gallery = () => {
   const [slideshowIndex, setSlideshowIndex] = useState(0);
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [lightboxPhotos, setLightboxPhotos] = useState([]);
+  const [lightboxTitle, setLightboxTitle] = useState('');
 
 
 
@@ -202,7 +244,17 @@ const Gallery = () => {
     if (SLIDESHOW_PHOTOS.length === 0) return;
     const currentPhoto = SLIDESHOW_PHOTOS[slideshowIndex];
     const mainIndex = FIDE_RATED_PHOTOS.indexOf(currentPhoto);
+    setLightboxPhotos(FIDE_RATED_PHOTOS);
+    setLightboxTitle('SBI GIC Ltd. Presents FIDE Rated Open Rapid Chess Tournament 2026');
     setLightboxIndex(mainIndex !== -1 ? mainIndex : 0);
+    setIsOpenLightbox(true);
+  };
+
+  const openExhibition = (photos, title, startIdx = 0) => {
+    if (!photos || photos.length === 0) return;
+    setLightboxPhotos(photos);
+    setLightboxTitle(title);
+    setLightboxIndex(startIdx);
     setIsOpenLightbox(true);
   };
 
@@ -262,11 +314,13 @@ const Gallery = () => {
   };
 
   const handleNextPhoto = () => {
-    setLightboxIndex(prev => (prev + 1) % FIDE_RATED_PHOTOS.length);
+    if (lightboxPhotos.length === 0) return;
+    setLightboxIndex(prev => (prev + 1) % lightboxPhotos.length);
   };
 
   const handlePrevPhoto = () => {
-    setLightboxIndex(prev => (prev - 1 + FIDE_RATED_PHOTOS.length) % FIDE_RATED_PHOTOS.length);
+    if (lightboxPhotos.length === 0) return;
+    setLightboxIndex(prev => (prev - 1 + lightboxPhotos.length) % lightboxPhotos.length);
   };
 
   // Keyboard navigation listener for lightbox modal
@@ -378,18 +432,99 @@ const Gallery = () => {
         )}
       </AnimatePresence>
 
-      {/* 3D Diary Book Section (Bottom) */}
+      {/* Current Season Exhibition (New Section) */}
+      <section className="mb-24 max-w-5xl mx-auto">
+        <div className="text-center md:text-left mb-10">
+          <p className="text-primary font-label text-xs tracking-[0.3em] uppercase mb-2">
+            Active Season
+          </p>
+          <h2 className="text-4xl font-serif text-on-surface">
+            This year events
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {CURRENT_YEAR_EVENTS.map((event) => (
+            <motion.div
+              key={event.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="bg-[#1b1916] rounded-2xl overflow-hidden border border-outline-variant/10 hover:border-primary/20 hover:shadow-[0_12px_40px_rgba(242,202,80,0.08)] transition-all duration-300 flex flex-col justify-between group relative"
+            >
+              {/* Card Image Wrapper */}
+              <div className="relative aspect-[16/11] overflow-hidden">
+                <img
+                  src={event.coverImage}
+                  alt={event.title}
+                  className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1b1916] via-transparent to-transparent pointer-events-none opacity-80" />
+                <div className="absolute top-3 left-3 bg-primary/10 text-primary border border-primary/20 backdrop-blur-sm font-label text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full shadow-sm">
+                  {event.tag}
+                </div>
+              </div>
+
+              {/* Card Details */}
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <span className="text-[10px] font-label text-on-surface-variant/60 tracking-wider block mb-2 font-semibold">
+                    {event.date}
+                  </span>
+                  <h3 className="text-lg font-serif font-bold text-on-surface mb-3 group-hover:text-primary transition-colors leading-tight">
+                    {event.title}
+                  </h3>
+                  <p className="text-xs text-on-surface-variant leading-relaxed mb-6 line-clamp-3">
+                    {event.description}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => openExhibition(event.photos, event.title)}
+                  className="w-full bg-[#fafafa]/5 text-on-surface hover:bg-primary hover:text-on-primary font-label text-[10px] font-bold uppercase tracking-widest py-3 rounded-xl border border-outline-variant/10 hover:border-primary transition-all flex items-center justify-center gap-2"
+                >
+                  <span className="material-symbols-outlined text-sm">filter_hdr</span>
+                  <span>View event archive</span>
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* 3D Diary Book Section (Archives - Bottom) */}
       <div className="relative w-full" ref={containerRef}>
         {carouselImages.length > 0 ? (
           <div className="py-10 flex flex-col items-center">
+            <div className="w-full max-w-[900px] mb-6 text-center md:text-left">
+              <p className="text-primary font-label text-xs tracking-[0.3em] uppercase mb-2">
+                Archives & History
+              </p>
+              <h3 className="text-3xl font-serif text-on-surface">
+                Past Year Events
+              </h3>
+            </div>
+
             {/* Book Wrapper */}
             <div
-              className="w-full max-w-[900px] aspect-[16/10] sm:aspect-[16/9.5] relative rounded-2xl bg-[#2d1f10] border-4 border-[#3e2c17] shadow-[0_25px_60px_rgba(0,0,0,0.65),inset_0_0_30px_rgba(0,0,0,0.8)] p-2 sm:p-3"
+              className="w-full max-w-[900px] aspect-[16/10] sm:aspect-[16/9.5] relative rounded-2xl bg-[#2d1f10] border-4 border-[#3e2c17] shadow-[0_25px_60px_rgba(0,0,0,0.65),inset_0_0_30px_rgba(0,0,0,0.8)] p-2 sm:p-3 group"
               style={{
                 perspective: '2000px',
                 transformStyle: 'preserve-3d'
               }}
             >
+              {/* Gold Metal Corners */}
+              <div className="absolute top-1 left-1 w-6 h-6 border-t-2 border-l-2 border-[#d4af37]/80 rounded-tl-lg pointer-events-none z-30 shadow-[inset_1px_1px_3px_rgba(255,255,255,0.2)]" />
+              <div className="absolute top-1 right-1 w-6 h-6 border-t-2 border-r-2 border-[#d4af37]/80 rounded-tr-lg pointer-events-none z-30 shadow-[inset_-1px_1px_3px_rgba(255,255,255,0.2)]" />
+              <div className="absolute bottom-1 left-1 w-6 h-6 border-b-2 border-l-2 border-[#d4af37]/80 rounded-bl-lg pointer-events-none z-30 shadow-[inset_1px_-1px_3px_rgba(255,255,255,0.2)]" />
+              <div className="absolute bottom-1 right-1 w-6 h-6 border-b-2 border-r-2 border-[#d4af37]/80 rounded-br-lg pointer-events-none z-30 shadow-[inset_-1px_-1px_3px_rgba(255,255,255,0.2)]" />
+
+              {/* Silk Ribbon Bookmark */}
+              <div 
+                className="absolute left-1/2 -translate-x-1/2 bottom-[-16px] w-3.5 h-10 bg-red-700/90 rounded-b-md shadow-md z-30 transition-transform duration-300 origin-top hover:scale-y-110 pointer-events-auto" 
+                title="Archival Ribbon"
+              />
               {/* Inner Pages container */}
               <div 
                 className="w-full h-full relative rounded-lg overflow-hidden flex shadow-[0_10px_25px_rgba(0,0,0,0.5)]"
@@ -413,6 +548,7 @@ const Gallery = () => {
                         : currentSpread * 2 + 1
                     }
                     isLeftPage={true}
+                    onPhotoClick={openExhibition}
                   />
                 </div>
 
@@ -434,6 +570,7 @@ const Gallery = () => {
                         : currentSpread * 2 + 2
                     }
                     isLeftPage={false}
+                    onPhotoClick={openExhibition}
                   />
                 </div>
 
@@ -484,6 +621,7 @@ const Gallery = () => {
                               : currentSpread * 2 + 2
                           }
                           isLeftPage={false}
+                          onPhotoClick={openExhibition}
                         />
                       </div>
 
@@ -512,6 +650,7 @@ const Gallery = () => {
                               : previousSpread * 2 + 1
                           }
                           isLeftPage={true}
+                          onPhotoClick={openExhibition}
                         />
                       </div>
                     </motion.div>
@@ -579,7 +718,7 @@ const Gallery = () => {
 
       {/* Full-Screen Image Lightbox Modal */}
       <AnimatePresence>
-        {isOpenLightbox && FIDE_RATED_PHOTOS.length > 0 && (
+        {isOpenLightbox && lightboxPhotos.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -589,7 +728,7 @@ const Gallery = () => {
             {/* Header Controls */}
             <div className="flex justify-between items-center w-full max-w-7xl mx-auto h-12">
               <div className="text-on-surface/75 text-xs md:text-sm font-label uppercase tracking-widest">
-                FIDE Rated Tournament Capture ({lightboxIndex + 1} / {FIDE_RATED_PHOTOS.length})
+                {lightboxTitle} Capture ({lightboxIndex + 1} / {lightboxPhotos.length})
               </div>
               <button
                 onClick={() => setIsOpenLightbox(false)}
@@ -614,8 +753,8 @@ const Gallery = () => {
                 <AnimatePresence mode="wait">
                   <motion.img
                     key={lightboxIndex}
-                    src={FIDE_RATED_PHOTOS[lightboxIndex]}
-                    alt={`FIDE Rated Tournament Photo ${lightboxIndex + 1}`}
+                    src={lightboxPhotos[lightboxIndex]}
+                    alt={`${lightboxTitle} Photo ${lightboxIndex + 1}`}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
@@ -636,7 +775,7 @@ const Gallery = () => {
 
             {/* Thumbnails Footer */}
             <div className="w-full max-w-7xl mx-auto py-4 overflow-x-auto flex justify-center gap-2 border-t border-outline-variant/10">
-              {FIDE_RATED_PHOTOS.map((photo, idx) => (
+              {lightboxPhotos.map((photo, idx) => (
                 <button
                   key={idx}
                   onClick={() => setLightboxIndex(idx)}
