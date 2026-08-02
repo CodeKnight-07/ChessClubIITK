@@ -57,7 +57,7 @@ const COORDINATORS = [
      funnyDescription: `"Achievement:
  Got a 1-month Diamond membership on Samay’s stream after Guki became the World Champ!
 "`,
-    email: "rishi24@iitk.ac.in",
+    email: "rishig24@iitk.ac.in",
     image: rishiImg
   },
   {
@@ -66,7 +66,7 @@ const COORDINATORS = [
     role: "Coordinator",
     funnyDescription: `"I look strict to juniors. Then I start talking...
 It gets worse."`,
-    email: "rudra24@iitk.ac.in",
+    email: "rudrad24@iitk.ac.in",
     image: rudraImg
   },
   {
@@ -74,7 +74,7 @@ It gets worse."`,
     name: "Shaurya Vats",
     role: "Coordinator",
     funnyDescription: `"Running on chewing gum and the annual 'this is DC's year' agenda."`,
-    email: `shaurya24@iitk.ac.in`,
+    email: `shauryav24@iitk.ac.in`,
     image: shauryaImg
   }
 ];
