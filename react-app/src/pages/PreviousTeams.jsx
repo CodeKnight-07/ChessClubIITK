@@ -2,14 +2,17 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from '../components/Footer';
 import profileImg from '../assets/profile_image.webp'; // Using existing image as placeholder
+import tanmayImg from "../assets/exCoordinators/tanmay.jpg";
+import akshatImg from "../assets/exCoordinators/akshat.png";
+import kushagraImg from "../assets/exCoordinators/kushagra.jpg";
 
 // Dummy data structure, will be replaced by user's data
 const TEAMS_DATA = {
   '25-26 Team': [
-    { name: "Akshat Srivastava", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 25-26 team." },
-    { name: "Kushagra Shukla", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 25-26 team." },
+    { name: "Akshat Srivastava", email: "placeholder@iitk.ac.in", image: akshatImg, funnyDescription: "Placeholder description for 25-26 team." },
+    { name: "Kushagra Shukla", email: "placeholder@iitk.ac.in", image: kushagraImg, funnyDescription: "Placeholder description for 25-26 team." },
     { name: "Pulkit Kumar Gajipara", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 25-26 team." },
-    { name: "Tanmay Kavikumar Sahare", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 25-26 team." }
+    { name: "Tanmay Kavikumar Sahare", email: "placeholder@iitk.ac.in", image: tanmayImg, funnyDescription: "Placeholder description for 25-26 team." }
   ],
   '24-25 Team': [
     { name: "Abhishek Kumar", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 24-25 team." },
