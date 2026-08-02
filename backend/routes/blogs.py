@@ -1,4 +1,5 @@
-import pymysql
+import psycopg
+from psycopg.rows import dict_row
 from flask import Blueprint, request, jsonify
 from config.db import get_db_connection
 
@@ -8,7 +9,7 @@ blogs_bp = Blueprint('blogs', __name__)
 def verify_admin_privileges(cursor, email):
     cursor.execute("SELECT is_admin FROM users WHERE email = %s", (email,))
     user = cursor.fetchone()
-    return user and user.get('is_admin') == 1
+    return user and bool(user.get('is_admin'))
 
 
 # --- CREATE: Add a New Blog (Admin Only) ---
@@ -30,7 +31,7 @@ def create_blog():
     connection = None
     try:
         connection = get_db_connection()
-        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+        with connection.cursor(row_factory=dict_row) as cursor:
             if not verify_admin_privileges(cursor, email):
                 return jsonify({"error": "Access Denied: Admin privileges required."}), 403
 
@@ -45,7 +46,7 @@ def create_blog():
         print(f"Blog Creation Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 
@@ -55,7 +56,7 @@ def get_all_blogs():
     connection = None
     try:
         connection = get_db_connection()
-        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+        with connection.cursor(row_factory=dict_row) as cursor:
             # We now select author_name and author_position directly out of the blogs row record itself!
             sql = """
                 SELECT 
@@ -72,7 +73,7 @@ def get_all_blogs():
         print(f"Fetch Blogs Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 
@@ -88,7 +89,7 @@ def delete_blog(blog_id):
     connection = None
     try:
         connection = get_db_connection()
-        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+        with connection.cursor(row_factory=dict_row) as cursor:
             if not verify_admin_privileges(cursor, email):
                 return jsonify({"error": "Access Denied: Admin privileges required."}), 403
 
@@ -99,7 +100,7 @@ def delete_blog(blog_id):
         print(f"Delete Blog Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 # --- UPDATE: Modify an Existing Blog (Admin Only) ---
@@ -120,7 +121,7 @@ def update_blog(blog_id):
     connection = None
     try:
         connection = get_db_connection()
-        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+        with connection.cursor(row_factory=dict_row) as cursor:
             if not verify_admin_privileges(cursor, email):
                 return jsonify({"error": "Access Denied: Admin privileges required."}), 403
 
@@ -136,5 +137,5 @@ def update_blog(blog_id):
         print(f"Blog Update Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()

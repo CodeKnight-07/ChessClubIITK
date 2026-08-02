@@ -4,7 +4,8 @@ import smtplib
 from email.mime.text import MIMEText
 from flask import Blueprint, request, jsonify
 import bcrypt
-import pymysql
+import psycopg
+from psycopg.rows import dict_row
 import requests
 from config.db import get_db_connection
 from google.cloud import storage
@@ -65,7 +66,7 @@ def generate_otp():
             sql = """
                 INSERT INTO pending_otps (email, otp) 
                 VALUES (%s, %s) 
-                ON DUPLICATE KEY UPDATE otp = VALUES(otp), created_at = CURRENT_TIMESTAMP
+                ON CONFLICT (email) DO UPDATE SET otp = EXCLUDED.otp, created_at = CURRENT_TIMESTAMP
             """
             cursor.execute(sql, (primary_email, primary_otp))
             cursor.execute(sql, (secondary_email, secondary_otp))
@@ -90,7 +91,7 @@ def generate_otp():
         print(f"OTP Generation Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 
@@ -159,7 +160,7 @@ def verify_and_register():
         print(f"Registration Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 
@@ -189,7 +190,7 @@ def forgot_password():
             otp = str(random.randint(100000, 999999))
             sql = """
                 INSERT INTO pending_otps (email, otp) VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE otp = VALUES(otp), created_at = CURRENT_TIMESTAMP
+                ON CONFLICT (email) DO UPDATE SET otp = EXCLUDED.otp, created_at = CURRENT_TIMESTAMP
             """
             cursor.execute(sql, (email, otp))
             connection.commit()
@@ -205,7 +206,7 @@ def forgot_password():
         print(f"Forgot Password Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 
@@ -245,7 +246,7 @@ def reset_password():
         print(f"Reset Password Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 @auth_bp.route('/user/profile/<email>', methods=['GET'])
@@ -260,7 +261,7 @@ def get_user_profile(email):
     connection = None
     try:
         connection = get_db_connection()
-        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+        with connection.cursor(row_factory=dict_row) as cursor:
             sql = "SELECT name, roll_no AS rollNo, contact, email, chess_username AS chesscom, avatar, secondary_email FROM users WHERE email = %s"
             cursor.execute(sql, (email,))
             profile = cursor.fetchone()
@@ -274,7 +275,7 @@ def get_user_profile(email):
         print(f"Profile Retrieval Failure: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 
@@ -316,7 +317,7 @@ def update_user_profile():
         print(f"Profile Update Failure: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 # --- DELETE REQUEST ---
@@ -364,5 +365,67 @@ def delete_user_account():
         print(f"Critical Account Deletion Error: {e}")
         return jsonify({"error": "Internal server error during account erasure."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
+            connection.close()
+
+# --- LEAGUE OF LEGENDS 6.0 EVENT REGISTRATION ---
+
+@auth_bp.route('/register-lol', methods=['POST'])
+@jwt_required()
+def register_lol():
+    data = request.get_json()
+    email = data.get('email')
+    name = data.get('name')
+    roll_no = data.get('roll_no')
+    chess_username = data.get('chess_username')
+    contact = data.get('contact')
+    secondary_email = data.get('secondary_email')
+
+    if not all([email, name, roll_no, chess_username, contact]):
+        return jsonify({"error": "All fields are required."}), 400
+
+    current_user_email = get_jwt_identity()
+    if current_user_email != email:
+        return jsonify({"error": "Unauthorized registration identity mismatch."}), 403
+
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            # Check if user is already registered
+            cursor.execute('SELECT id FROM "lolEntries" WHERE email = %s', (email,))
+            if cursor.fetchone():
+                return jsonify({"error": "You are already registered for this event."}), 409
+
+            # Insert registration record
+            cursor.execute(
+                'INSERT INTO "lolEntries" (email, name, roll_no, chess_username, contact, secondary_email) VALUES (%s, %s, %s, %s, %s, %s)',
+                (email, name, roll_no, chess_username, contact, secondary_email or '')
+            )
+            connection.commit()
+            return jsonify({"message": "Successfully registered for League of Legends 6.0!"}), 201
+
+    except Exception as e:
+        print(f"LoL Registration Error: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+    finally:
+        if connection:
+            connection.close()
+
+@auth_bp.route('/register-lol/status', methods=['GET'])
+@jwt_required()
+def register_lol_status():
+    email = get_jwt_identity()
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT id FROM "lolEntries" WHERE email = %s', (email,))
+            is_registered = cursor.fetchone() is not None
+            return jsonify({"is_registered": is_registered}), 200
+    except Exception as e:
+        print(f"LoL Registration Status Error: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+    finally:
+        if connection:
             connection.close()

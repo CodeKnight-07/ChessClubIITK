@@ -10,11 +10,14 @@ import Blogs from './pages/Blogs';
 import BlogPost from './pages/BlogPost';
 import UserProfile from './pages/UserProfile';
 import Contact from './pages/Contact';
+import PreviousTeams from './pages/PreviousTeams';
 import Gallery from './pages/Gallery';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import ScrollToTop from './components/ScrollToTop';
+import ServerError500 from './pages/ServerError500';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   return (
@@ -22,7 +25,8 @@ function App() {
       <Router>
         <ScrollToTop />
         <MainLayout>
-          <Routes>
+          <ErrorBoundary>
+            <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/events" element={<Events />} />
@@ -30,15 +34,18 @@ function App() {
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/blog/:id" element={<BlogPost />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/previous-teams" element={<PreviousTeams />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/user" element={<UserProfile />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/500" element={<ServerError500 />} />
           </Routes>
-        </MainLayout>
-      </Router>
-    </AuthProvider>
+        </ErrorBoundary>
+      </MainLayout>
+    </Router>
+  </AuthProvider>
   );
 }
 

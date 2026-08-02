@@ -5,7 +5,21 @@ import { useAuth } from '../context/AuthContext';
 import userAvatar from '../assets/new_user_avatar.png';
 
 const UserProfile = () => {
-  const [profile, setProfile] = useState(null);
+  
+  // Extract the authenticated session email dynamically from context rather than localstorage
+  const { user, token, logout } = useAuth();
+  const userEmail = user?.email;
+  
+  const [profile, setProfile] = useState({
+    name: "",
+    rollno: "",
+    contact: "",
+    email: "",
+    secondary_email: "",
+    chesscom: "",
+    avatar: userAvatar
+  });
+  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [participations, setParticipations] = useState([]);
   const [error, setError] = useState('');
@@ -14,20 +28,12 @@ const UserProfile = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
-  const { logout } = useAuth();
 
   const navigate = useNavigate();
 
-  // Extract the authenticated session email dynamically from context rather than localstorage
-  const { user,token } = useAuth();
-  const userEmail = user?.email;
+  
 
-  useEffect(() => {
-    if (!userEmail) {
-      setError("Please log in to view your profile properties.");
-      return;
-    }
-    const fetchProfile = async () => {
+  const fetchProfile = async () => {
       try {
         const token = localStorage.getItem('chess-club-jwt');
         const response = await fetch(`${API_BASE_URL}/api/user/profile/${userEmail}`, {
@@ -43,16 +49,30 @@ const UserProfile = () => {
         const data = await response.json();
         setProfile({
           ...data,
+          rollno: data.rollno || data.roll_no || "",
           avatar: data.avatar || userAvatar
+          
         });
+        setIsLoading(false);
       } catch (err) {
         console.error(err);
         setError("Failed loading profile from server.");
+        setIsLoading(false);
       }
     };
+  
+  useEffect(() => {
+    const jwtToken = localStorage.getItem('chess-club-jwt');
+    if (!jwtToken) {
+      setError("Please log in to view your profile properties.");
+      setIsLoading(false);
+      return;
+    }
 
-    fetchProfile();
-
+    if (userEmail) {
+      fetchProfile(userEmail);
+    }
+    
     const savedParts = localStorage.getItem('chess-club-participations');
     if (savedParts) {
       try {
@@ -82,7 +102,13 @@ const UserProfile = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
          },
-        body: JSON.stringify(profile),
+        body: JSON.stringify({
+          email: profile.email,
+          name: profile.name,
+          rollNo: profile.rollno, // maps frontend 'rollno' to backend 'rollNo'
+          contact: profile.contact,
+          avatar: profile.avatar
+        }),
       });
 
       if (!response.ok) throw new Error("Failed saving database modifications");
@@ -216,8 +242,8 @@ const UserProfile = () => {
                   <div className="flex flex-col gap-4">
                     <input 
                       type="text" 
-                      value={profile.rollNo}
-                      onChange={(e) => setProfile({...profile, rollNo: e.target.value})}
+                      value={profile.rollno}
+                      onChange={(e) => setProfile({...profile, rollno: e.target.value})}
                       className="text-[11px] font-label uppercase tracking-widest bg-transparent border-b border-outline-variant/30 text-on-surface pb-1 focus:outline-none focus:border-primary w-full transition-colors text-center"
                       placeholder="Roll Number"
                     />
@@ -268,7 +294,7 @@ const UserProfile = () => {
                   <div className="flex flex-col gap-4">
                     <div className="flex justify-between items-center text-left">
                       <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Roll No</span>
-                      <span className="text-[11px] text-on-surface font-mono">{profile.rollNo || "-"}</span>
+                      <span className="text-[11px] text-on-surface font-mono">{profile.rollno || "-"}</span>
                     </div>
                     <div className="flex justify-between items-center text-left">
                       <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Contact</span>

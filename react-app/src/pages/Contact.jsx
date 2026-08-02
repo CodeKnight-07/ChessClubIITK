@@ -17,7 +17,6 @@ import chaitanyaImg from "../assets/secretaries/chaitanya.jpg";
 import divyeshImg from "../assets/secretaries/divyesh.jpeg";
 import furzaanImg from "../assets/secretaries/furzaan.png";
 import hariomImg from "../assets/secretaries/hariom.jpg";
-import kdheerajImg from "../assets/secretaries/kdheeraj.png";
 import kratagyaImg from "../assets/secretaries/kratagya.jpg";
 import madhavImg from "../assets/secretaries/madhav.jpg";
 import mayankBhakhandImg from "../assets/secretaries/mayank_bhakhand.jpeg";
@@ -35,10 +34,10 @@ import lakshyaImg from "../assets/secretaries/lakshya.jpg";
 import Footer from '../components/Footer';
 const COORDINATORS = [
   {
-    id: 'coord-1',
+    id: 'coord-0',
     name: "Inesh Aggarwal",
     role: "Coordinator",
-    funnyDescription: "I wake up and eat parathas with samosational level of enthusiasm",
+    funnyDescription: `"I wake up and eat parathas with samosational level of enthusiasm"`,
     email: "ineshag24@iitk.ac.in",
     image: ineshImg
 
@@ -47,7 +46,7 @@ const COORDINATORS = [
     id: 'coord-1',
     name: "Laksh Dhir",
     role: "Coordinator",
-    funnyDescription: "If you find a bottle or ID card at random places on campus, there’s a decent chance it’s mine..",
+    funnyDescription: `"If you find a bottle or ID card at random places on campus, there’s a decent chance it’s mine.."`,
     email: "laksh24@iitk.ac.in",
     image: lakshImg
   },
@@ -58,7 +57,7 @@ const COORDINATORS = [
      funnyDescription: `"Achievement:
  Got a 1-month Diamond membership on Samay’s stream after Guki became the World Champ!
 "`,
-    email: "rishi24@iitk.ac.in",
+    email: "rishig24@iitk.ac.in",
     image: rishiImg
   },
   {
@@ -67,7 +66,7 @@ const COORDINATORS = [
     role: "Coordinator",
     funnyDescription: `"I look strict to juniors. Then I start talking...
 It gets worse."`,
-    email: "rudra24@iitk.ac.in",
+    email: "rudrad24@iitk.ac.in",
     image: rudraImg
   },
   {
@@ -75,7 +74,7 @@ It gets worse."`,
     name: "Shaurya Vats",
     role: "Coordinator",
     funnyDescription: `"Running on chewing gum and the annual 'this is DC's year' agenda."`,
-    email: `shaurya24@iitk.ac.in`,
+    email: `shauryav24@iitk.ac.in`,
     image: shauryaImg
   }
 ];
@@ -186,14 +185,6 @@ const SECRETARIES = [
     image: hariomImg,
   },
   {
-    id: "sec-13",
-    name: "K Dheeraj",
-    role: "Secretary",
-    funnyDescription: `"One brilliant move outweighs thousand horrible blunders"`,
-
-    image: kdheerajImg,
-  },
-  {
     id: "sec-14",
     name: "Kratagya Jain",
     role: "Secretary",
@@ -295,9 +286,7 @@ const ContactCard = ({ person }) => (
       />
       <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent transition-opacity duration-500 opacity-90 group-hover:opacity-60"></div>
 
-      <div className="absolute top-4 left-4 z-20">
-        <span className="bg-surface-container-highest/80 backdrop-blur-md border border-outline-variant/20 px-3 py-1 text-[9px] font-bold tracking-[0.2em] uppercase text-on-surface rounded-full shadow-lg transition-colors group-hover:bg-primary group-hover:text-on-primary group-hover:border-primary">{person.role}</span>
-      </div>
+      
 
       <div className="absolute bottom-0 left-0 w-full p-6 translate-y-6 group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
         <h5 className="text-2xl font-serif font-bold text-on-surface mb-1 drop-shadow-md group-hover:text-primary transition-colors duration-300">{person.name}</h5>

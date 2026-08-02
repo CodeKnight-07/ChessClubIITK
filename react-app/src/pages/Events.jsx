@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import Footer from '../components/Footer';
@@ -36,6 +36,7 @@ export const OFFICIAL_EVENTS = [
   {
     id: 1,
     title: "League of Legends 6.0",
+    tag: "Tournament",
     date: "August 7, 2026",
     time: "Multiple Days",
     location: "chess.com",
@@ -212,7 +213,118 @@ export const OFFICIAL_EVENTS = [
 const Events = () => {
   // 1. Pull auth context and token for admin verification and API calls
   const { isLoggedIn, token } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [expandedId, setExpandedId] = useState(null);
+
+  // LoL Registration Custom States
+  const [isRegisteredForLol, setIsRegisteredForLol] = useState(false);
+  const [isLolModalOpen, setIsLolModalOpen] = useState(false);
+  const [lolProfileData, setLolProfileData] = useState(null);
+  const [lolRegError, setLolRegError] = useState('');
+  const [lolRegSuccess, setLolRegSuccess] = useState(false);
+  const [isSubmittingLol, setIsSubmittingLol] = useState(false);
+  const [isFetchingLolProfile, setIsFetchingLolProfile] = useState(false);
+
+  // Check LoL registration status
+  useEffect(() => {
+    if (isLoggedIn && token) {
+      const checkLolStatus = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/register-lol/status`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setIsRegisteredForLol(data.is_registered);
+          }
+        } catch (e) {
+          console.error("Error checking lol registration status:", e);
+        }
+      };
+      checkLolStatus();
+    } else {
+      setIsRegisteredForLol(false);
+    }
+  }, [isLoggedIn, token]);
+
+  // Handle auto-opening registration modal from landing page announcement popup
+  useEffect(() => {
+    if (location.state?.openRegisterLol && isLoggedIn && token) {
+      handleRegisterLolClick();
+      // Clean up the location state so it doesn't open again on page reload
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, isLoggedIn, token]);
+
+  const handleRegisterLolClick = async () => {
+    if (!isLoggedIn) {
+      navigate('/login');
+      return;
+    }
+    setIsFetchingLolProfile(true);
+    setLolRegError('');
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const email = payload.sub || localStorage.getItem('logged_in_user_email');
+      
+      const response = await fetch(`${API_BASE_URL}/api/user/profile/${email}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const profile = await response.json();
+        setLolProfileData(profile);
+        setIsLolModalOpen(true);
+      } else {
+        setLolRegError("Failed to fetch profile properties. Please try again.");
+      }
+    } catch (err) {
+      console.error("Failed to load profile for LoL registration:", err);
+      setLolRegError("Connection failed. Please check your backend.");
+    } finally {
+      setIsFetchingLolProfile(false);
+    }
+  };
+
+  const handleConfirmLolRegistration = async () => {
+    setIsSubmittingLol(true);
+    setLolRegError('');
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/register-lol`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          email: lolProfileData.email,
+          name: lolProfileData.name,
+          roll_no: lolProfileData.rollno,
+          chess_username: lolProfileData.chesscom,
+          contact: lolProfileData.contact,
+          secondary_email: lolProfileData.secondary_email
+        })
+      });
+      
+      const data = await response.json();
+      if (response.ok) {
+        setLolRegSuccess(true);
+        setIsRegisteredForLol(true);
+      } else {
+        setLolRegError(data.error || "Failed to register.");
+      }
+    } catch (err) {
+      console.error("LoL registration submission failure:", err);
+      setLolRegError("Server connection error.");
+    } finally {
+      setIsSubmittingLol(false);
+    }
+  };
 
   // 2. The Ultimate Bouncer: Admin Check Logic
   let isAdmin = false;
@@ -519,7 +631,24 @@ return (
                           </div>
                         )}
 
-                        {event.register_link && (
+                        {event.id === 1 ? (
+                          isRegisteredForLol ? (
+                            <button
+                              disabled
+                              className="block w-full text-center bg-gray-800 text-gray-500 py-3 rounded-lg font-bold cursor-not-allowed border border-gray-700"
+                            >
+                              REGISTERED ✓
+                            </button>
+                          ) : (
+                            <button 
+                              onClick={handleRegisterLolClick}
+                              disabled={isFetchingLolProfile}
+                              className="block w-full text-center bg-yellow-400 text-black py-3 rounded-lg font-bold hover:bg-yellow-500 transition-colors"
+                            >
+                              {isFetchingLolProfile ? "LOADING PROFILE..." : "REGISTER"}
+                            </button>
+                          )
+                        ) : event.register_link && (
                           <a 
                             href={event.register_link} 
                             target="_blank" 
@@ -557,6 +686,94 @@ return (
       </div>
 
       <Footer />
+
+      {/* LoL Registration Modal */}
+      {isLolModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4">
+          <div className="bg-[#1a1a1a] p-8 rounded-xl max-w-lg w-full border border-gray-700 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <h2 className="text-2xl text-yellow-400 mb-2 font-serif font-bold">Event Registration</h2>
+            <p className="text-gray-400 text-sm mb-6">League of Legends 6.0 — August 7, 2026</p>
+            
+            {lolRegSuccess ? (
+              <div className="text-center py-6">
+                <span className="material-symbols-outlined text-6xl text-green-500 mb-4">check_circle</span>
+                <h3 className="text-xl font-bold text-gray-100 mb-2">Registration Confirmed!</h3>
+                <p className="text-gray-400 text-sm mb-6">You have been successfully registered for League of Legends 6.0.</p>
+                <button 
+                  onClick={() => {
+                    setIsLolModalOpen(false);
+                    setLolRegSuccess(false);
+                  }}
+                  className="px-6 py-2 bg-yellow-400 text-black font-bold rounded-md hover:bg-yellow-500 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4 text-gray-200">
+                <p className="text-xs text-yellow-400/80 mb-2 font-semibold">
+                  ⚠️ Please verify that your profile details below are correct. These details cannot be modified during registration.
+                </p>
+                
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Full Name</label>
+                  <input readOnly value={lolProfileData?.name || ''} className="w-full p-2.5 bg-[#111111] rounded-md border border-gray-800 text-gray-400 cursor-not-allowed focus:outline-none" />
+                </div>
+                
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Roll Number</label>
+                    <input readOnly value={lolProfileData?.rollno || ''} className="w-full p-2.5 bg-[#111111] rounded-md border border-gray-800 text-gray-400 cursor-not-allowed focus:outline-none" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Chess.com Username</label>
+                    <input readOnly value={lolProfileData?.chesscom || ''} className="w-full p-2.5 bg-[#111111] rounded-md border border-gray-800 text-gray-400 cursor-not-allowed focus:outline-none" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Primary Email (IITK)</label>
+                  <input readOnly value={lolProfileData?.email || ''} className="w-full p-2.5 bg-[#111111] rounded-md border border-gray-800 text-gray-400 cursor-not-allowed focus:outline-none" />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Secondary Email (Gmail)</label>
+                  <input readOnly value={lolProfileData?.secondary_email || 'Not Provided'} className="w-full p-2.5 bg-[#111111] rounded-md border border-gray-800 text-gray-400 cursor-not-allowed focus:outline-none" />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Phone Number</label>
+                  <input readOnly value={lolProfileData?.contact || ''} className="w-full p-2.5 bg-[#111111] rounded-md border border-gray-800 text-gray-400 cursor-not-allowed focus:outline-none" />
+                </div>
+
+                {lolRegError && (
+                  <div className="text-red-400 text-xs mt-2 bg-red-950/30 border border-red-900/50 p-2.5 rounded-md">
+                    {lolRegError}
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-4 mt-6">
+                  <button 
+                    type="button" 
+                    onClick={() => setIsLolModalOpen(false)} 
+                    disabled={isSubmittingLol}
+                    className="px-5 py-2 bg-gray-800 rounded-md hover:bg-gray-700 transition-colors font-medium text-sm"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleConfirmLolRegistration}
+                    disabled={isSubmittingLol}
+                    className="px-5 py-2 bg-yellow-400 text-black font-bold rounded-md hover:bg-yellow-500 transition-colors text-sm flex items-center gap-2"
+                  >
+                    {isSubmittingLol ? "Registering..." : "Confirm & Register"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Admin Creation Modal */}
       {isModalOpen && (
