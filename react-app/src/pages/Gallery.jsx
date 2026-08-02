@@ -524,7 +524,7 @@ const handleDeletePhoto = async (index, photoUrl) => {
                             }
                           }
                         }}
-                        className="absolute top-4 right-4 bg-red-600/90 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold shadow-lg hover:bg-red-500 z-50 transition-colors cursor-pointer"
+                        className="absolute top-4 right-4 bg-red-600/90 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold shadow-lg hover:bg-red-500 z-30 transition-colors cursor-pointer"
                         title="Delete this photo"
                       >
                         ✕
