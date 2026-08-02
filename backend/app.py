@@ -11,6 +11,8 @@ from werkzeug.utils import secure_filename
 import bcrypt
 from flask_jwt_extended import JWTManager, create_access_token
 import bcrypt 
+# import time #test
+# from flask import request, g #test
 # Load your local .env file BEFORE anything else
 load_dotenv()
 
@@ -49,7 +51,26 @@ app.register_blueprint(blogs_bp, url_prefix='/api')
 app.register_blueprint(events_bp)
 
 # <--- MUST BE AT THE TOP OF app.py
+#test, comment out before deploying or pushing into master repo
+# @app.before_request
+# def before_request():
+#     # Record the high-precision start time when the request hits the server
+#     g.start_time = time.perf_counter()
 
+# @app.after_request
+# def after_request(response):
+#     # Calculate how long the request took if start_time exists
+#     if hasattr(g, 'start_time'):
+#         elapsed_ms = (time.perf_counter() - g.start_time) * 1000
+        
+#         # Log the route and exact execution time to your terminal
+#         # print(f"⏱️ [PERF MONITOR] {request.method} {request.path} took {elapsed_ms:.2f} ms (Status: {response.status_code})")
+        
+#         # Optional: Send it back in the browser's response headers so you can see it in Chrome DevTools
+#         response.headers['X-Response-Time'] = f"{elapsed_ms:.2f}ms"
+        
+#     return response
+#testcloses
 @app.route('/api/login', methods=['POST'])
 def login():
     try:
