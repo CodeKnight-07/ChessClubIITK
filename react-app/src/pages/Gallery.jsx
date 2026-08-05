@@ -530,24 +530,27 @@ const handleDeletePhoto = async (index, photoUrl) => {
                           className="overflow-hidden"
                         >
                           <div className="pt-4 pb-6 grid grid-cols-1 sm:grid-cols-3 gap-6 px-2">
-                            {["Tournaments", "Workshops", "Socials"].map((category) => (
+                            {[
+                              { id: "Event 1", img: tournamentImg },
+                              { id: "Event 2", img: workshopImg },
+                              { id: "Event 3", img: socialImg }
+                            ].map((event) => (
                               <div
-                                key={category}
+                                key={event.id}
                                 onClick={() => {
                                   setActiveTenure(tenure);
-                                  setModalCategory(category);
+                                  setModalCategory(event.id);
                                   setIsTenureModalOpen(true);
                                 }}
-                                className="bg-surface-container hover:bg-surface-container-high border border-outline-variant/20 hover:border-primary/40 p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center gap-4 group"
+                                className="relative aspect-[4/3] rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer overflow-hidden group border-2 border-transparent hover:border-primary/50"
                               >
-                                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                                  <span className="material-symbols-outlined text-3xl text-primary">
-                                    {category === "Tournaments" ? "emoji_events" : category === "Workshops" ? "school" : "groups"}
-                                  </span>
-                                </div>
-                                <div className="text-center">
-                                  <h3 className="font-serif text-xl text-on-surface group-hover:text-primary transition-colors">{category}</h3>
-                                  <p className="text-xs font-label text-on-surface-variant/70 uppercase tracking-widest mt-2">View Album</p>
+                                <img 
+                                  src={event.img} 
+                                  alt="Event thumbnail"
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                  <span className="text-white font-label text-xs uppercase tracking-[0.2em] font-bold">View Album</span>
                                 </div>
                               </div>
                             ))}
