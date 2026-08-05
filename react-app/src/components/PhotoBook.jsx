@@ -138,12 +138,19 @@ const PhotoBook = ({ photos = [], title = "Current Tenure", subtitle = "Chess Cl
     return (
       <div className="absolute inset-0 bg-[#fbf9f4] text-zinc-800 p-4 flex flex-col justify-between shadow-inner select-none border border-zinc-300/30">
         <div className="flex-1 w-full bg-zinc-900 rounded-lg overflow-hidden border border-zinc-400/25 shadow-md flex items-center justify-center p-1.5">
-          <img
-            src={photoUrl}
-            alt={`Memory ${pageNum}`}
-            className="max-w-full max-h-full object-contain"
-            draggable="false"
-          />
+          {photoUrl ? (
+            <img
+              src={photoUrl}
+              alt={`Memory ${pageNum}`}
+              className="max-w-full max-h-full object-contain"
+              draggable="false"
+            />
+          ) : (
+            <div className="text-zinc-700 font-label text-[10px] tracking-widest uppercase flex flex-col items-center gap-2">
+              <span className="material-symbols-outlined text-3xl opacity-50">image</span>
+              Empty Frame
+            </div>
+          )}
         </div>
         <div className="mt-3 pt-2 border-t border-zinc-300/40 flex justify-between items-center px-1">
           <div>

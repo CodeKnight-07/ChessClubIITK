@@ -495,7 +495,11 @@ const handleDeletePhoto = async (index, photoUrl) => {
 
               {/* 3D Page Turning Book Wrapper Extracted */}
               <div className="w-full flex items-center justify-center overflow-visible">
-                <PhotoBook photos={clubMemoriesPhotos} title="Current Tenure" subtitle="Photo Album" />
+                <PhotoBook 
+                  photos={clubMemoriesPhotos.length > 0 ? clubMemoriesPhotos : ['', '', '', '']} 
+                  title="Current Tenure" 
+                  subtitle="Photo Album" 
+                />
               </div>
 
 {/* Tenure Selection Dropdown */}
@@ -569,7 +573,11 @@ const handleDeletePhoto = async (index, photoUrl) => {
           </button>
         </div>
         <div className="w-full flex-1 overflow-auto flex items-center justify-center mt-8">
-          <PhotoBook photos={clubMemoriesPhotos} title={`${activeTenure} Tenure`} subtitle="Past Memories" />
+          <PhotoBook 
+            photos={clubMemoriesPhotos.length > 0 ? clubMemoriesPhotos : ['', '', '', '']} 
+            title={`${activeTenure} Tenure`} 
+            subtitle="Past Memories" 
+          />
         </div>
       </motion.div>
     )}
