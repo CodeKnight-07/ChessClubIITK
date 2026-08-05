@@ -495,13 +495,32 @@ const handleDeletePhoto = async (index, photoUrl) => {
                 </h2>
               </div>
 
-              {/* 3D Page Turning Book Wrapper Extracted */}
-              <div className="w-full flex items-center justify-center overflow-visible">
-                <PhotoBook 
-                  photos={clubMemoriesPhotos.length > 0 ? clubMemoriesPhotos : ['', '', '', '']} 
-                  title="Current Tenure" 
-                  subtitle="Photo Album" 
-                />
+              {/* Current Tenure Cards */}
+              <div className="pt-4 pb-6 grid grid-cols-1 sm:grid-cols-3 gap-6 px-2 max-w-4xl mx-auto">
+                {[
+                  { id: "Event 1", img: tournamentImg },
+                  { id: "Event 2", img: workshopImg },
+                  { id: "Event 3", img: socialImg }
+                ].map((event) => (
+                  <div
+                    key={event.id}
+                    onClick={() => {
+                      setActiveTenure("Current");
+                      setModalCategory(event.id);
+                      setIsTenureModalOpen(true);
+                    }}
+                    className="relative aspect-[4/3] rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer overflow-hidden group border-2 border-transparent hover:border-primary/50"
+                  >
+                    <img 
+                      src={event.img} 
+                      alt="Event thumbnail"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="text-white font-label text-xs uppercase tracking-[0.2em] font-bold">View Album</span>
+                    </div>
+                  </div>
+                ))}
               </div>
 
 {/* Tenure Strips */}
@@ -608,7 +627,7 @@ const handleDeletePhoto = async (index, photoUrl) => {
             <span className="material-symbols-outlined text-xl">close</span>
           </button>
         </div>
-        <div className="w-full flex-1 overflow-auto flex items-center justify-center mt-8">
+        <div className="w-full flex-1 overflow-auto flex flex-col items-center justify-start mt-8 pb-12">
           <PhotoBook 
             photos={clubMemoriesPhotos.length > 0 ? clubMemoriesPhotos : ['', '', '', '']} 
             title={`${activeTenure} Tenure`} 

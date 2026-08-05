@@ -177,10 +177,7 @@ const PhotoBook = ({ photos = [], title = "Current Tenure", subtitle = "Chess Cl
   if (!photos || photos.length === 0) return null;
 
   const maxSpread = Math.ceil(photos.length / 2);
-  const availableHeight = windowHeight - 350; // Account for modal padding, header, controls, and thumbnail strip
-  const maxScaleByHeight = Math.max(0.3, Math.min(1, availableHeight / 500));
-  const maxScaleByWidth = containerWidth > 0 && containerWidth < 840 ? (containerWidth - 32) / 800 : 1;
-  const bookScale = Math.min(maxScaleByWidth, maxScaleByHeight);
+  const bookScale = containerWidth > 0 && containerWidth < 840 ? (containerWidth - 32) / 800 : 1;
   const bookHeight = 500 * bookScale;
 
   return (
