@@ -58,6 +58,33 @@ const Gallery = () => {
   const [openStripTenure, setOpenStripTenure] = useState(null);
   const [modalCategory, setModalCategory] = useState("Past Memories");
 
+  const defaultEvents = [
+    { 
+      id: "Workshops", 
+      category: "WORKSHOPS",
+      title: "Chess in Slums",
+      description: "Deconstructing the Sicilian Defense and introducing chess logic with our core team.",
+      photoCount: 5,
+      img: workshopImg 
+    },
+    { 
+      id: "Socials", 
+      category: "SOCIALS",
+      title: "We The Ones",
+      description: "Late night sessions filled with coffee, conversations, and 3-minute blitz madness.",
+      photoCount: 5,
+      img: socialImg 
+    },
+    { 
+      id: "Tournaments", 
+      category: "TOURNAMENTS",
+      title: "IITK Grand Swiss",
+      description: "The road to the Candidates starts here. Click to view the tournament gallery.",
+      photoCount: 17,
+      img: tournamentImg 
+    }
+  ];
+
   
 
   // 3. FETCH DATA FROM YOUR PYTHON BACKEND
@@ -496,12 +523,8 @@ const handleDeletePhoto = async (index, photoUrl) => {
               </div>
 
               {/* Current Tenure Cards */}
-              <div className="pt-4 pb-6 grid grid-cols-1 sm:grid-cols-3 gap-6 px-2 max-w-4xl mx-auto">
-                {[
-                  { id: "Event 1", img: tournamentImg },
-                  { id: "Event 2", img: workshopImg },
-                  { id: "Event 3", img: socialImg }
-                ].map((event) => (
+              <div className="pt-4 pb-6 grid grid-cols-1 md:grid-cols-3 gap-6 px-4 max-w-7xl mx-auto">
+                {defaultEvents.map((event) => (
                   <div
                     key={event.id}
                     onClick={() => {
@@ -509,15 +532,33 @@ const handleDeletePhoto = async (index, photoUrl) => {
                       setModalCategory(event.id);
                       setIsTenureModalOpen(true);
                     }}
-                    className="relative aspect-[4/3] rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer overflow-hidden group border-2 border-transparent hover:border-primary/50"
+                    className="bg-[#1c1c1c] border border-white/5 rounded-2xl overflow-hidden shadow-2xl flex flex-col group cursor-pointer transition-all hover:-translate-y-1 hover:shadow-black/50"
                   >
-                    <img 
-                      src={event.img} 
-                      alt="Event thumbnail"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                    />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <span className="text-white font-label text-xs uppercase tracking-[0.2em] font-bold">View Album</span>
+                    {/* Image Section */}
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      <img 
+                        src={event.img} 
+                        alt={event.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                      />
+                      {/* Category Tag */}
+                      <div className="absolute top-4 left-4 bg-amber-500/20 border border-amber-500/30 backdrop-blur-md text-amber-400 text-[10px] font-bold px-3 py-1 rounded uppercase tracking-widest shadow-sm">
+                        {event.category}
+                      </div>
+                    </div>
+
+                    {/* Content Section */}
+                    <div className="p-6 flex flex-col flex-1">
+                      <h3 className="text-xl font-serif text-white mb-3 font-semibold">{event.title}</h3>
+                      <p className="text-sm text-gray-400 leading-relaxed mb-6 flex-1">
+                        {event.description}
+                      </p>
+
+                      {/* Button */}
+                      <button className="w-full py-3 bg-[#242424] hover:bg-[#2a2a2a] text-gray-300 text-xs font-bold tracking-[0.15em] uppercase rounded-lg flex items-center justify-center gap-2 transition-colors border border-white/10">
+                        <span className="material-symbols-outlined text-[18px]">photo_library</span>
+                        VIEW GALLERY ({event.photoCount})
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -548,12 +589,8 @@ const handleDeletePhoto = async (index, photoUrl) => {
                           exit={{ height: 0, opacity: 0 }}
                           className="overflow-hidden"
                         >
-                          <div className="pt-4 pb-6 grid grid-cols-1 sm:grid-cols-3 gap-6 px-2">
-                            {[
-                              { id: "Event 1", img: tournamentImg },
-                              { id: "Event 2", img: workshopImg },
-                              { id: "Event 3", img: socialImg }
-                            ].map((event) => (
+                          <div className="pt-6 pb-8 grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
+                            {defaultEvents.map((event) => (
                               <div
                                 key={event.id}
                                 onClick={() => {
@@ -561,15 +598,33 @@ const handleDeletePhoto = async (index, photoUrl) => {
                                   setModalCategory(event.id);
                                   setIsTenureModalOpen(true);
                                 }}
-                                className="relative aspect-[4/3] rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer overflow-hidden group border-2 border-transparent hover:border-primary/50"
+                                className="bg-[#1c1c1c] border border-white/5 rounded-2xl overflow-hidden shadow-2xl flex flex-col group cursor-pointer transition-all hover:-translate-y-1 hover:shadow-black/50"
                               >
-                                <img 
-                                  src={event.img} 
-                                  alt="Event thumbnail"
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                                />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                  <span className="text-white font-label text-xs uppercase tracking-[0.2em] font-bold">View Album</span>
+                                {/* Image Section */}
+                                <div className="relative aspect-[4/3] overflow-hidden">
+                                  <img 
+                                    src={event.img} 
+                                    alt={event.title}
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                                  />
+                                  {/* Category Tag */}
+                                  <div className="absolute top-4 left-4 bg-amber-500/20 border border-amber-500/30 backdrop-blur-md text-amber-400 text-[10px] font-bold px-3 py-1 rounded uppercase tracking-widest shadow-sm">
+                                    {event.category}
+                                  </div>
+                                </div>
+
+                                {/* Content Section */}
+                                <div className="p-6 flex flex-col flex-1 text-left">
+                                  <h3 className="text-xl font-serif text-white mb-3 font-semibold">{event.title}</h3>
+                                  <p className="text-sm text-gray-400 leading-relaxed mb-6 flex-1">
+                                    {event.description}
+                                  </p>
+
+                                  {/* Button */}
+                                  <button className="w-full py-3 bg-[#242424] hover:bg-[#2a2a2a] text-gray-300 text-xs font-bold tracking-[0.15em] uppercase rounded-lg flex items-center justify-center gap-2 transition-colors border border-white/10">
+                                    <span className="material-symbols-outlined text-[18px]">photo_library</span>
+                                    VIEW GALLERY ({event.photoCount})
+                                  </button>
                                 </div>
                               </div>
                             ))}
