@@ -105,13 +105,31 @@ const Gallery = () => {
 
   useEffect(() => {
     if (globalCache.gallery) {
-      const { fide, memories, data, configData } = globalCache.gallery;
-      setFideRatedPhotos(fide);
-      setClubMemoriesPhotos(memories);
-      setGalleryCards(data);
-      if (configData) {
-        setFeaturedTitle(configData.featured_title);
-        setFeaturedDesc(configData.featured_desc);
+      const cached = globalCache.gallery;
+      if (cached && !Array.isArray(cached)) {
+        const { fide, memories, data, configData } = cached;
+        setFideRatedPhotos(fide || []);
+        setClubMemoriesPhotos(memories || []);
+        setGalleryCards(data || []);
+        if (configData) {
+          setFeaturedTitle(configData.featured_title);
+          setFeaturedDesc(configData.featured_desc);
+        }
+      } else if (Array.isArray(cached)) {
+        const formatUrl = (url) => {
+          if (!url) return '';
+          const cleanUrl = url.replace(/\s/g, '%20');
+          return cleanUrl.startsWith('http') ? cleanUrl : `${API_BASE_URL}${cleanUrl}`;
+        };
+        const fide = cached
+          .filter(img => img.album_type === 'FIDE_RATED')
+          .map(img => formatUrl(img.image_url));
+        const memories = cached
+          .filter(img => img.album_type === 'CLUB_MEMORIES')
+          .map(img => formatUrl(img.image_url));
+        setFideRatedPhotos(fide || []);
+        setClubMemoriesPhotos(memories || []);
+        setGalleryCards(cached || []);
       }
       setIsLoading(false);
       fetchGallery();
