@@ -6,12 +6,14 @@ const PhotoBook = ({ photos = [], title = "Current Tenure", subtitle = "Chess Cl
   const [isFlipping, setIsFlipping] = useState(false);
   const [flipDirection, setFlipDirection] = useState('next');
   const [isAlbumAutoplay, setIsAlbumAutoplay] = useState(false);
-  const [showThumbnails, setShowThumbnails] = useState(false);
+  const [showThumbnails, setShowThumbnails] = useState(true);
   const [isAlbumLightboxOpen, setIsAlbumLightboxOpen] = useState(false);
   const [albumLightboxIndex, setAlbumLightboxIndex] = useState(0);
   
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
+
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
 
   // Measure container width for responsive calculations
   useEffect(() => {
@@ -23,7 +25,14 @@ const PhotoBook = ({ photos = [], title = "Current Tenure", subtitle = "Chess Cl
       }
     });
     observer.observe(containerRef.current);
-    return () => observer.disconnect();
+    
+    const handleResize = () => setWindowHeight(window.innerHeight);
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const flipNext = () => {
@@ -168,7 +177,10 @@ const PhotoBook = ({ photos = [], title = "Current Tenure", subtitle = "Chess Cl
   if (!photos || photos.length === 0) return null;
 
   const maxSpread = Math.ceil(photos.length / 2);
-  const bookScale = containerWidth > 0 && containerWidth < 840 ? (containerWidth - 32) / 800 : 1;
+  const availableHeight = windowHeight - 250;
+  const maxScaleByHeight = Math.max(0.4, Math.min(1, availableHeight / 500));
+  const maxScaleByWidth = containerWidth > 0 && containerWidth < 840 ? (containerWidth - 32) / 800 : 1;
+  const bookScale = Math.min(maxScaleByWidth, maxScaleByHeight);
   const bookHeight = 500 * bookScale;
 
   return (
@@ -257,12 +269,6 @@ const PhotoBook = ({ photos = [], title = "Current Tenure", subtitle = "Chess Cl
           <span className="material-symbols-outlined text-lg sm:text-xl">fullscreen</span>
         </button>
         <button
-          onClick={() => setShowThumbnails(!showThumbnails)}
-          className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl outline-none ${showThumbnails ? 'bg-primary/20 border-primary text-primary' : 'bg-surface-container-low border-outline-variant/20 hover:border-primary/50 text-on-surface'}`}
-        >
-          <span className="material-symbols-outlined text-lg sm:text-xl">grid_view</span>
-        </button>
-        <button
           onClick={flipNext}
           disabled={spreadIndex >= maxSpread}
           className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-low border border-outline-variant/20 hover:border-primary/50 text-on-surface flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl outline-none disabled:opacity-30 disabled:pointer-events-none"
@@ -274,13 +280,13 @@ const PhotoBook = ({ photos = [], title = "Current Tenure", subtitle = "Chess Cl
       {/* Thumbnails */}
       <AnimatePresence>
         {showThumbnails && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.3 }} className="mt-12 w-full border-t border-outline-variant/10 pt-8 overflow-hidden">
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 max-h-72 overflow-y-auto p-2 border border-outline-variant/5 bg-surface-container-lowest/50 rounded-xl custom-scrollbar">
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.3 }} className="mt-8 w-full border-t border-outline-variant/10 pt-6 overflow-hidden">
+            <div className="flex overflow-x-auto gap-3 max-w-5xl mx-auto p-2 bg-surface-container-lowest/50 rounded-xl custom-scrollbar" style={{ scrollbarWidth: 'none' }}>
               {photos.map((photo, idx) => {
                 const isHighlighted = idx === Math.max(0, Math.min(photos.length - 1, 2 * spreadIndex - 2)) || idx === Math.max(0, Math.min(photos.length - 1, 2 * spreadIndex - 1));
                 return (
-                  <button key={idx} onClick={() => jumpToPhoto(idx)} className={`aspect-square rounded-lg overflow-hidden border-2 transition-all relative group ${isHighlighted && spreadIndex > 0 && spreadIndex < maxSpread ? 'border-primary scale-[0.98] shadow-md shadow-primary/20' : 'border-transparent opacity-60 hover:opacity-100 hover:scale-[1.02]'}`}>
-                    <img src={photo} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                  <button key={idx} onClick={() => jumpToPhoto(idx)} className={`w-20 h-14 md:w-24 md:h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all relative group ${isHighlighted && spreadIndex > 0 && spreadIndex < maxSpread ? 'border-primary scale-[0.98] shadow-md shadow-primary/20' : 'border-transparent opacity-60 hover:opacity-100 hover:scale-[1.02]'}`}>
+                    <img src={photo || ''} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <span className="text-[11px] text-white font-bold font-mono bg-black/60 px-2 py-0.5 rounded">{idx + 1}</span>
                     </div>
