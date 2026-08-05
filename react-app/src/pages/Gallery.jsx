@@ -55,6 +55,7 @@ const Gallery = () => {
   const [containerWidth, setContainerWidth] = useState(0);
 
   const [isTenureModalOpen, setIsTenureModalOpen] = useState(false);
+  const [isTenureStripOpen, setIsTenureStripOpen] = useState(false);
 
   
 
@@ -502,28 +503,52 @@ const handleDeletePhoto = async (index, photoUrl) => {
                 />
               </div>
 
-{/* Tenure Selection Dropdown */}
-              <div className="flex flex-col items-center justify-center mt-12 mb-4 gap-4">
-                <div className="relative group">
-                  <select 
-                    className="appearance-none bg-surface-container-low border border-outline-variant/30 text-on-surface py-3 px-6 pr-12 rounded-xl shadow-md hover:border-primary/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors cursor-pointer text-sm font-semibold tracking-wide font-label uppercase"
-                    value={activeTenure}
-                    onChange={(e) => setActiveTenure(e.target.value)}
-                  >
-                    <option value="2025-26">2025-26 Tenure</option>
-                    <option value="2024-25">2024-25 Tenure</option>
-                    <option value="2023-24">2023-24 Tenure</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-primary transition-colors">
-                    <span className="material-symbols-outlined text-lg">expand_more</span>
-                  </div>
-                </div>
+{/* Past Tenures Accordion Strip */}
+              <div className="w-full max-w-4xl mx-auto mt-12 mb-4 flex flex-col gap-4">
                 <button
-                  onClick={() => setIsTenureModalOpen(true)}
-                  className="bg-primary text-on-primary font-bold px-6 py-2 rounded-lg shadow-md hover:scale-[1.03] active:scale-95 transition-all outline-none"
+                  onClick={() => setIsTenureStripOpen(!isTenureStripOpen)}
+                  className="w-full bg-surface-container-low border border-outline-variant/30 text-on-surface py-5 px-8 rounded-2xl shadow-lg hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all flex justify-between items-center group outline-none"
                 >
-                  View Album for {activeTenure}
+                  <span className="font-serif text-2xl tracking-wide">Past Tenures</span>
+                  <motion.span
+                    animate={{ rotate: isTenureStripOpen ? 180 : 0 }}
+                    className="material-symbols-outlined text-3xl text-primary group-hover:scale-110 transition-transform"
+                  >
+                    expand_more
+                  </motion.span>
                 </button>
+                
+                <AnimatePresence>
+                  {isTenureStripOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pt-2 pb-6 grid grid-cols-1 sm:grid-cols-3 gap-6 px-2">
+                        {["2025-26", "2024-25", "2023-24"].map((tenure) => (
+                          <div
+                            key={tenure}
+                            onClick={() => {
+                              setActiveTenure(tenure);
+                              setIsTenureModalOpen(true);
+                            }}
+                            className="bg-surface-container hover:bg-surface-container-high border border-outline-variant/20 hover:border-primary/40 p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center gap-4 group"
+                          >
+                            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                              <span className="material-symbols-outlined text-3xl text-primary">auto_stories</span>
+                            </div>
+                            <div className="text-center">
+                              <h3 className="font-serif text-xl text-on-surface group-hover:text-primary transition-colors">{tenure}</h3>
+                              <p className="text-xs font-label text-on-surface-variant/70 uppercase tracking-widest mt-2">View Album</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </section>
 
