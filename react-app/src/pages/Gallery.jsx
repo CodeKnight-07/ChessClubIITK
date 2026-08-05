@@ -55,7 +55,8 @@ const Gallery = () => {
   const [containerWidth, setContainerWidth] = useState(0);
 
   const [isTenureModalOpen, setIsTenureModalOpen] = useState(false);
-  const [isTenureStripOpen, setIsTenureStripOpen] = useState(false);
+  const [openStripTenure, setOpenStripTenure] = useState(null);
+  const [modalCategory, setModalCategory] = useState("Past Memories");
 
   
 
@@ -503,52 +504,59 @@ const handleDeletePhoto = async (index, photoUrl) => {
                 />
               </div>
 
-{/* Past Tenures Accordion Strip */}
+{/* Tenure Strips */}
               <div className="w-full max-w-4xl mx-auto mt-12 mb-4 flex flex-col gap-4">
-                <button
-                  onClick={() => setIsTenureStripOpen(!isTenureStripOpen)}
-                  className="w-full bg-surface-container-low border border-outline-variant/30 text-on-surface py-5 px-8 rounded-2xl shadow-lg hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all flex justify-between items-center group outline-none"
-                >
-                  <span className="font-serif text-2xl tracking-wide">Past Tenures</span>
-                  <motion.span
-                    animate={{ rotate: isTenureStripOpen ? 180 : 0 }}
-                    className="material-symbols-outlined text-3xl text-primary group-hover:scale-110 transition-transform"
-                  >
-                    expand_more
-                  </motion.span>
-                </button>
-                
-                <AnimatePresence>
-                  {isTenureStripOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
+                {["2025-26", "2024-25"].map((tenure) => (
+                  <div key={tenure} className="flex flex-col gap-2">
+                    <button
+                      onClick={() => setOpenStripTenure(openStripTenure === tenure ? null : tenure)}
+                      className="w-full bg-surface-container-low border border-outline-variant/30 text-on-surface py-5 px-8 rounded-2xl shadow-lg hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all flex justify-between items-center group outline-none"
                     >
-                      <div className="pt-2 pb-6 grid grid-cols-1 sm:grid-cols-3 gap-6 px-2">
-                        {["2025-26", "2024-25", "2023-24"].map((tenure) => (
-                          <div
-                            key={tenure}
-                            onClick={() => {
-                              setActiveTenure(tenure);
-                              setIsTenureModalOpen(true);
-                            }}
-                            className="bg-surface-container hover:bg-surface-container-high border border-outline-variant/20 hover:border-primary/40 p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center gap-4 group"
-                          >
-                            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                              <span className="material-symbols-outlined text-3xl text-primary">auto_stories</span>
-                            </div>
-                            <div className="text-center">
-                              <h3 className="font-serif text-xl text-on-surface group-hover:text-primary transition-colors">{tenure}</h3>
-                              <p className="text-xs font-label text-on-surface-variant/70 uppercase tracking-widest mt-2">View Album</p>
-                            </div>
+                      <span className="font-serif text-2xl tracking-wide">{tenure} Tenure</span>
+                      <motion.span
+                        animate={{ rotate: openStripTenure === tenure ? 180 : 0 }}
+                        className="material-symbols-outlined text-3xl text-primary group-hover:scale-110 transition-transform"
+                      >
+                        expand_more
+                      </motion.span>
+                    </button>
+                    
+                    <AnimatePresence>
+                      {openStripTenure === tenure && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="pt-4 pb-6 grid grid-cols-1 sm:grid-cols-3 gap-6 px-2">
+                            {["Tournaments", "Workshops", "Socials"].map((category) => (
+                              <div
+                                key={category}
+                                onClick={() => {
+                                  setActiveTenure(tenure);
+                                  setModalCategory(category);
+                                  setIsTenureModalOpen(true);
+                                }}
+                                className="bg-surface-container hover:bg-surface-container-high border border-outline-variant/20 hover:border-primary/40 p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center gap-4 group"
+                              >
+                                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                                  <span className="material-symbols-outlined text-3xl text-primary">
+                                    {category === "Tournaments" ? "emoji_events" : category === "Workshops" ? "school" : "groups"}
+                                  </span>
+                                </div>
+                                <div className="text-center">
+                                  <h3 className="font-serif text-xl text-on-surface group-hover:text-primary transition-colors">{category}</h3>
+                                  <p className="text-xs font-label text-on-surface-variant/70 uppercase tracking-widest mt-2">View Album</p>
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))}
               </div>
             </section>
 
@@ -601,7 +609,7 @@ const handleDeletePhoto = async (index, photoUrl) => {
           <PhotoBook 
             photos={clubMemoriesPhotos.length > 0 ? clubMemoriesPhotos : ['', '', '', '']} 
             title={`${activeTenure} Tenure`} 
-            subtitle="Past Memories" 
+            subtitle={`${modalCategory} Album`} 
           />
         </div>
       </motion.div>
