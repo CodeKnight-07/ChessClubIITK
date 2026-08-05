@@ -27,5 +27,8 @@ export const globalCache = {
   set gallery(val) { setStored('gallery', val); },
 
   get carouselImages() { return getStored('carouselImages'); },
-  set carouselImages(val) { setStored('carouselImages', val); }
+  set carouselImages(val) { setStored('carouselImages', val); },
+
+  get profile() { return getStored('profile'); },
+  set profile(val) { setStored('profile', val); }
 };

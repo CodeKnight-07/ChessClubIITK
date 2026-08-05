@@ -85,6 +85,12 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('chess-club-jwt');
     localStorage.removeItem('logged_in_user_email');
     localStorage.removeItem('chess-club-role');
+    
+    // Clear all client-side cached database properties on logout
+    localStorage.removeItem('chess_club_cache_profile');
+    localStorage.removeItem('chess_club_cache_blogs');
+    localStorage.removeItem('chess_club_cache_events');
+    localStorage.removeItem('chess_club_cache_gallery');
   };
 
   return (
