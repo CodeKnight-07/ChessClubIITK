@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-import { OFFICIAL_EVENTS } from './Events';
+import { OFFICIAL_EVENTS } from '../constants/events';
 
 const EventRegistration = () => {
   const { id } = useParams();

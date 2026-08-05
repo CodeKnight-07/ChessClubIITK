@@ -1,5 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { globalCache } from '../utils/cache';
+import Footer from '../components/Footer';
+import { API_BASE_URL } from '../config';
+import { useAuth } from '../context/AuthContext';
+
+// Keep your static UI assets
 import tournamentImg from '../assets/chess_tournament_gallery_1775821881801.png';
 import workshopImg from '../assets/chess_workshop_gallery_1775821901249.png';
 import socialImg from '../assets/chess_social_gallery_1775821917712.png';
@@ -219,8 +225,239 @@ const Gallery = () => {
   const [containerWidth, setContainerWidth] = useState(0);
   const [lightboxPhotos, setLightboxPhotos] = useState([]);
   const [lightboxTitle, setLightboxTitle] = useState('');
+// Pull the user data from your login system
+  const { isLoggedIn, token } = useAuth();
 
 
+// The Ultimate Bouncer: Checks local storage AND the secure token payload
+  let isAdmin = false;
+  if (isLoggedIn && token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      
+      // We are now checking the 'role' key exactly as your Python backend wrote it!
+      // I included both 'admin' and 'secretary' just in case. 
+      if (payload.role === 'admin' || payload.role === 'secretary') {
+        isAdmin = true;
+      }
+    } catch (error) {
+      console.error("Could not decode token for admin check:", error);
+    }
+  }
+
+  // State to hold the array of images from the database
+  const [carouselImages, setCarouselImages] = useState([]);
+  // --- Admin Editing States ---
+  const [isEditingFeatured, setIsEditingFeatured] = useState(false);
+  const [featuredTitle, setFeaturedTitle] = useState("Loading...");
+  const [featuredDesc, setFeaturedDesc] = useState("Loading...");
+  // 1. CLOUD DATA STATES
+  const [fideRatedPhotos, setFideRatedPhotos] = useState([]);
+  const [clubMemoriesPhotos, setClubMemoriesPhotos] = useState([]);
+  const [galleryCards, setGalleryCards] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 2. EXISTING UI STATES
+
+  const [spreadIndex, setSpreadIndex] = useState(0);
+  const [isFlipping, setIsFlipping] = useState(false);
+  const [flipDirection, setFlipDirection] = useState('next');
+  const [isAlbumAutoplay, setIsAlbumAutoplay] = useState(true);
+  const [showThumbnails, setShowThumbnails] = useState(false);
+  const [isAlbumLightboxOpen, setIsAlbumLightboxOpen] = useState(false);
+  const [albumLightboxIndex, setAlbumLightboxIndex] = useState(0);
+
+  
+
+  // 3. FETCH DATA FROM YOUR PYTHON BACKEND
+  const fetchGallery = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/gallery`);
+      const data = await response.json();
+      
+      const formatUrl = (url) => {
+        if (!url) return '';
+        const cleanUrl = url.replace(/\s/g, '%20');
+        return cleanUrl.startsWith('http') ? cleanUrl : `${API_BASE_URL}${cleanUrl}`;
+      };
+
+      const fide = data
+        .filter(img => img.album_type === 'FIDE_RATED')
+        .map(img => formatUrl(img.image_url));
+        
+      const memories = data
+        .filter(img => img.album_type === 'CLUB_MEMORIES')
+        .map(img => formatUrl(img.image_url));
+      
+      setFideRatedPhotos(fide);
+      setClubMemoriesPhotos(memories);
+      setGalleryCards(data);
+      
+      const configResponse = await fetch(`${API_BASE_URL}/api/config/featured`);
+      let configData = null;
+      if (configResponse.ok) {
+        configData = await configResponse.json();
+        setFeaturedTitle(configData.featured_title);
+        setFeaturedDesc(configData.featured_desc);
+      }
+
+      globalCache.gallery = { fide, memories, data, configData };
+    } catch (error) {
+      console.error("Error fetching gallery images:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (globalCache.gallery) {
+      const cached = globalCache.gallery;
+      if (cached && !Array.isArray(cached)) {
+        const { fide, memories, data, configData } = cached;
+        setFideRatedPhotos(fide || []);
+        setClubMemoriesPhotos(memories || []);
+        setGalleryCards(data || []);
+        if (configData) {
+          setFeaturedTitle(configData.featured_title);
+          setFeaturedDesc(configData.featured_desc);
+        }
+      } else if (Array.isArray(cached)) {
+        const formatUrl = (url) => {
+          if (!url) return '';
+          const cleanUrl = url.replace(/\s/g, '%20');
+          return cleanUrl.startsWith('http') ? cleanUrl : `${API_BASE_URL}${cleanUrl}`;
+        };
+        const fide = cached
+          .filter(img => img.album_type === 'FIDE_RATED')
+          .map(img => formatUrl(img.image_url));
+        const memories = cached
+          .filter(img => img.album_type === 'CLUB_MEMORIES')
+          .map(img => formatUrl(img.image_url));
+        setFideRatedPhotos(fide || []);
+        setClubMemoriesPhotos(memories || []);
+        setGalleryCards(cached || []);
+      }
+      setIsLoading(false);
+      fetchGallery();
+    } else {
+      fetchGallery();
+    }
+  }, []);
+
+  const fetchImages = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/carousel`);
+      const data = await response.json();
+      if (response.ok) {
+        setCarouselImages(data);
+        globalCache.carouselImages = data;
+      }
+    } catch (err) {
+      console.error("Failed to fetch carousel images:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (globalCache.carouselImages) {
+      setCarouselImages(globalCache.carouselImages);
+      fetchImages();
+    } else {
+      fetchImages();
+    }
+  }, []);
+
+const handleDeletePhoto = async (index, photoUrl) => {
+  alert("Delete button was clicked!");
+    if (!window.confirm("Delete this photo from the archives?")) return;
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/gallery/memories`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ image_url: photoUrl, index: index })
+      });
+      if (response.ok) {
+        setClubMemoriesPhotos(prev => prev.filter((_, i) => i !== index));
+      } else {
+        alert("Failed to delete photo.");
+      }
+    } catch (error) {
+      console.error("Error deleting photo:", error);
+    }
+  };
+
+  const handleReplacePhoto = async (index, oldPhotoUrl, file) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('new_image', file);
+    formData.append('old_image_url', oldPhotoUrl);
+    formData.append('index', index);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/gallery/memories/replace`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}` 
+        },
+        body: formData
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setClubMemoriesPhotos(prev => {
+          const newPhotos = [...prev];
+          newPhotos[index] = data.new_image_url;
+          return newPhotos;
+        });
+      } else {
+        alert("Failed to replace photo.");
+      }
+    } catch (error) {
+      console.error("Error replacing photo:", error);
+    }
+  };
+  const handleSaveFeatured = async () => {
+    // Add these right before the try/catch block
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/config/featured`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // THE VIP PASS
+        },
+        body: JSON.stringify({
+          title: featuredTitle,
+          description: featuredDesc
+        })
+      });
+
+      if (response.ok) {
+        setIsEditingFeatured(false); 
+      } else {
+        const errorData = await response.json();
+        alert(`Failed: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error("Error saving config:", error);
+    }
+  };
+
+  // 4. CALCULATE SLIDESHOW PHOTOS DYNAMICALLY
+  const SLIDESHOW_PHOTOS = FIDE_RATED_PHOTOS.length >= 17
+    ? [
+      FIDE_RATED_PHOTOS[0],   
+      FIDE_RATED_PHOTOS[2],   
+      FIDE_RATED_PHOTOS[13],  
+      FIDE_RATED_PHOTOS[15],  
+      FIDE_RATED_PHOTOS[17],  
+      FIDE_RATED_PHOTOS[FIDE_RATED_PHOTOS.length - 1] 
+    ]
+    : FIDE_RATED_PHOTOS;
+
+  // If the data is still fetching, return a simple loading state
+    
 
   // Slideshow interval timer (5 seconds)
   useEffect(() => {
@@ -282,7 +519,7 @@ const Gallery = () => {
   };
 
   const handleNext = () => {
-    const totalSpreads = Math.ceil(carouselImages.length / 2);
+    const totalSpreads = Math.ceil(bookImages.length / 2);
     if (isAnimating || totalSpreads <= 1) return;
     setAnimDirection('next');
     setPreviousSpread(currentSpread);
@@ -291,7 +528,7 @@ const Gallery = () => {
   };
 
   const handlePrev = () => {
-    const totalSpreads = Math.ceil(carouselImages.length / 2);
+    const totalSpreads = Math.ceil(bookImages.length / 2);
     if (isAnimating || totalSpreads <= 1) return;
     setAnimDirection('prev');
     setPreviousSpread(currentSpread);
@@ -348,7 +585,7 @@ const Gallery = () => {
   const showSpotlight = activeCategory === 'All' || activeCategory === 'Tournaments';
 
   // Filter remaining images for the carousel
-  const carouselImages = otherImages.filter(img =>
+  const bookImages = otherImages.filter(img =>
     activeCategory === 'All' ? true : img.category === activeCategory
   );
 
@@ -495,7 +732,7 @@ const Gallery = () => {
 
       {/* 3D Diary Book Section (Archives - Bottom) */}
       <div className="relative w-full" ref={containerRef}>
-        {carouselImages.length > 0 ? (
+        {bookImages.length > 0 ? (
           <div className="py-10 flex flex-col items-center">
             <div className="w-full max-w-[900px] mb-6 text-center md:text-left">
               <p className="text-primary font-label text-xs tracking-[0.3em] uppercase mb-2">
@@ -536,9 +773,9 @@ const Gallery = () => {
                     event={
                       isAnimating
                         ? (animDirection === 'next'
-                            ? carouselImages[previousSpread * 2]
-                            : carouselImages[currentSpread * 2])
-                        : carouselImages[currentSpread * 2]
+                            ? bookImages[previousSpread * 2]
+                            : bookImages[currentSpread * 2])
+                        : bookImages[currentSpread * 2]
                     }
                     pageNumber={
                       isAnimating
@@ -558,9 +795,9 @@ const Gallery = () => {
                     event={
                       isAnimating
                         ? (animDirection === 'next'
-                            ? carouselImages[currentSpread * 2 + 1]
-                            : carouselImages[previousSpread * 2 + 1])
-                        : carouselImages[currentSpread * 2 + 1]
+                            ? bookImages[currentSpread * 2 + 1]
+                            : bookImages[previousSpread * 2 + 1])
+                        : bookImages[currentSpread * 2 + 1]
                     }
                     pageNumber={
                       isAnimating
@@ -587,13 +824,13 @@ const Gallery = () => {
                       style={{
                         position: "absolute",
                         top: 0,
-                        right: 0,
-                        width: "50%",
-                        height: "100%",
-                        transformOrigin: "left center",
-                        transformStyle: "preserve-3d",
-                        zIndex: 15,
-                        pointerEvents: "none"
+                        bottom: 0,
+                        left: '50%',
+                        width: '50%',
+                        transformStyle: 'preserve-3d',
+                        originX: 0,
+                        zIndex: 25,
+                        willChange: 'transform'
                       }}
                     >
                       {/* Front Face (Facing up initially, visible 0 -> 90 deg) */}
@@ -612,8 +849,8 @@ const Gallery = () => {
                         <DiaryPage 
                           event={
                             animDirection === 'next'
-                              ? carouselImages[previousSpread * 2 + 1]
-                              : carouselImages[currentSpread * 2 + 1]
+                              ? bookImages[previousSpread * 2 + 1]
+                              : bookImages[currentSpread * 2 + 1]
                           } 
                           pageNumber={
                             animDirection === 'next'
@@ -641,8 +878,8 @@ const Gallery = () => {
                         <DiaryPage 
                           event={
                             animDirection === 'next'
-                              ? carouselImages[currentSpread * 2]
-                              : carouselImages[previousSpread * 2]
+                              ? bookImages[currentSpread * 2]
+                              : bookImages[previousSpread * 2]
                           } 
                           pageNumber={
                             animDirection === 'next'
@@ -663,7 +900,7 @@ const Gallery = () => {
                 <div className="absolute left-1/2 -translate-x-1/2 top-0 h-full w-[1px] bg-black/25 pointer-events-none z-30" />
 
                 {/* Click Overlay Targets */}
-                {!isAnimating && carouselImages.length > 2 && (
+                {!isAnimating && bookImages.length > 2 && (
                   <>
                     <div
                       onClick={handlePrev}
@@ -680,7 +917,7 @@ const Gallery = () => {
               </div>
 
               {/* Navigation Arrows (Positioned outside the book box) */}
-              {carouselImages.length > 2 && (
+              {bookImages.length > 2 && (
                 <>
                   <button
                     onClick={handlePrev}
@@ -701,10 +938,10 @@ const Gallery = () => {
             </div>
             
             {/* Optional helper text */}
-            {carouselImages.length > 2 && (
+            {bookImages.length > 2 && (
               <div className="mt-4 text-xs font-label uppercase tracking-widest text-on-surface-variant/60 flex items-center gap-2 select-none">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                <span>Click on pages or use arrows to turn • Events {currentSpread * 2 + 1}-{Math.min(currentSpread * 2 + 2, carouselImages.length)} of {carouselImages.length}</span>
+                <span>Click on pages or use arrows to turn • Events {currentSpread * 2 + 1}-{Math.min(currentSpread * 2 + 2, bookImages.length)} of {bookImages.length}</span>
               </div>
             )}
           </div>
