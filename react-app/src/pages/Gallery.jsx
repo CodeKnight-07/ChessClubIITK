@@ -235,150 +235,6 @@ const handleDeletePhoto = async (index, photoUrl) => {
     }
   }, [SLIDESHOW_PHOTOS, clubMemoriesPhotos]);
 
-  const flipNext = () => {
-    if (isFlipping) return;
-    if (spreadIndex >= 21) return;
-    setFlipDirection('next');
-    setIsFlipping(true);
-  };
-
-  const flipPrev = () => {
-    if (isFlipping) return;
-    if (spreadIndex <= 0) return;
-    setFlipDirection('prev');
-    setIsFlipping(true);
-  };
-
-  // Keyboard navigation for Album stack and Lightbox
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (isOpenLightbox) return;
-
-      if (isAlbumLightboxOpen) {
-        if (e.key === 'ArrowRight') {
-          setAlbumLightboxIndex(prev => (prev + 1) % clubMemoriesPhotos.length);
-        } else if (e.key === 'ArrowLeft') {
-          setAlbumLightboxIndex(prev => (prev - 1 + clubMemoriesPhotos.length) % clubMemoriesPhotos.length);
-        } else if (e.key === 'Escape') {
-          setIsAlbumLightboxOpen(false);
-        }
-      } else {
-        if (e.key === 'ArrowRight') {
-          flipNext();
-        } else if (e.key === 'ArrowLeft') {
-          flipPrev();
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpenLightbox, isAlbumLightboxOpen, spreadIndex, isFlipping, clubMemoriesPhotos.length]);
-
-  // Autoplay slideshow for Album (automatically flips every 5 seconds)
-  useEffect(() => {
-    if (!isAlbumAutoplay || isFlipping) return;
-    const interval = setInterval(() => {
-      if (spreadIndex >= 21) {
-        setSpreadIndex(0);
-      } else {
-        flipNext();
-      }
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [isAlbumAutoplay, spreadIndex, isFlipping]);
-
-  // Sync index between Album and Fullscreen Lightbox
-  useEffect(() => {
-    if (!isAlbumLightboxOpen) {
-      const newSpread = Math.floor((albumLightboxIndex + 2) / 2);
-      setSpreadIndex(newSpread);
-    }
-  }, [isAlbumLightboxOpen, albumLightboxIndex]);
-
-  useEffect(() => {
-    if (isAlbumLightboxOpen) {
-      const photoIdx = Math.max(0, Math.min(clubMemoriesPhotos.length - 1, 2 * spreadIndex - 2));
-      setAlbumLightboxIndex(photoIdx);
-    }
-  }, [isAlbumLightboxOpen, clubMemoriesPhotos.length, spreadIndex]);
-
-  const jumpToPhoto = (idx) => {
-    if (isFlipping) return;
-    const targetSpread = Math.floor((idx + 2) / 2);
-    setSpreadIndex(targetSpread);
-  };
-
-  const getPageContent = (pageNum) => {
-    if (pageNum < 0 || pageNum > clubMemoriesPhotos.length + 1) return null;
-
-    if (pageNum === 0) {
-      // Front Cover
-      return (
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-900 to-amber-955 flex flex-col justify-between p-6 text-center border-l-4 border-amber-800 shadow-inner rounded-r-xl select-none">
-          <div className="border border-primary/30 rounded-lg p-4 flex-1 flex flex-col justify-center items-center gap-4">
-            <span className="material-symbols-outlined text-primary text-5xl animate-pulse">menu_book</span>
-            <div>
-              <h3 className="font-serif text-2xl text-primary tracking-wide leading-tight mb-2">Current Tenure</h3>
-              <p className="font-label text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/80">Chess Club IITK</p>
-            </div>
-            <div className="h-0.5 w-12 bg-primary/30" />
-            <p className="text-[9px] font-label text-on-surface-variant/60 uppercase tracking-widest max-w-[160px]">
-              Est. 2026 • Visual Archives
-            </p>
-          </div>
-        </div>
-      );
-    }
-
-    if (pageNum === clubMemoriesPhotos.length + 1) {
-      // Back Cover
-      return (
-        <div className="absolute inset-0 bg-gradient-to-bl from-amber-955 to-amber-900 flex flex-col justify-center items-center p-6 text-center border-r-4 border-amber-800 shadow-inner rounded-l-xl select-none">
-          <div className="border border-primary/20 rounded-lg p-4 w-full h-full flex flex-col justify-center items-center gap-4">
-            <span className="material-symbols-outlined text-primary text-4xl">emoji_events</span>
-            <h3 className="font-serif text-lg text-primary tracking-wider">Chess Club IITK</h3>
-            <p className="text-[9px] font-label text-on-surface-variant/50 max-w-[150px]">
-              Thank you for being part of our chess journey.
-            </p>
-            <div className="h-0.5 w-10 bg-primary/20 mt-2" />
-          </div>
-        </div>
-      );
-    }
-
-    // Photo Page 
-    const photoIdx = pageNum - 1;
-    const photoUrl = clubMemoriesPhotos[photoIdx];
-
-    return (
-      <div className="absolute inset-0 bg-[#fbf9f4] text-zinc-800 p-4 flex flex-col justify-between shadow-inner select-none border border-zinc-300/30">
-        
-        
-
-        {/* Photo Container */}
-        <div className="flex-1 w-full bg-zinc-900 rounded-lg overflow-hidden border border-zinc-400/25 shadow-md flex items-center justify-center p-1.5">
-          <img
-            src={photoUrl}
-            alt={`Memory ${pageNum}`}
-            className="max-w-full max-h-full object-contain"
-            draggable="false"
-          />
-        </div>
-
-        {/* Polaroid/Archival Caption */}
-        <div className="mt-3 pt-2 border-t border-zinc-300/40 flex justify-between items-center px-1">
-          <div>
-            <h4 className="font-serif text-xs font-semibold text-zinc-700 tracking-wide">Current Tenure</h4>
-            <p className="text-[9px] text-zinc-500 font-label">IIT Kanpur Chess Community</p>
-          </div>
-          <span className="font-mono text-[9px] font-semibold text-zinc-400 bg-zinc-200/50 px-2 py-0.5 rounded-full border border-zinc-300/30">
-            Page {pageNum}
-          </span>
-        </div>
-      </div>
-    );
-  };
   const handleSpotlightClick = () => {
     // 1. If the database has no photos, do nothing
     if (carouselImages.length === 0) return;
@@ -648,7 +504,7 @@ const handleDeletePhoto = async (index, photoUrl) => {
               </div>
 
 {/* Tenure Selection Dropdown */}
-              <div className="flex justify-center mt-12 mb-4">
+              <div className="flex flex-col items-center justify-center mt-12 mb-4 gap-4">
                 <div className="relative group">
                   <select 
                     className="appearance-none bg-surface-container-low border border-outline-variant/30 text-on-surface py-3 px-6 pr-12 rounded-xl shadow-md hover:border-primary/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors cursor-pointer text-sm font-semibold tracking-wide font-label uppercase"
@@ -663,6 +519,12 @@ const handleDeletePhoto = async (index, photoUrl) => {
                     <span className="material-symbols-outlined text-lg">expand_more</span>
                   </div>
                 </div>
+                <button
+                  onClick={() => setIsTenureModalOpen(true)}
+                  className="bg-primary text-on-primary font-bold px-6 py-2 rounded-lg shadow-md hover:scale-[1.03] active:scale-95 transition-all outline-none"
+                >
+                  View Album for {activeTenure}
+                </button>
               </div>
             </section>
           );
