@@ -513,15 +513,6 @@ const handleDeletePhoto = async (index, photoUrl) => {
         )}
         {/* Club Memories Section */}
         <section className="mt-20 sm:mt-28 mb-16 border-t border-outline-variant/10 pt-16 max-w-5xl mx-auto overflow-visible">
-              <div className="text-center mb-12">
-                <p className="text-primary font-label text-xs tracking-[0.4em] uppercase mb-3">
-                  Photo Album
-                </p>
-                <h2 className="text-3xl sm:text-4xl font-serif text-on-surface mb-4">
-                  Current Tenure
-                </h2>
-              </div>
-
               {/* Current Tenure Cards */}
               <div className="pt-4 pb-6 grid grid-cols-1 md:grid-cols-3 gap-6 px-4 max-w-7xl mx-auto">
                 {defaultEvents.map((event) => (
@@ -572,7 +563,7 @@ const handleDeletePhoto = async (index, photoUrl) => {
                       onClick={() => setOpenStripTenure(openStripTenure === tenure ? null : tenure)}
                       className="w-full bg-surface-container-low border border-outline-variant/30 text-on-surface py-5 px-8 rounded-2xl shadow-lg hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all flex justify-between items-center group outline-none"
                     >
-                      <span className="font-serif text-2xl tracking-wide">{tenure} Tenure</span>
+                      <span className="font-serif text-2xl tracking-wide">{tenure}</span>
                       <motion.span
                         animate={{ rotate: openStripTenure === tenure ? 180 : 0 }}
                         className="material-symbols-outlined text-3xl text-primary group-hover:scale-110 transition-transform"
