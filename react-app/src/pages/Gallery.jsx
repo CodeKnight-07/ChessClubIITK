@@ -483,12 +483,7 @@ const handleDeletePhoto = async (index, photoUrl) => {
           </div>
         )}
         {/* Club Memories Section */}
-        {clubMemoriesPhotos.length > 0 && (() => {
-          const bookScale = containerWidth > 0 && containerWidth < 840 ? (containerWidth - 32) / 800 : 1;
-          const bookHeight = 500 * bookScale;
-
-          return (
-            <section className="mt-20 sm:mt-28 mb-16 border-t border-outline-variant/10 pt-16 max-w-5xl mx-auto overflow-visible">
+        <section className="mt-20 sm:mt-28 mb-16 border-t border-outline-variant/10 pt-16 max-w-5xl mx-auto overflow-visible">
               <div className="text-center mb-12">
                 <p className="text-primary font-label text-xs tracking-[0.4em] uppercase mb-3">
                   Photo Album
@@ -527,8 +522,6 @@ const handleDeletePhoto = async (index, photoUrl) => {
                 </button>
               </div>
             </section>
-          );
-        })()}
 
         {/* Full-Screen Image Lightbox Modal */}
   <AnimatePresence>
