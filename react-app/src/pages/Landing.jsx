@@ -15,10 +15,12 @@ import tanmayImg from "../assets/exCoordinators/tanmay.jpg";
 import akshatImg from "../assets/exCoordinators/akshat.png";
 import kushagraImg from "../assets/exCoordinators/kushagra.jpg";
 import pulkitImg from "../assets/exCoordinators/pulkit.jpg";
-import { OFFICIAL_EVENTS } from '../constants/events';
+import { globalCache } from '../utils/cache';
+import { API_BASE_URL } from '../config';
 
 const Landing = () => {
   const { isLoggedIn } = useAuth();
+  const [nextEvent, setNextEvent] = useState(null);
 
   useEffect(() => {
     // Delay preloading by 2 seconds to prioritize main landing page resources
@@ -32,44 +34,58 @@ const Landing = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Helper to map event ID to image
-  const getEventImage = (id) => {
-    switch (id) {
-      case 1:
-        return lolImg;
-      case 2:
-        return fresherImg;
-      case 3:
-        return grandSwissImg;
-      case 8:
-        return fideImg;
-      default:
-        return featuredEventImg;
-    }
+  useEffect(() => {
+    const fetchNextEvent = async () => {
+      let data = globalCache.events;
+      if (!data) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/events`);
+          if (res.ok) {
+            data = await res.json();
+            globalCache.events = data;
+          }
+        } catch (e) {}
+      }
+      if (data && Array.isArray(data)) {
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        
+        // format and filter
+        const upcoming = data.map(evt => ({
+          id: evt.id,
+          title: evt.title,
+          date: evt.event_date,
+          endDate: evt.event_end_date,
+          tag: evt.event_type,
+          shortDesc: evt.short_description,
+          location: evt.location,
+          format: evt.format
+        })).filter(evt => {
+          const compareDate = new Date(evt.endDate || evt.date);
+          compareDate.setHours(0,0,0,0);
+          return compareDate >= today;
+        });
+        
+        if (upcoming.length > 0) {
+          // Sort by date ascending
+          upcoming.sort((a, b) => new Date(a.date) - new Date(b.date));
+          setNextEvent(upcoming[0]);
+        }
+      }
+    };
+    fetchNextEvent();
+  }, []);
+
+  // Helper to map event to image
+  const getEventImage = (event) => {
+    if (!event) return featuredEventImg;
+    const t = String(event.title).toLowerCase();
+    if (t.includes('league of legends')) return lolImg;
+    if (t.includes("fresher's chess") || t.includes("freshers chess")) return fresherImg;
+    if (t.includes('grand swiss')) return grandSwissImg;
+    if (t.includes('fide rated') || t.includes('fide open')) return fideImg;
+    return featuredEventImg;
   };
-
-
-
-  // Helper to find the next upcoming event relative to local time
-  const getNextEvent = () => {
-    const now = new Date();
-    // Zero out time for date comparison
-    const nowTime = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-
-    const futureEvents = OFFICIAL_EVENTS.filter(event => {
-      const eventDate = new Date(event.date);
-      const eventTime = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate()).getTime();
-      return eventTime >= nowTime;
-    });
-
-    if (futureEvents.length === 0) return null;
-
-    // Sort by date ascending
-    futureEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
-    return futureEvents[0];
-  };
-
-  const nextEvent = getNextEvent();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -249,7 +265,7 @@ const Landing = () => {
                 <img
                   alt={nextEvent.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1000ms] ease-out"
-                  src={getEventImage(nextEvent.id)}
+                  src={getEventImage(nextEvent)}
                 />
                 {/* Dark gradient overlay blending image into card */}
                 <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-surface/60 via-transparent to-transparent"></div>

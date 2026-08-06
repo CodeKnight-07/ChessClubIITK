@@ -6,6 +6,9 @@ import tanmayImg from "../assets/exCoordinators/tanmay.jpg";
 import akshatImg from "../assets/exCoordinators/akshat.png";
 import kushagraImg from "../assets/exCoordinators/kushagra.jpg";
 import pulkitImg from "../assets/exCoordinators/pulkit.jpg";
+import abhishekImg from "../assets/exCoordinators/Abhishek.jpg";
+import prajeetImg from "../assets/exCoordinators/Prajeet.jpg";
+import premImg from "../assets/exCoordinators/Prem.png";
 
 // Dummy data structure, will be replaced by user's data
 const TEAMS_DATA = {
@@ -16,9 +19,9 @@ const TEAMS_DATA = {
     { name: "Tanmay Kavikumar Sahare", email: "tanmayka23@iitk.ac.in", image: tanmayImg, funnyDescription: "Placeholder description for 25-26 team." }
   ],
   '24-25 Team': [
-    { name: "Abhishek Kumar", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 24-25 team." },
+    { name: "Abhishek Kumar", email: "placeholder@iitk.ac.in", image: abhishekImg, funnyDescription: "Placeholder description for 24-25 team." },
     { name: "Parv Goyal", email: "parvgoyal22@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 24-25 team." },
-    { name: "Prajeet Singh Rawat", email: "prajeetsr22@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 24-25 team." }
+    { name: "Prajeet Singh Rawat", email: "prajeetsr22@iitk.ac.in", image: prajeetImg, funnyDescription: "Placeholder description for 24-25 team." }
   ],
   '23-24 Team': [
     { name: "Abhijeet Verma", email: "abhiteet21@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 23-24 team." },
@@ -27,10 +30,10 @@ const TEAMS_DATA = {
     { name: "Tejas Goyal", email: "tejasg21@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 23-24 team." }
   ],
   '22-23 Team': [
-    { name: "Himanshu Beniwal", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." },
-    { name: "Pranshu Gaur", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." },
-    { name: "Prem Milind Gujrathi", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." },
-    { name: "Vaibhav Waghmare", email: "placeholder@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." }
+    { name: "Himanshu Beniwal", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." },
+    { name: "Pranshu Gaur", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." },
+    { name: "Prem Milind Gujrathi", image: premImg, funnyDescription: "Placeholder description for 22-23 team." },
+    { name: "Vaibhav Waghmare", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." }
   ]
 };
 
@@ -48,7 +51,9 @@ const MemberCard = ({ person }) => (
       
       <div className="absolute bottom-0 left-0 w-full p-4 translate-y-6 group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
         <h5 className="text-xl font-serif font-bold text-on-surface mb-1 drop-shadow-md group-hover:text-primary transition-colors duration-300">{person.name}</h5>
-        <a href={`mailto:${person.email}`} className="text-[10px] font-mono text-primary hover:text-primary/70 transition-colors tracking-wider block opacity-0 group-hover:opacity-100 duration-500 delay-100 ease-out">{person.email}</a>
+        {person.email && (
+          <a href={`mailto:${person.email}`} className="text-[10px] font-mono text-primary hover:text-primary/70 transition-colors tracking-wider block opacity-0 group-hover:opacity-100 duration-500 delay-100 ease-out">{person.email}</a>
+        )}
       </div>
     </div>
   </div>
