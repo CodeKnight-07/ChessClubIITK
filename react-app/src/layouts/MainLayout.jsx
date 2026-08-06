@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { OFFICIAL_EVENTS } from '../constants/events';
+import { globalCache } from '../utils/cache';
 import Navbar from '../components/Navbar';
 import ScrollToTopButton from '../components/ScrollToTopButton';
 import { API_BASE_URL } from '../config';
@@ -12,31 +12,54 @@ const MainLayout = ({ children }) => {
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRegisteredForLol, setIsRegisteredForLol] = useState(false);
-
-  // Helper to find the next upcoming event relative to local time
-  const getNextEvent = () => {
-    const now = new Date();
-    // Zero out time for date comparison
-    const nowTime = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-
-    const futureEvents = OFFICIAL_EVENTS.filter(event => {
-      const eventDate = new Date(event.date);
-      const eventTime = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate()).getTime();
-      return eventTime >= nowTime;
-    });
-
-    if (futureEvents.length === 0) return null;
-
-    // Sort ascending by date
-    futureEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    return futureEvents[0];
-  };
-
-  const nextEvent = getNextEvent();
+  const [nextEvent, setNextEvent] = useState(null);
 
   useEffect(() => {
-    if (isLoggedIn && token && nextEvent?.id === 1) {
+    const fetchNextEvent = async () => {
+      let data = globalCache.events;
+      if (!data) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/events`);
+          if (res.ok) {
+            data = await res.json();
+            globalCache.events = data;
+          }
+        } catch (e) {}
+      }
+      if (data && Array.isArray(data)) {
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        
+        const upcoming = data.map(evt => ({
+          id: evt.id,
+          title: evt.title,
+          date: evt.event_date,
+          endDate: evt.event_end_date,
+          tag: evt.event_type,
+          shortDesc: evt.short_description,
+          fullDesc: evt.event_briefing,
+          location: evt.location,
+          time: evt.event_time,
+          format: evt.format
+        })).filter(evt => {
+          const compareDate = new Date(evt.endDate || evt.date);
+          compareDate.setHours(0,0,0,0);
+          return compareDate >= today;
+        });
+        
+        if (upcoming.length > 0) {
+          upcoming.sort((a, b) => new Date(a.date) - new Date(b.date));
+          setNextEvent(upcoming[0]);
+        }
+      }
+    };
+    fetchNextEvent();
+  }, []);
+
+  const isLolEvent = nextEvent?.title?.toLowerCase().includes("league of legends");
+
+  useEffect(() => {
+    if (isLoggedIn && token && nextEvent && isLolEvent) {
       const checkLolStatus = async () => {
         try {
           const response = await fetch(`${API_BASE_URL}/api/register-lol/status`, {
@@ -56,7 +79,7 @@ const MainLayout = ({ children }) => {
     } else {
       setIsRegisteredForLol(false);
     }
-  }, [isLoggedIn, token, nextEvent]);
+  }, [isLoggedIn, token, nextEvent, isLolEvent]);
 
   useEffect(() => {
     const handleOpenModal = () => setIsModalOpen(true);
@@ -268,7 +291,7 @@ const MainLayout = ({ children }) => {
                   Close
                 </button>
                 {isLoggedIn ? (
-                  isRegisteredForLol && nextEvent.id === 1 ? (
+                  isRegisteredForLol && isLolEvent ? (
                     <button
                       disabled
                       className="px-6 py-2.5 rounded-xl bg-gray-800 text-gray-500 text-xs font-bold uppercase tracking-wider border border-gray-700 cursor-not-allowed"
@@ -277,8 +300,8 @@ const MainLayout = ({ children }) => {
                     </button>
                   ) : (
                     <Link
-                      to={nextEvent.id === 1 ? "/events" : `/events/register/${nextEvent.id}`}
-                      state={nextEvent.id === 1 ? { openRegisterLol: true } : undefined}
+                      to={isLolEvent ? "/events" : `/events/register/${nextEvent.id}`}
+                      state={isLolEvent ? { openRegisterLol: true } : undefined}
                       onClick={() => setIsModalOpen(false)}
                       className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#f2ca50] to-[#d4af37] text-xs font-bold uppercase tracking-wider text-[#3c2f00] shadow-lg transition-transform hover:scale-[1.02]"
                     >

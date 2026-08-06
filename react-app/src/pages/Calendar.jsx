@@ -8,39 +8,14 @@ import Footer from '../components/Footer';
 import { API_BASE_URL } from '../config';
 
 const PRE_SCHEDULED_EVENTS = [
-  { id: 'pre-1', type: 'workshop', title: 'Interviews', location: 'Online/Offline', time: 'TBD', date: '2026-05-22' },
-  { id: 'pre-2', type: 'workshop', title: 'Secy Tasks & Results', location: 'Online', time: 'TBD', date: '2026-05-25' },
-  { id: 'pre-3', type: 'workshop', title: 'Secy Recruitment & All-Team Meet', location: 'Online', time: 'TBD', date: '2026-06-05' },
-  { id: 'pre-4', type: 'tournament', title: 'Fog of war tournament', location: 'chess.com', time: 'TBD', date: '2026-06-20' },
-  { id: 'pre-5', type: 'workshop', title: 'Orientation PPT & Intro Video', location: 'Online', time: 'TBD', date: '2026-07-15' },
-  { id: 'pre-6', type: 'tournament', title: 'International Chess Day Arena', location: 'chess.com', time: 'TBD', date: '2026-07-20' },
-  { id: 'pre-7', type: 'tournament', title: 'League of Legends 6.0', location: 'Online', time: 'TBD', date: '2026-08-07' },
+  { id: 'pre-6', type: 'tournament', title: 'International Chess Day', location: 'chess.com', time: 'TBD', date: '2026-07-20' },
   { id: 'pre-8', type: 'tournament', title: 'Candidates Start', location: 'chess.com', time: 'TBD', date: '2026-08-19' },
-  { id: 'pre-9', type: 'tournament', title: "Fresher's Chess League", location: 'Online', time: 'TBD', date: '2026-08-21' },
   { id: 'pre-10', type: 'tournament', title: 'Candidates End', location: 'Online', time: 'TBD', date: '2026-09-04' },
-  { id: 'pre-11', type: 'tournament', title: 'Twisted Boards', location: 'Online', time: 'TBD', date: '2026-09-05' },
   { id: 'pre-12', type: 'tournament', title: 'IITK Chess Championship Starts', location: 'TBD', time: 'TBD', date: '2026-09-22' },
-  { id: 'pre-13', type: 'workshop', title: '1st Secy Review', location: 'TBD', time: 'TBD', date: '2026-09-26' },
-  { id: 'pre-14', type: 'tournament', title: 'IITK Grand Swiss', location: 'TBD', time: 'TBD', date: '2026-10-02' },
   { id: 'pre-15', type: 'tournament', title: 'IITK Chess Championship Ends', location: 'TBD', time: 'TBD', date: '2026-10-08' },
+  { id: 'pre-14', type: 'tournament', title: 'FIDE Rated Open Rapid Chess Championship', location: 'TBD', time: 'TBD', date: '2026-10-11' },
   { id: 'pre-16', type: 'workshop', title: 'FIDE Permissions & Designing', location: 'TBD', time: 'TBD', date: '2026-10-15' },
   { id: 'pre-17', type: 'workshop', title: 'Puzzles Quiz', location: 'TBD', time: 'TBD', date: '2026-10-27' },
-  { id: 'pre-18', type: 'workshop', title: 'Endsem Blackout Period Begins', location: 'N/A', time: 'All Day', date: '2026-11-06' },
-  { id: 'pre-19', type: 'workshop', title: 'Endsems', location: 'IITK', time: 'All Day', date: '2026-11-16' },
-  { id: 'pre-20', type: 'tournament', title: 'Speed Chess Championship', location: 'Online', time: 'TBD', date: '2026-12-25' },
-  { id: 'pre-21', type: 'workshop', title: 'FIDE Permissions & Designing', location: 'TBD', time: 'TBD', date: '2026-12-28' },
-  { id: 'pre-22', type: 'tournament', title: 'FIDE Rated Open Rapid Tournament', location: 'TBD', time: 'TBD', date: '2027-01-09' },
-  { id: 'pre-23', type: 'workshop', title: '2nd Secy Review', location: 'TBD', time: 'TBD', date: '2027-01-15' },
-  { id: 'pre-24', type: 'workshop', title: 'FIDE Bills Clearing', location: 'TBD', time: 'TBD', date: '2027-01-20' },
-  { id: 'pre-25', type: 'tournament', title: 'Twisted Boards', location: 'Online', time: 'TBD', date: '2027-02-05' },
-  { id: 'pre-26', type: 'workshop', title: 'Prospective Candidates', location: 'TBD', time: 'TBD', date: '2027-02-15' },
-  { id: 'pre-27', type: 'tournament', title: "Queen's Gambit", location: 'TBD', time: 'TBD', date: '2027-03-08' },
-  { id: 'pre-28', type: 'tournament', title: 'Chess Masters Premier League 4.0', location: 'TBD', time: 'TBD', date: '2027-03-15' },
-  { id: 'pre-29', type: 'workshop', title: 'Coordie Interviews', location: 'TBD', time: 'TBD', date: '2027-03-18' },
-  { id: 'pre-30', type: 'workshop', title: '3rd Post Secy Review', location: 'TBD', time: 'TBD', date: '2027-03-20' },
-  { id: 'pre-31', type: 'workshop', title: 'End-Tenure Party', location: 'TBD', time: 'TBD', date: '2027-03-30' },
-  { id: 'pre-32', type: 'tournament', title: 'IITK Chess Cup', location: 'TBD', time: 'TBD', date: '2027-04-02' },
-  { id: 'pre-33', type: 'workshop', title: 'End-Term Report', location: 'TBD', time: 'TBD', date: '2027-04-10' }
 ];
 // A dictionary to map event types to their specific colors
 const eventTheme = {
@@ -103,14 +78,15 @@ const Calendar = () => {
           
           // Map backend data to what the calendar grid expects
           const formattedEvents = data.map(evt => {
-             // Ensure the date is perfectly formatted as YYYY-MM-DD for the grid filter
              const yyyyMmDd = new Date(evt.event_date).toISOString().split('T')[0];
+             const endYyyyMmDd = evt.event_end_date ? new Date(evt.event_end_date).toISOString().split('T')[0] : null;
              
              return {
                id: `db-${evt.id}`,
                title: evt.title,
                date: yyyyMmDd,
-               type: evt.event_type.toLowerCase(), // e.g., 'tournament', 'workshop'
+               endDate: endYyyyMmDd,
+               type: evt.event_type.toLowerCase(),
                time: evt.event_time,
                location: evt.location
              };
@@ -133,13 +109,10 @@ const Calendar = () => {
     ...PRE_SCHEDULED_EVENTS,
     ...dbEvents
   ].filter(e => {
-    // Apply your filters based on the unified 'type'
     if (e.type === 'tournament' && !showTournaments) return false;
     if (e.type === 'workshop' && !showWorkshops) return false;
     return true;
   });
-
-  
 
   const handlePrevMonth = () => {
     setCurrentDate(
@@ -158,7 +131,11 @@ const Calendar = () => {
 
   const currentMonthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
   const currentMonthEvents = allEvents
-    .filter((e) => e.date && e.date.startsWith(currentMonthStr))
+    .filter((e) => {
+      const startInMonth = e.date && e.date.startsWith(currentMonthStr);
+      const endInMonth = e.endDate && e.endDate.startsWith(currentMonthStr);
+      return startInMonth || endInMonth;
+    })
     .sort((a, b) => a.date.localeCompare(b.date));
 
   const firstDayOfMonth = new Date(year, month, 1).getDay();
@@ -186,6 +163,115 @@ const Calendar = () => {
   for (let i = 1; i <= remainingCells; i++) {
     calendarCells.push({ type: 'next', day: i });
   }
+
+  // Map absolute date strings to prev and next month cells
+  const cellsWithDate = calendarCells.map((cell) => {
+    if (cell.dateStr) return cell;
+    
+    let dateStr = '';
+    if (cell.type === 'prev') {
+      const prevMonth = month === 0 ? 11 : month - 1;
+      const prevYear = month === 0 ? year - 1 : year;
+      dateStr = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}-${String(cell.day).padStart(2, '0')}`;
+    } else if (cell.type === 'next') {
+      const nextMonth = month === 11 ? 0 : month + 1;
+      const nextYear = month === 11 ? year + 1 : year;
+      dateStr = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(cell.day).padStart(2, '0')}`;
+    }
+    return { ...cell, dateStr };
+  });
+
+  // Split cells into rows of weeks (7 days each)
+  const gridWeeks = [];
+  for (let i = 0; i < cellsWithDate.length; i += 7) {
+    gridWeeks.push(cellsWithDate.slice(i, i + 7));
+  }
+
+  const isEventOnDate = (event, dateStr) => {
+    if (!event.date || !dateStr) return false;
+    if (event.endDate) {
+      return dateStr >= event.date && dateStr <= event.endDate;
+    }
+    return dateStr === event.date;
+  };
+
+  // Pre-calculate track assignments for each week row to avoid overlaps
+  const weeksData = gridWeeks.map((week) => {
+    const weekEvents = allEvents.filter(event => {
+      return week.some(cell => isEventOnDate(event, cell.dateStr));
+    });
+
+    const getDuration = (e) => {
+      if (!e.endDate) return 1;
+      return Math.max(1, Math.round((new Date(e.endDate) - new Date(e.date)) / (1000 * 60 * 60 * 24)) + 1);
+    };
+
+    // Sort by duration descending, then by start date ascending
+    const sortedWeekEvents = [...weekEvents].sort((a, b) => {
+      const durA = getDuration(a);
+      const durB = getDuration(b);
+      if (durA !== durB) return durB - durA;
+      return a.date.localeCompare(b.date);
+    });
+
+    const tracks = [];
+    const eventTrackAssignments = {};
+
+    sortedWeekEvents.forEach(event => {
+      const activeDays = week.map(cell => isEventOnDate(event, cell.dateStr));
+      
+      let assignedTrack = -1;
+      for (let t = 0; t < tracks.length; t++) {
+        let isFree = true;
+        for (let d = 0; d < 7; d++) {
+          if (activeDays[d] && tracks[t][d]) {
+            isFree = false;
+            break;
+          }
+        }
+        if (isFree) {
+          assignedTrack = t;
+          break;
+        }
+      }
+      
+      if (assignedTrack === -1) {
+        assignedTrack = tracks.length;
+        tracks.push(new Array(7).fill(false));
+      }
+      
+      for (let d = 0; d < 7; d++) {
+        if (activeDays[d]) {
+          tracks[assignedTrack][d] = true;
+        }
+      }
+      
+      eventTrackAssignments[event.id] = assignedTrack;
+    });
+
+    console.log("Week row:", week[0].dateStr, "to", week[6].dateStr, "Assignments:", JSON.stringify(eventTrackAssignments), "Max tracks:", tracks.length);
+
+    return {
+      week,
+      events: sortedWeekEvents,
+      eventTrackAssignments,
+      maxTracksCount: tracks.length
+    };
+  });
+
+  useEffect(() => {
+    if (dbEvents.length > 0) {
+      const logMsg = weeksData.map((wData, idx) => {
+        return `Week ${idx}: ${wData.week[0].dateStr} to ${wData.week[6].dateStr} Assignments: ${JSON.stringify(wData.eventTrackAssignments)} Max tracks: ${wData.maxTracksCount}`;
+      }).join('\n');
+      
+      fetch(`${API_BASE_URL}/api/events/debug_log`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ msg: logMsg })
+      }).catch(() => {});
+    }
+  }, [dbEvents, weeksData]);
 
   const handleScheduleClick = () => {
     const today = new Date();
@@ -271,7 +357,7 @@ return (
                         <div
                           key={idx}
                           // Redirect to events page instead of opening a modal
-                          onClick={() => navigate('/events')}
+                          onClick={() => navigate('/events', { state: { scrollToEventId: evt.id } })}
                           className={`p-4 rounded-xl border-l-[4px] bg-surface-container-high transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer hover:border-primary/50 hover:bg-surface-container-highest ${
                             evt.type === 'tournament' ? 'border-[#f2ca50]' : 
                             evt.type === 'workshop' ? 'border-[#e5e2e1]' : 
@@ -323,71 +409,83 @@ return (
                     ))}
                   </div>
 
-                  <div className="grid flex-1 grid-cols-7 auto-rows-fr">
-                    {calendarCells.map((cell, idx) => {
-                      const isCurrent = cell.type === 'current';
-                      const isToday = isCurrent && cell.dateStr === todayStr; // <-- NEW: Check if this cell is today!
+                  <div className="flex-1 flex flex-col divide-y divide-outline-variant/10 border-l border-r border-b border-outline-variant/10">
+                    {weeksData.map((weekData, weekIdx) => {
+                      const week = weekData.week;
+                      const maxTracks = weekData.maxTracksCount;
                       
-                      const dayEvents = isCurrent
-                        ? allEvents.filter((e) => e.date === cell.dateStr)
-                        : [];
-
-                      const baseClass =
-                        'group relative flex min-h-[110px] flex-col overflow-hidden border-b border-r border-outline-variant/5 p-2 sm:p-3';
-                      
-                      // NEW: Add a faint gold background to today's box
-                      const bgClass = isCurrent
-                        ? isToday 
-                          ? 'bg-primary/5 transition-colors hover:bg-primary/10' 
-                          : 'bg-transparent transition-colors hover:bg-surface-container-high'
-                        : 'bg-surface-container-lowest opacity-30';
-
                       return (
-                        <div
-                          key={idx}
-                          className={`${baseClass} ${bgClass}`}
-                        >
-                          {/* NEW: The day number wrapper. If it's today, make it a solid gold circle! */}
-                          <div className="mb-1 flex items-start">
-                            <span
-                              className={`flex h-6 w-6 items-center justify-center rounded-full text-sm ${
-                                isToday
-                                  ? 'bg-primary text-black font-bold' // Solid circle for today
-                                  : dayEvents.length > 0
-                                  ? 'font-bold text-primary'
-                                  : 'font-medium text-on-surface/80'
-                              }`}
-                            >
-                              {cell.day}
-                            </span>
-                          </div>
+                        <div key={weekIdx} className="grid grid-cols-7 relative min-h-[145px] divide-x divide-outline-variant/5">
+                          {/* 1. Background day cells */}
+                          {week.map((cell, dayIdx) => {
+                            const isCurrent = cell.type === 'current';
+                            const isToday = isCurrent && cell.dateStr === todayStr;
+                            
+                            // Highlight dates that contain any active event
+                            const dayEvents = allEvents.filter((e) => isEventOnDate(e, cell.dateStr));
+                            
+                            const bgClass = isCurrent
+                              ? isToday 
+                                ? 'bg-primary/5 transition-colors hover:bg-primary/10' 
+                                : 'bg-transparent transition-colors hover:bg-surface-container-high'
+                              : 'bg-surface-container-lowest opacity-30';
 
-                          <div className="flex-1 space-y-1 overflow-y-auto min-h-0 disable-scrollbar">
-                            {dayEvents.map((evt, eIdx) => {
-                              
-                              // 1. Grab the colors for this specific event type (or use default)
-                              const theme = eventTheme[evt.type] || eventTheme.default;
-
-                              return (
-                                <div
-                                  key={eIdx}
-                                  title={evt.title}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate('/events');
-                                  }}
-                                  // 2. Inject the dynamic border and background colors
-                                  className={`cursor-pointer rounded border-l-[3px] px-1.5 py-1 text-left hover:opacity-80 transition-opacity ${theme.border} ${theme.bg}`}
+                            return (
+                              <div
+                                key={dayIdx}
+                                className={`p-2 sm:p-3 flex flex-col justify-start items-start ${bgClass}`}
+                              >
+                                <span
+                                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs ${
+                                    isToday
+                                      ? 'bg-primary text-black font-bold'
+                                      : dayEvents.length > 0 && isCurrent
+                                      ? 'font-bold text-primary'
+                                      : 'font-medium text-on-surface/80'
+                                  }`}
                                 >
-                                  <div
-                                    // 3. Inject the dynamic text color
-                                    className={`truncate text-[9px] font-bold uppercase leading-tight tracking-tight ${theme.text}`}
-                                  >
-                                    {evt.title}
-                                  </div>
-                                  <div className="mt-0.5 truncate text-[8px] text-on-surface-variant">
-                                    {evt.location} • {evt.time}
-                                  </div>
+                                  {cell.day}
+                                </span>
+                              </div>
+                            );
+                          })}
+
+                          {/* 2. Track Event Banners Overlay */}
+                          <div className="absolute top-10 left-0 right-0 bottom-0 pointer-events-none flex flex-col gap-1.5 px-1.5 py-1">
+                            {Array.from({ length: maxTracks }).map((_, tIdx) => {
+                              // Find events on this track in this week
+                              const trackEvents = weekData.events.filter(e => weekData.eventTrackAssignments[e.id] === tIdx);
+                              
+                              return (
+                                <div key={tIdx} className="grid grid-cols-7 w-full h-[26px] relative pointer-events-none gap-x-1.5">
+                                  {trackEvents.map(evt => {
+                                    const activeDays = week.map(cell => isEventOnDate(evt, cell.dateStr));
+                                    const startIdx = activeDays.indexOf(true);
+                                    const endIdx = activeDays.lastIndexOf(true);
+                                    
+                                    if (startIdx === -1) return null;
+                                    
+                                    const theme = eventTheme[evt.type] || eventTheme.default;
+                                    
+                                    return (
+                                      <div
+                                        key={evt.id}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          navigate('/events', { state: { scrollToEventId: evt.id } });
+                                        }}
+                                        style={{
+                                          gridColumnStart: startIdx + 1,
+                                          gridColumnEnd: endIdx + 2,
+                                          gridRowStart: 1
+                                        }}
+                                        title={`${evt.title} (${evt.location})`}
+                                        className={`cursor-pointer pointer-events-auto h-[26px] flex items-center justify-center text-center px-3 text-[10px] font-bold rounded border-l-[3px] transition-opacity hover:opacity-85 shadow-[0_1px_3px_rgba(0,0,0,0.3)] ${theme.border} ${theme.bg} ${theme.text}`}
+                                      >
+                                        <span className="truncate leading-none">{evt.title}</span>
+                                      </div>
+                                    );
+                                  })}
                                 </div>
                               );
                             })}

@@ -4,6 +4,7 @@ import { API_BASE_URL } from '../config';
 import { useAuth } from '../context/AuthContext'; 
 import tournamentImg from '../assets/fide.png';
 import fresherImg from '../assets/fcl.png';
+import defaultBlogHero from '../assets/chessboard.jpg';
 
 // Helper to fix any <img> tags inside HTML content that have raw Base64 src strings
 const formatInjectedContent = (htmlContent) => {
@@ -27,6 +28,7 @@ const BlogPost = () => {
   // 1. Get user data from context safely using optional chaining
   const authContext = useAuth();
   const user = authContext?.user;
+  const token = authContext?.token;
 
   // 2. Try to pull admin status from context OR fall back to a manual check if context is broken
   const localEmail = localStorage.getItem('logged_in_user_email');
@@ -34,6 +36,43 @@ const BlogPost = () => {
   // To avoid crashes, we treat them as admin ONLY if context says so, 
   // or if they have a real email session going during local tests
   const isAdmin = user?.is_admin === 1 || user?.is_admin === true;
+
+  const getImageUrl = (url) => {
+    if (!url) return defaultBlogHero;
+    if (typeof url !== 'string') return url;
+    if (url.startsWith('/static/')) {
+      return `${API_BASE_URL}${url}`;
+    }
+    return url;
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/upload`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const data = await response.json();
+      setEditCover(data.image_url);
+    } catch (err) {
+      console.error(err);
+      alert("Error uploading image to server.");
+    }
+  };
 
 
 
@@ -179,7 +218,23 @@ const BlogPost = () => {
             </div>
             <div>
               <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">Cover Banner Image URL</label>
-              <input type="text" value={editCover} onChange={(e)=>setEditCover(e.target.value)} className="w-full bg-surface-container-lowest border border-outline-variant/20 p-3 rounded-xl text-sm text-on-surface focus:outline-primary"/>
+              <div className="flex gap-2 items-center bg-surface-container-lowest border border-outline-variant/20 rounded-xl px-3 py-1.5 focus-within:outline focus-within:outline-2 focus-within:outline-primary">
+                <input 
+                  type="text" placeholder="Banner Graphic URL" value={editCover}
+                  onChange={(e) => setEditCover(e.target.value)}
+                  className="flex-grow bg-transparent text-sm text-on-surface focus:outline-none py-1.5"
+                />
+                <label className="cursor-pointer bg-primary text-[#3c2f00] hover:bg-primary-container transition-all px-3 py-1.5 rounded-lg flex items-center justify-center gap-1.5 text-[10px] uppercase font-bold tracking-wider shadow-sm select-none shrink-0">
+                  <span className="material-symbols-outlined text-xs">upload</span>
+                  <span>Desktop Photo</span>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleImageUpload} 
+                    className="hidden" 
+                  />
+                </label>
+              </div>
             </div>
             <div>
               <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">Body Content String (HTML supported)</label>
@@ -226,12 +281,10 @@ const BlogPost = () => {
               </div>
             </div>
 
-            {dbPost.cover_image && (
-              <div className="w-full h-[450px] rounded-xl overflow-hidden mb-16 relative shadow-2xl shadow-black/50 bg-black/20">
-                <img alt={dbPost.title} className="w-full h-full object-cover" src={dbPost.cover_image}/>
-                <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-40 pointer-events-none"></div>
-              </div>
-            )}
+            <div className="w-full h-[450px] rounded-xl overflow-hidden mb-16 relative shadow-2xl shadow-black/50 bg-black/20">
+              <img alt={dbPost.title} className="w-full h-full object-cover" src={getImageUrl(dbPost.cover_image)}/>
+              <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-40 pointer-events-none"></div>
+            </div>
 
             {/* Safely injects the LONGTEXT content string rendering paragraphs/embedded elements */}
             <article 
