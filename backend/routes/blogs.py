@@ -114,6 +114,7 @@ def update_blog(blog_id):
     cover_image = data.get('cover_image')
     author_name = data.get('author_name')
     author_position = data.get('author_position')
+    created_at = data.get('created_at')
 
     if not email:
         return jsonify({"error": "User validation email required to verify update rights."}), 400
@@ -125,12 +126,21 @@ def update_blog(blog_id):
             if not verify_admin_privileges(cursor, email):
                 return jsonify({"error": "Access Denied: Admin privileges required."}), 403
 
-            sql = """
-                UPDATE blogs 
-                SET title = %s, subtitle = %s, content = %s, cover_image = %s, author_name = %s, author_position = %s
-                WHERE id = %s
-            """
-            cursor.execute(sql, (title, subtitle, content, cover_image, author_name, author_position, blog_id))
+            if created_at:
+                sql = """
+                    UPDATE blogs 
+                    SET title = %s, subtitle = %s, content = %s, cover_image = %s, author_name = %s, author_position = %s, created_at = %s
+                    WHERE id = %s
+                """
+                cursor.execute(sql, (title, subtitle, content, cover_image, author_name, author_position, created_at, blog_id))
+            else:
+                sql = """
+                    UPDATE blogs 
+                    SET title = %s, subtitle = %s, content = %s, cover_image = %s, author_name = %s, author_position = %s
+                    WHERE id = %s
+                """
+                cursor.execute(sql, (title, subtitle, content, cover_image, author_name, author_position, blog_id))
+
             connection.commit()
             return jsonify({"message": "Blog post updated successfully!"}), 200
     except Exception as e:

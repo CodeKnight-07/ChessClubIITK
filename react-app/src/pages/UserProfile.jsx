@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config'; 
 import { useAuth } from '../context/AuthContext';
+import { globalCache } from '../utils/cache';
 import userAvatar from '../assets/new_user_avatar.png';
 
 const UserProfile = () => {
@@ -10,7 +11,8 @@ const UserProfile = () => {
   const { user, token, logout } = useAuth();
   const userEmail = user?.email;
   
-  const [profile, setProfile] = useState({
+  const cachedProfile = globalCache.profile;
+  const [profile, setProfile] = useState(cachedProfile || {
     name: "",
     rollno: "",
     contact: "",
@@ -19,7 +21,7 @@ const UserProfile = () => {
     chesscom: "",
     avatar: userAvatar
   });
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!cachedProfile);
   const [isEditing, setIsEditing] = useState(false);
   const [participations, setParticipations] = useState([]);
   const [error, setError] = useState('');
@@ -44,19 +46,29 @@ const UserProfile = () => {
           }
         });
         
+        if (response.status === 401 || response.status === 403) {
+          logout();
+          navigate('/login');
+          return;
+        }
+
         if (!response.ok) throw new Error("Could not retrieve profile properties");
         
         const data = await response.json();
-        setProfile({
+        const updatedProfile = {
           ...data,
           rollno: data.rollno || data.roll_no || "",
           avatar: data.avatar || userAvatar
-          
-        });
+        };
+        setProfile(updatedProfile);
+        globalCache.profile = updatedProfile;
         setIsLoading(false);
       } catch (err) {
         console.error(err);
-        setError("Failed loading profile from server.");
+        // Only set error if we don't even have cached profile to show
+        if (!globalCache.profile) {
+          setError("Failed loading profile from server.");
+        }
         setIsLoading(false);
       }
     };
@@ -113,6 +125,14 @@ const UserProfile = () => {
 
       if (!response.ok) throw new Error("Failed saving database modifications");
       
+      const updatedProfile = {
+        ...profile,
+        name: profile.name,
+        rollno: profile.rollno,
+        contact: profile.contact,
+        avatar: profile.avatar
+      };
+      globalCache.profile = updatedProfile;
       setIsEditing(false);
       setError('');
     } catch (err) {

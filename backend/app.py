@@ -216,6 +216,39 @@ def upload_carousel_image():
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/upload', methods=['POST'])
+@token_required
+def upload_general_file():
+    try:
+        if 'image' not in request.files:
+            return jsonify({"error": "No image provided"}), 400
+            
+        file = request.files['image']
+        
+        if file.filename == '':
+            return jsonify({"error": "No selected file"}), 400
+
+        filename = secure_filename(file.filename)
+        
+        # Make filename unique to avoid duplicate collisions
+        import uuid
+        ext = os.path.splitext(filename)[1]
+        unique_filename = f"{uuid.uuid4().hex}{ext}"
+        
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+        file.save(file_path)
+
+        db_path = f"/static/uploads/{unique_filename}"
+        
+        return jsonify({
+            "message": "Image uploaded successfully!", 
+            "image_url": db_path
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     
 
 @app.route('/api/carousel', methods=['GET'])

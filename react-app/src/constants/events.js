@@ -76,10 +76,10 @@ export const OFFICIAL_EVENTS = [
     schedule: [
       { time: "Oct 2nd", activity: "Rounds 1 - 3" },
       { time: "Oct 3rd", activity: "Rounds 4 & 5" },
-      { time: "Oct 4th", activity: "Rounds 6 & 7 (Finals)" }
     ],
     prizes: "Top 3: Candidates. Pos 4-17: Chess Cup. Top 5: Gold Memberships. Top 50: Coupons."
   },
+  /*
   {
     id: 4,
     title: "Speed Chess Championship",
@@ -113,16 +113,16 @@ export const OFFICIAL_EVENTS = [
     location: "IIT Kanpur Campus, Uttar Pradesh, India",
     format: "FIDE Rated OTB (9-Round Swiss Rapid 10+5)",
     shortDesc:
-      "The first-ever FIDE Rated Chess Tournament hosted by Chess Club IITK, featuring 9 Swiss rounds and a ₹2,00,000 prize pool.",
+      "The first-ever FIDE Rated Chess Tournament hosted by Chess Club IITK, featuring 9 Swiss rounds and a ₹2,0,000 prize pool.",
     fullDesc:
-      "A new chapter in IIT Kanpur's chess legacy begins with the FIDE Rated Open Rapid Chess Chess Tournament 2026. This over-the-board event features 9 Swiss rounds played in a 10+5 rapid format. Players from across the country will battle for rating points, glory, and a massive ₹2,00,000 prize fund.",
+      "A new chapter in IIT Kanpur's chess legacy begins with the FIDE Rated Open Rapid Chess Chess Tournament 2026. This over-the-board event features 9 Swiss rounds played in a 10+5 rapid format. Players from across the country will battle for rating points, glory, and a massive ₹2,0,000 prize fund.",
     schedule: [
       {
         time: "Feb 7th",
         activity: "9 Swiss Rounds (Rapid 10+5)"
       }
     ],
-    prizes: "Prize Fund Worth ₹2,00,000!"
+    prizes: "Prize Fund Worth ₹2,0,000!"
   },
   {
     id: 7,
@@ -180,4 +180,5 @@ export const OFFICIAL_EVENTS = [
     ],
     prizes: "Top 4 players qualify for the IITK Candidates Tournament!"
   }
+  */
 ];

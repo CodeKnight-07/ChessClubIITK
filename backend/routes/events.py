@@ -19,31 +19,30 @@ def create_event():
     location = data.get('location')
     format_type = data.get('format')
     register_link = data.get('register_link')
+    event_end_date = data.get('event_end_date') or None
 
     # Basic validation
     if not title or not event_type or not event_date or not event_time:
         return jsonify({"error": "Missing required fields"}), 400
 
     try:
-        # 2. Use your custom connection function instead of 'mysql'
         conn = get_db_connection()
         cur = conn.cursor()
         
         query = """
             INSERT INTO events (
                 title, event_type, short_description, event_briefing, 
-                event_date, event_time, location, format, register_link
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                event_date, event_time, location, format, register_link, event_end_date
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         cur.execute(query, (
             title, event_type, short_description, event_briefing, 
-            event_date, event_time, location, format_type, register_link
+            event_date, event_time, location, format_type, register_link, event_end_date
         ))
         
-        # 3. Commit and close using 'conn'
         conn.commit()
         cur.close()
-        conn.close()  # Good practice to close the connection as well
+        conn.close()
         
         return jsonify({"message": "Event created successfully!"}), 201
 
@@ -59,13 +58,8 @@ def get_events():
         
         cur.execute("SELECT * FROM events ORDER BY event_date ASC")
         
-        # --- THE FIX IS HERE ---
-        # 1. Grab the column names from the cursor
         columns = [col[0] for col in cur.description]
-        
-        # 2. Zip the column names with the rows to create a list of dictionaries
         events_data = [dict(zip(columns, row)) for row in cur.fetchall()]
-        # -----------------------
         
         cur.close()
         conn.close()
@@ -78,7 +72,6 @@ def get_events():
     
 @events_bp.route('/api/events/<int:event_id>', methods=['PUT', 'DELETE', 'OPTIONS'])
 def modify_event(event_id):
-    # 1. Handle CORS Preflight
     if request.method == 'OPTIONS':
         return jsonify({"message": "CORS preflight successful"}), 200
 
@@ -86,26 +79,26 @@ def modify_event(event_id):
     cur = conn.cursor()
 
     try:
-        # 2. Handle DELETE Request
         if request.method == 'DELETE':
             cur.execute("DELETE FROM events WHERE id = %s", (event_id,))
             conn.commit()
             return jsonify({"message": "Event deleted successfully!"}), 200
 
-        # 3. Handle PUT (Edit) Request
         if request.method == 'PUT':
             data = request.get_json()
             
             query = """
                 UPDATE events 
                 SET title=%s, event_type=%s, short_description=%s, event_briefing=%s, 
-                    event_date=%s, event_time=%s, location=%s, format=%s, register_link=%s
+                    event_date=%s, event_time=%s, location=%s, format=%s, register_link=%s,
+                    event_end_date=%s
                 WHERE id = %s
             """
             cur.execute(query, (
                 data.get('title'), data.get('event_type'), data.get('short_description'), 
                 data.get('event_briefing'), data.get('event_date'), data.get('event_time'), 
                 data.get('location'), data.get('format'), data.get('register_link'),
+                data.get('event_end_date') or None,
                 event_id
             ))
             conn.commit()
@@ -118,3 +111,12 @@ def modify_event(event_id):
     finally:
         cur.close()
         conn.close()
+
+@events_bp.route('/api/events/debug_log', methods=['POST'])
+def debug_log():
+    data = request.json
+    log_msg = data.get('msg', '')
+    print("BROWSER LOG:", log_msg)
+    with open('browser_debug.log', 'a') as f:
+        f.write(log_msg + '\n')
+    return jsonify({"status": "ok"}), 200
