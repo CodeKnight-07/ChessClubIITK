@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { globalCache } from '../utils/cache';
 import Footer from '../components/Footer';
+import PhotoBook from '../components/PhotoBook';
 import { API_BASE_URL } from '../config';
 
 // Keep your static UI assets
@@ -47,19 +48,43 @@ const Gallery = () => {
 
   // 2. EXISTING UI STATES
   const [activeCategory, setActiveCategory] = useState('All');
+  const [activeTenure, setActiveTenure] = useState('2025-26');
   const [isOpenLightbox, setIsOpenLightbox] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [slideshowIndex, setSlideshowIndex] = useState(0);
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
 
-  const [spreadIndex, setSpreadIndex] = useState(0);
-  const [isFlipping, setIsFlipping] = useState(false);
-  const [flipDirection, setFlipDirection] = useState('next');
-  const [isAlbumAutoplay, setIsAlbumAutoplay] = useState(true);
-  const [showThumbnails, setShowThumbnails] = useState(false);
-  const [isAlbumLightboxOpen, setIsAlbumLightboxOpen] = useState(false);
-  const [albumLightboxIndex, setAlbumLightboxIndex] = useState(0);
+  const [isTenureModalOpen, setIsTenureModalOpen] = useState(false);
+  const [openStripTenure, setOpenStripTenure] = useState(null);
+  const [modalCategory, setModalCategory] = useState("Past Memories");
+
+  const defaultEvents = [
+    { 
+      id: "Workshops", 
+      category: "WORKSHOPS",
+      title: "Chess in Slums",
+      description: "Deconstructing the Sicilian Defense and introducing chess logic with our core team.",
+      photoCount: 5,
+      img: workshopImg 
+    },
+    { 
+      id: "Socials", 
+      category: "SOCIALS",
+      title: "We The Ones",
+      description: "Late night sessions filled with coffee, conversations, and 3-minute blitz madness.",
+      photoCount: 5,
+      img: socialImg 
+    },
+    { 
+      id: "Tournaments", 
+      category: "TOURNAMENTS",
+      title: "IITK Grand Swiss",
+      description: "The road to the Candidates starts here. Click to view the tournament gallery.",
+      photoCount: 17,
+      img: tournamentImg 
+    }
+  ];
 
   
 
@@ -260,150 +285,6 @@ const handleDeletePhoto = async (index, photoUrl) => {
     }
   }, [SLIDESHOW_PHOTOS, clubMemoriesPhotos]);
 
-  const flipNext = () => {
-    if (isFlipping) return;
-    if (spreadIndex >= 21) return;
-    setFlipDirection('next');
-    setIsFlipping(true);
-  };
-
-  const flipPrev = () => {
-    if (isFlipping) return;
-    if (spreadIndex <= 0) return;
-    setFlipDirection('prev');
-    setIsFlipping(true);
-  };
-
-  // Keyboard navigation for Album stack and Lightbox
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (isOpenLightbox) return;
-
-      if (isAlbumLightboxOpen) {
-        if (e.key === 'ArrowRight') {
-          setAlbumLightboxIndex(prev => (prev + 1) % clubMemoriesPhotos.length);
-        } else if (e.key === 'ArrowLeft') {
-          setAlbumLightboxIndex(prev => (prev - 1 + clubMemoriesPhotos.length) % clubMemoriesPhotos.length);
-        } else if (e.key === 'Escape') {
-          setIsAlbumLightboxOpen(false);
-        }
-      } else {
-        if (e.key === 'ArrowRight') {
-          flipNext();
-        } else if (e.key === 'ArrowLeft') {
-          flipPrev();
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpenLightbox, isAlbumLightboxOpen, spreadIndex, isFlipping, clubMemoriesPhotos.length]);
-
-  // Autoplay slideshow for Album (automatically flips every 5 seconds)
-  useEffect(() => {
-    if (!isAlbumAutoplay || isFlipping) return;
-    const interval = setInterval(() => {
-      if (spreadIndex >= 21) {
-        setSpreadIndex(0);
-      } else {
-        flipNext();
-      }
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [isAlbumAutoplay, spreadIndex, isFlipping]);
-
-  // Sync index between Album and Fullscreen Lightbox
-  useEffect(() => {
-    if (!isAlbumLightboxOpen) {
-      const newSpread = Math.floor((albumLightboxIndex + 2) / 2);
-      setSpreadIndex(newSpread);
-    }
-  }, [isAlbumLightboxOpen, albumLightboxIndex]);
-
-  useEffect(() => {
-    if (isAlbumLightboxOpen) {
-      const photoIdx = Math.max(0, Math.min(clubMemoriesPhotos.length - 1, 2 * spreadIndex - 2));
-      setAlbumLightboxIndex(photoIdx);
-    }
-  }, [isAlbumLightboxOpen, clubMemoriesPhotos.length, spreadIndex]);
-
-  const jumpToPhoto = (idx) => {
-    if (isFlipping) return;
-    const targetSpread = Math.floor((idx + 2) / 2);
-    setSpreadIndex(targetSpread);
-  };
-
-  const getPageContent = (pageNum) => {
-    if (pageNum < 0 || pageNum > clubMemoriesPhotos.length + 1) return null;
-
-    if (pageNum === 0) {
-      // Front Cover
-      return (
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-900 to-amber-955 flex flex-col justify-between p-6 text-center border-l-4 border-amber-800 shadow-inner rounded-r-xl select-none">
-          <div className="border border-primary/30 rounded-lg p-4 flex-1 flex flex-col justify-center items-center gap-4">
-            <span className="material-symbols-outlined text-primary text-5xl animate-pulse">menu_book</span>
-            <div>
-              <h3 className="font-serif text-2xl text-primary tracking-wide leading-tight mb-2">Club Memories</h3>
-              <p className="font-label text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/80">Chess Club IITK</p>
-            </div>
-            <div className="h-0.5 w-12 bg-primary/30" />
-            <p className="text-[9px] font-label text-on-surface-variant/60 uppercase tracking-widest max-w-[160px]">
-              Est. 2026 • Visual Archives
-            </p>
-          </div>
-        </div>
-      );
-    }
-
-    if (pageNum === clubMemoriesPhotos.length + 1) {
-      // Back Cover
-      return (
-        <div className="absolute inset-0 bg-gradient-to-bl from-amber-955 to-amber-900 flex flex-col justify-center items-center p-6 text-center border-r-4 border-amber-800 shadow-inner rounded-l-xl select-none">
-          <div className="border border-primary/20 rounded-lg p-4 w-full h-full flex flex-col justify-center items-center gap-4">
-            <span className="material-symbols-outlined text-primary text-4xl">emoji_events</span>
-            <h3 className="font-serif text-lg text-primary tracking-wider">Chess Club IITK</h3>
-            <p className="text-[9px] font-label text-on-surface-variant/50 max-w-[150px]">
-              Thank you for being part of our chess journey.
-            </p>
-            <div className="h-0.5 w-10 bg-primary/20 mt-2" />
-          </div>
-        </div>
-      );
-    }
-
-    // Photo Page 
-    const photoIdx = pageNum - 1;
-    const photoUrl = clubMemoriesPhotos[photoIdx];
-
-    return (
-      <div className="absolute inset-0 bg-[#fbf9f4] text-zinc-800 p-4 flex flex-col justify-between shadow-inner select-none border border-zinc-300/30">
-        
-        
-
-        {/* Photo Container */}
-        <div className="flex-1 w-full bg-zinc-900 rounded-lg overflow-hidden border border-zinc-400/25 shadow-md flex items-center justify-center p-1.5">
-          <img
-            src={photoUrl}
-            alt={`Memory ${pageNum}`}
-            className="max-w-full max-h-full object-contain"
-            draggable="false"
-          />
-        </div>
-
-        {/* Polaroid/Archival Caption */}
-        <div className="mt-3 pt-2 border-t border-zinc-300/40 flex justify-between items-center px-1">
-          <div>
-            <h4 className="font-serif text-xs font-semibold text-zinc-700 tracking-wide">Club Moments</h4>
-            <p className="text-[9px] text-zinc-500 font-label">IIT Kanpur Chess Community</p>
-          </div>
-          <span className="font-mono text-[9px] font-semibold text-zinc-400 bg-zinc-200/50 px-2 py-0.5 rounded-full border border-zinc-300/30">
-            Page {pageNum}
-          </span>
-        </div>
-      </div>
-    );
-  };
   const handleSpotlightClick = () => {
     // 1. If the database has no photos, do nothing
     if (carouselImages.length === 0) return;
@@ -433,35 +314,7 @@ const handleDeletePhoto = async (index, photoUrl) => {
     return () => observer.disconnect();
   }, []);
 
-  const handleNextPhoto = () => {
-  setLightboxIndex((prev) => 
-    prev === carouselImages.length - 1 ? 0 : prev + 1
-  );
-};
 
-  const handlePrevPhoto = () => {
-  setLightboxIndex((prev) => 
-    prev === 0 ? carouselImages.length - 1 : prev - 1
-  );
-};
-
-  // Keyboard navigation listener for lightbox modal
-  useEffect(() => {
-    if (!isOpenLightbox) return;
-
-    const handleKeyDown = (e) => {
-      if (e.key === 'ArrowRight') {
-        handleNextPhoto();
-      } else if (e.key === 'ArrowLeft') {
-        handlePrevPhoto();
-      } else if (e.key === 'Escape') {
-        setIsOpenLightbox(false);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpenLightbox, fideRatedPhotos.length]);
 
   // Static content for the featured tournament card since DB doesn't have titles yet
   const featuredTournament = {
@@ -568,7 +421,7 @@ const handleDeletePhoto = async (index, photoUrl) => {
               {/* Content side */}
               <div className="lg:w-2/5 p-8 lg:p-10 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-outline-variant/10">
                 <span className="text-[10px] font-label text-primary uppercase tracking-[0.3em] mb-3 block">
-                  Featured Tournament
+                  FIDE RATED RAPID TOURNAMENT
                 </span>
                 {/* THE EDITING UI SWAP */}
                 { isEditingFeatured ? (
@@ -680,425 +533,177 @@ const handleDeletePhoto = async (index, photoUrl) => {
           </div>
         )}
         {/* Club Memories Section */}
-        {clubMemoriesPhotos.length > 0 && (() => {
-          const bookScale = containerWidth > 0 && containerWidth < 840 ? (containerWidth - 32) / 800 : 1;
-          const bookHeight = 500 * bookScale;
-
-          return (
-            <section className="mt-20 sm:mt-28 mb-16 border-t border-outline-variant/10 pt-16 max-w-5xl mx-auto overflow-visible">
-              <div className="text-center mb-12">
-                <p className="text-primary font-label text-xs tracking-[0.4em] uppercase mb-3">
-                  Interactive Archives
-                </p>
-                <h2 className="text-3xl sm:text-4xl font-serif text-on-surface mb-4">
-                  Club Memories
-                </h2>
-              </div>
-
-              {/* 3D Page Turning Book Wrapper */}
-              <div
-                className="w-full flex items-center justify-center overflow-visible"
-                style={{ height: `${bookHeight}px` }}
-              >
-                <motion.div
-                  drag="x"
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.2}
-                  onDragEnd={(e, info) => {
-                    const swipeThreshold = 50;
-                    if (info.offset.x > swipeThreshold) {
-                      flipPrev();
-                    } else if (info.offset.x < -swipeThreshold) {
-                      flipNext();
-                    }
-                  }}
-                  className="relative bg-zinc-950 border-8 border-stone-900 rounded-3xl shadow-[0_40px_80px_-15px_rgba(0,0,0,0.8)] flex select-none overflow-visible origin-center cursor-grab active:cursor-grabbing"
-                  style={{
-                    width: '800px',
-                    height: '500px',
-                    perspective: '2000px',
-                    transform: `scale(${bookScale})`,
-                    transition: 'transform 0.1s ease-out'
-                  }}
-                >
-                  {/* Spine of the book */}
-                  <div className="absolute top-0 bottom-0 left-1/2 w-1.5 bg-gradient-to-r from-stone-950 via-stone-800 to-stone-950 z-30 transform -translate-x-1/2 shadow-lg" />
-
-                  {/* Spine shadows */}
-                  <div className="absolute top-0 bottom-0 left-1/2 w-8 bg-gradient-to-r from-black/40 to-transparent z-20 pointer-events-none" />
-                  <div className="absolute top-0 bottom-0 right-1/2 w-8 bg-gradient-to-l from-black/40 to-transparent z-20 pointer-events-none" />
-
-                  {/* LEFT SIDE (Static background) */}
-                  <div className="w-1/2 h-full relative bg-zinc-900 rounded-l-2xl overflow-hidden shadow-2xl origin-right">
-                    {isFlipping && flipDirection === 'next'
-                      ? getPageContent(2 * spreadIndex - 1)
-                      : isFlipping && flipDirection === 'prev'
-                        ? getPageContent(2 * (spreadIndex - 1) - 1)
-                        : getPageContent(2 * spreadIndex - 1)}
-                  </div>
-
-                  {/* RIGHT SIDE (Static background) */}
-                  <div className="w-1/2 h-full relative bg-zinc-900 rounded-r-2xl overflow-hidden shadow-2xl origin-left">
-                    {isFlipping && flipDirection === 'next'
-                      ? getPageContent(2 * (spreadIndex + 1))
-                      : isFlipping && flipDirection === 'prev'
-                        ? getPageContent(2 * spreadIndex)
-                        : getPageContent(2 * spreadIndex)}
-                  </div>
-
-                  {/* FLIPPING SHEET */}
-                  {isFlipping && (
-                    <motion.div
-                      key={`${spreadIndex}-${flipDirection}`}
-                      initial={{ rotateY: flipDirection === 'next' ? 0 : -180 }}
-                      animate={{ rotateY: flipDirection === 'next' ? -180 : 0 }}
-                      transition={{ duration: 0.85, ease: [0.645, 0.045, 0.355, 1.0] }}
-                      onAnimationComplete={() => {
-                        setSpreadIndex(prev => flipDirection === 'next' ? prev + 1 : prev - 1);
-                        setIsFlipping(false);
-                      }}
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        bottom: 0,
-                        left: '50%',
-                        width: '50%',
-                        transformStyle: 'preserve-3d',
-                        originX: 0,
-                        zIndex: 25,
-                        willChange: 'transform'
-                      }}
-                    >
-                      {/* Front Face (Facing right initially) */}
-                      <div
-                        style={{
-                          position: 'absolute',
-                          inset: 0,
-                          backfaceVisibility: 'hidden',
-                          transform: 'rotateY(0deg)',
-                          transformStyle: 'preserve-3d'
-                        }}
-                      >
-                        {flipDirection === 'next'
-                          ? getPageContent(2 * spreadIndex)
-                          : getPageContent(2 * (spreadIndex - 1))}
-                        {/* Soft shadow on page when flipping */}
-                        <div className="absolute inset-0 bg-black/5 pointer-events-none" />
-                      </div>
-
-                      {/* Back Face (Facing left initially, rotated 180deg) */}
-                      <div
-                        style={{
-                          position: 'absolute',
-                          inset: 0,
-                          backfaceVisibility: 'hidden',
-                          transform: 'rotateY(180deg)',
-                          transformStyle: 'preserve-3d'
-                        }}
-                      >
-                        {flipDirection === 'next'
-                          ? getPageContent(2 * (spreadIndex + 1) - 1)
-                          : getPageContent(2 * spreadIndex - 1)}
-                        {/* Soft shadow on page when flipping */}
-                        <div className="absolute inset-0 bg-black/5 pointer-events-none" />
-                      </div>
-                    </motion.div>
-                  )}
-                </motion.div>
-              </div>
-
-              {/* Album Controls */}
-              <div className="flex items-center justify-center gap-2 sm:gap-4 mt-12">
-                <button
-                  onClick={flipPrev}
-                  disabled={spreadIndex <= 0}
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-low border border-outline-variant/20 hover:border-primary/50 text-on-surface flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl outline-none disabled:opacity-30 disabled:pointer-events-none"
-                  title="Previous Pages (Left Arrow)"
-                >
-                  <span className="material-symbols-outlined text-lg sm:text-xl">chevron_left</span>
-                </button>
-
-                <button
-                  onClick={() => setIsAlbumAutoplay(!isAlbumAutoplay)}
-                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl outline-none ${isAlbumAutoplay
-                    ? 'bg-primary border-primary text-on-primary'
-                    : 'bg-surface-container-low border-outline-variant/20 hover:border-primary/50 text-on-surface'
-                    }`}
-                  title={isAlbumAutoplay ? 'Pause Slideshow' : 'Play Slideshow'}
-                >
-                  <span className="material-symbols-outlined text-lg sm:text-xl">
-                    {isAlbumAutoplay ? 'pause' : 'play_arrow'}
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setIsAlbumLightboxOpen(true);
-
-                  }}
-                  
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-low border border-outline-variant/20 hover:border-primary/50 text-on-surface flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl outline-none"
-                  title="Fullscreen View"
-                >
-                  <span className="material-symbols-outlined text-lg sm:text-xl">fullscreen</span>
-                </button>
-
-                <button
-                  onClick={() => setShowThumbnails(!showThumbnails)}
-                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl outline-none ${showThumbnails
-                    ? 'bg-primary/20 border-primary text-primary'
-                    : 'bg-surface-container-low border-outline-variant/20 hover:border-primary/50 text-on-surface'
-                    }`}
-                  title="Show All Photos Grid"
-                >
-                  <span className="material-symbols-outlined text-lg sm:text-xl">grid_view</span>
-                </button>
-
-                <button
-                  onClick={flipNext}
-                  disabled={spreadIndex >= 21}
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-low border border-outline-variant/20 hover:border-primary/50 text-on-surface flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl outline-none disabled:opacity-30 disabled:pointer-events-none"
-                  title="Next Pages (Right Arrow)"
-                >
-                  <span className="material-symbols-outlined text-lg sm:text-xl">chevron_right</span>
-                </button>
-              </div>
-
-              {/* Thumbnails Grid Drawer */}
-              <AnimatePresence>
-                {showThumbnails && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="mt-12 border-t border-outline-variant/10 pt-8 overflow-hidden"
+        <section className="mt-20 sm:mt-28 mb-16 border-t border-outline-variant/10 pt-16 max-w-5xl mx-auto overflow-visible">
+              {/* Current Tenure Cards */}
+              <div className="pt-4 pb-6 grid grid-cols-1 md:grid-cols-3 gap-6 px-4 max-w-7xl mx-auto">
+                {defaultEvents.map((event) => (
+                  <div
+                    key={event.id}
+                    onClick={() => {
+                      setActiveTenure("Current");
+                      setModalCategory(event.id);
+                      setIsTenureModalOpen(true);
+                    }}
+                    className="bg-[#1c1c1c] border border-white/5 rounded-2xl overflow-hidden shadow-2xl flex flex-col group cursor-pointer transition-all hover:-translate-y-1 hover:shadow-black/50"
                   >
-                    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 max-h-72 overflow-y-auto p-2 border border-outline-variant/5 bg-surface-container-lowest/50 rounded-xl custom-scrollbar">
-                      {clubMemoriesPhotos.map((photo, idx) => {
-                        const isHighlighted = idx === Math.max(0, Math.min(clubMemoriesPhotos.length - 1, 2 * spreadIndex - 2)) || idx === Math.max(0, Math.min(clubMemoriesPhotos.length - 1, 2 * spreadIndex - 1));
-                        return (
-                          <button
-                            key={idx}
-                            onClick={() => jumpToPhoto(idx)}
-                            className={`aspect-square rounded-lg overflow-hidden border-2 transition-all relative group ${isHighlighted && spreadIndex > 0 && spreadIndex < 21
-                              ? 'border-primary scale-[0.98] shadow-md shadow-primary/20'
-                              : 'border-transparent opacity-60 hover:opacity-100 hover:scale-[1.02]'
-                              }`}
-                          >
-                            <img src={photo} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <span className="text-[11px] text-white font-bold font-mono bg-black/60 px-2 py-0.5 rounded">{idx + 1}</span>
-                            </div>
-                          </button>
-                        );
-                      })}
+                    {/* Image Section */}
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      <img 
+                        src={event.img} 
+                        alt={event.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                      />
+                      {/* Category Tag */}
+                      <div className="absolute top-4 left-4 bg-amber-500/20 border border-amber-500/30 backdrop-blur-md text-amber-400 text-[10px] font-bold px-3 py-1 rounded uppercase tracking-widest shadow-sm">
+                        {event.category}
+                      </div>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+
+                    {/* Content Section */}
+                    <div className="p-6 flex flex-col flex-1">
+                      <h3 className="text-xl font-serif text-white mb-3 font-semibold">{event.title}</h3>
+                      <p className="text-sm text-gray-400 leading-relaxed mb-6 flex-1">
+                        {event.description}
+                      </p>
+
+                      {/* Button */}
+                      <button className="w-full py-3 bg-[#242424] hover:bg-[#2a2a2a] text-gray-300 text-xs font-bold tracking-[0.15em] uppercase rounded-lg flex items-center justify-center gap-2 transition-colors border border-white/10">
+                        <span className="material-symbols-outlined text-[18px]">photo_library</span>
+                        VIEW GALLERY ({event.photoCount})
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+{/* Tenure Strips */}
+              <div className="w-full max-w-4xl mx-auto mt-12 mb-4 flex flex-col gap-4">
+                {["2025-26", "2024-25"].map((tenure) => (
+                  <div key={tenure} className="flex flex-col gap-2">
+                    <button
+                      onClick={() => setOpenStripTenure(openStripTenure === tenure ? null : tenure)}
+                      className="w-full bg-surface-container-low border border-outline-variant/30 text-on-surface py-5 px-8 rounded-2xl shadow-lg hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all flex justify-between items-center group outline-none"
+                    >
+                      <span className="font-serif text-2xl tracking-wide">{tenure}</span>
+                      <motion.span
+                        animate={{ rotate: openStripTenure === tenure ? 180 : 0 }}
+                        className="material-symbols-outlined text-3xl text-primary group-hover:scale-110 transition-transform"
+                      >
+                        expand_more
+                      </motion.span>
+                    </button>
+                    
+                    <AnimatePresence>
+                      {openStripTenure === tenure && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="pt-6 pb-8 grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
+                            {defaultEvents.map((event) => (
+                              <div
+                                key={event.id}
+                                onClick={() => {
+                                  setActiveTenure(tenure);
+                                  setModalCategory(event.id);
+                                  setIsTenureModalOpen(true);
+                                }}
+                                className="bg-[#1c1c1c] border border-white/5 rounded-2xl overflow-hidden shadow-2xl flex flex-col group cursor-pointer transition-all hover:-translate-y-1 hover:shadow-black/50"
+                              >
+                                {/* Image Section */}
+                                <div className="relative aspect-[4/3] overflow-hidden">
+                                  <img 
+                                    src={event.img} 
+                                    alt={event.title}
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                                  />
+                                  {/* Category Tag */}
+                                  <div className="absolute top-4 left-4 bg-amber-500/20 border border-amber-500/30 backdrop-blur-md text-amber-400 text-[10px] font-bold px-3 py-1 rounded uppercase tracking-widest shadow-sm">
+                                    {event.category}
+                                  </div>
+                                </div>
+
+                                {/* Content Section */}
+                                <div className="p-6 flex flex-col flex-1 text-left">
+                                  <h3 className="text-xl font-serif text-white mb-3 font-semibold">{event.title}</h3>
+                                  <p className="text-sm text-gray-400 leading-relaxed mb-6 flex-1">
+                                    {event.description}
+                                  </p>
+
+                                  {/* Button */}
+                                  <button className="w-full py-3 bg-[#242424] hover:bg-[#2a2a2a] text-gray-300 text-xs font-bold tracking-[0.15em] uppercase rounded-lg flex items-center justify-center gap-2 transition-colors border border-white/10">
+                                    <span className="material-symbols-outlined text-[18px]">photo_library</span>
+                                    VIEW GALLERY ({event.photoCount})
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))}
+              </div>
             </section>
-          );
-        })()}
 
         {/* Full-Screen Image Lightbox Modal */}
   <AnimatePresence>
-  {/* We check carouselImages instead of fideRatedPhotos */}
-  {isOpenLightbox && carouselImages.length > 0 && (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 md:p-8 outline-none"
-    >
-      {/* Header Controls */}
-      <div className="flex justify-between items-center w-full max-w-7xl mx-auto h-12">
-        <div className="text-on-surface/75 text-xs md:text-sm font-label uppercase tracking-widest">
-          FIDE Rated Tournament Capture ({lightboxIndex + 1} / {carouselImages.length})
-        </div>
-        <button
-          onClick={() => setIsOpenLightbox(false)}
-          className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary transition-colors text-on-surface hover:text-on-primary flex items-center justify-center outline-none shadow-lg"
-        >
-          <span className="material-symbols-outlined text-xl">close</span>
-        </button>
-      </div>
-
-      {/* Main Photo Area */}
-      <div className="flex-1 flex items-center justify-center relative max-w-7xl mx-auto w-full my-4">
-        {/* Previous Button */}
-        <button
-          onClick={handlePrevPhoto}
-          className="absolute left-2 md:left-4 z-10 w-12 h-12 rounded-full bg-surface-container-low/80 hover:bg-primary text-on-surface hover:text-on-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all outline-none"
-        >
-          <span className="material-symbols-outlined text-2xl">chevron_left</span>
-        </button>
-
-        {/* Active Image */}
-        <div className="relative max-h-[68vh] max-w-[85vw] flex items-center justify-center overflow-hidden rounded-xl shadow-2xl border border-outline-variant/10">
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={lightboxIndex}
-
-              src={carouselImages[lightboxIndex]?.image_url?.startsWith('http') 
-  ? carouselImages[lightboxIndex]?.image_url 
-  : `${API_BASE_URL}${carouselImages[lightboxIndex]?.image_url}`}
-              alt={`FIDE Rated Tournament Photo ${lightboxIndex + 1}`}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.25 }}
-              className="max-h-[68vh] max-w-full object-contain rounded-xl"
-            />
-          </AnimatePresence>
-        </div>
-
-        {/* Next Button */}
-        <button
-          onClick={handleNextPhoto}
-          className="absolute right-2 md:right-4 z-10 w-12 h-12 rounded-full bg-surface-container-low/80 hover:bg-primary text-on-surface hover:text-on-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all outline-none"
-        >
-          <span className="material-symbols-outlined text-2xl">chevron_right</span>
-        </button>
-      </div>
-
-      {/* Thumbnails Footer */}
-      <div className="w-full max-w-7xl mx-auto py-4 overflow-x-auto flex justify-center gap-2 border-t border-outline-variant/10">
-        {carouselImages.map((photo, idx) => (
+    {isOpenLightbox && carouselImages.length > 0 && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4 md:p-8 outline-none"
+      >
+        <div className="flex justify-end w-full max-w-7xl mx-auto h-12 mb-4">
           <button
-            key={photo.id || idx}
-            onClick={() => setLightboxIndex(idx)}
-            className={`w-16 h-12 md:w-20 md:h-14 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all ${idx === lightboxIndex
-              ? 'border-primary scale-105 shadow-md shadow-primary/20'
-              : 'border-transparent opacity-50 hover:opacity-100'
-              }`}
+            onClick={() => setIsOpenLightbox(false)}
+            className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary transition-colors text-on-surface hover:text-on-primary flex items-center justify-center outline-none shadow-lg"
           >
-            {/* Same backend URL setup for the thumbnails */}
-            <img 
-  src={photo.image_url?.startsWith('http') ? photo.image_url : `${API_BASE_URL}${photo.image_url}`} 
-  alt="" 
-  className="w-full h-full object-cover" 
-/>
+            <span className="material-symbols-outlined text-xl">close</span>
           </button>
-        ))}
-      </div>
-    </motion.div>
-  )}
-</AnimatePresence>
+        </div>
+        <div className="w-full flex-1 overflow-auto flex items-center justify-center mt-8">
+          <PhotoBook 
+            photos={carouselImages.map(img => img.image_url?.startsWith('http') ? img.image_url : `${API_BASE_URL}${img.image_url}`)} 
+            title="FIDE Rated Tournament" 
+            subtitle="Captures" 
+          />
+        </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
 
-        {/* Full-Screen Album Lightbox Modal */}
-        <AnimatePresence>
-          {isAlbumLightboxOpen && clubMemoriesPhotos.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 md:p-8 outline-none"
-            >
-             {/* Header Controls */}
-              <div className="flex justify-between items-center w-full max-w-7xl mx-auto h-12">
-                <div className="text-on-surface/75 text-xs md:text-sm font-label uppercase tracking-widest">
-                  Club Memories Capture ({albumLightboxIndex + 1} / {clubMemoriesPhotos.length})
-                </div>
-                
-                {/* Top Right Controls Group */}
-                <div className="flex items-center gap-3 sm:gap-4">
-                  
-                  {/* --- THE ADMIN OVERLAY --- */}
-                  {isAdmin && (
-                    <div className="flex gap-2">
-                      <label className="bg-yellow-500 text-black px-3 py-1.5 sm:px-4 rounded text-[10px] sm:text-xs font-bold cursor-pointer hover:bg-yellow-400 transition-colors shadow-lg flex items-center">
-                        Replace
-                        <input 
-                          type="file" 
-                          className="hidden" 
-                          accept="image/*"
-                          onChange={(e) => handleReplacePhoto(albumLightboxIndex, clubMemoriesPhotos[albumLightboxIndex], e.target.files[0])} 
-                        />
-                      </label>
-                      <button 
-                        onClick={() => handleDeletePhoto(albumLightboxIndex, clubMemoriesPhotos[albumLightboxIndex])}
-                        className="bg-red-600 text-white px-3 py-1.5 sm:px-4 rounded text-[10px] sm:text-xs font-bold hover:bg-red-500 transition-colors shadow-lg outline-none"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Close Button */}
-                  <button
-                    onClick={() => setIsAlbumLightboxOpen(false)}
-                    className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary transition-colors text-on-surface hover:text-on-primary flex items-center justify-center outline-none shadow-lg shrink-0"
-                  >
-                    <span className="material-symbols-outlined text-xl">close</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Main Photo Area */}
-              <div className="flex-1 flex items-center justify-center relative max-w-7xl mx-auto w-full my-4">
-                {/* Previous Button */}
-                <button
-                  onClick={() => setAlbumLightboxIndex(prev => (prev - 1 + clubMemoriesPhotos.length) % clubMemoriesPhotos.length)}
-                  className="absolute left-2 md:left-4 z-10 w-12 h-12 rounded-full bg-surface-container-low/80 hover:bg-primary text-on-surface hover:text-on-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all outline-none"
-                >
-                  <span className="material-symbols-outlined text-2xl">chevron_left</span>
-                </button>
-
-                {/* Active Image */}
-                <div className="relative max-h-[68vh] max-w-[85vw] flex items-center justify-center overflow-hidden rounded-xl shadow-2xl border border-outline-variant/10">
-                  <AnimatePresence mode="wait">
-                    <motion.img
-                      key={albumLightboxIndex}
-                      src={clubMemoriesPhotos[albumLightboxIndex]}
-                      alt={`Club Memories Photo ${albumLightboxIndex + 1}`}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.25 }}
-                      drag="x"
-                      dragConstraints={{ left: 0, right: 0 }}
-                      dragElastic={0.5}
-                      onDragEnd={(e, info) => {
-                        const swipeThreshold = 50;
-                        if (info.offset.x > swipeThreshold) {
-                          setAlbumLightboxIndex(prev => (prev - 1 + clubMemoriesPhotos.length) % clubMemoriesPhotos.length);
-                        } else if (info.offset.x < -swipeThreshold) {
-                          setAlbumLightboxIndex(prev => (prev + 1) % clubMemoriesPhotos.length);
-                        }
-                      }}
-                      className="max-h-[68vh] max-w-full object-contain rounded-xl cursor-grab active:cursor-grabbing"
-                    />
-                  </AnimatePresence>
-                </div>
-
-                {/* Next Button */}
-                <button
-                  onClick={() => setAlbumLightboxIndex(prev => (prev + 1) % clubMemoriesPhotos.length)}
-                  className="absolute right-2 md:right-4 z-10 w-12 h-12 rounded-full bg-surface-container-low/80 hover:bg-primary text-on-surface hover:text-on-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all outline-none"
-                >
-                  <span className="material-symbols-outlined text-2xl">chevron_right</span>
-                </button>
-              </div>
-
-              {/* Thumbnails Footer */}
-              <div className="w-full max-w-7xl mx-auto py-4 overflow-x-auto flex justify-start md:justify-center gap-2 border-t border-outline-variant/10 scrollbar-none">
-                {clubMemoriesPhotos.map((photo, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setAlbumLightboxIndex(idx)}
-                    className={`w-16 h-12 md:w-20 md:h-14 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all ${idx === albumLightboxIndex
-                      ? 'border-primary scale-105 shadow-md shadow-primary/20'
-                      : 'border-transparent opacity-50 hover:opacity-100'
-                      }`}
-                  >
-                    <img src={photo} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+  {/* Tenure Modal */}
+  <AnimatePresence>
+    {isTenureModalOpen && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4 md:p-8 outline-none"
+      >
+        <div className="flex justify-end w-full max-w-7xl mx-auto h-12 mb-4">
+          <button
+            onClick={() => setIsTenureModalOpen(false)}
+            className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary transition-colors text-on-surface hover:text-on-primary flex items-center justify-center outline-none shadow-lg"
+          >
+            <span className="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+        <div className="w-full flex-1 overflow-auto flex flex-col items-center justify-start mt-8 pb-12">
+          <PhotoBook 
+            photos={clubMemoriesPhotos.length > 0 ? clubMemoriesPhotos : ['', '', '', '']} 
+            title={`${activeTenure} Tenure`} 
+            subtitle={`${modalCategory} Album`} 
+          />
+        </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
       </div>
       <Footer />
     </div>
@@ -1106,3 +711,4 @@ const handleDeletePhoto = async (index, photoUrl) => {
 };
 
 export default Gallery;
+
