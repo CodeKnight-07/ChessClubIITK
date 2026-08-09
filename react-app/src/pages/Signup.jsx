@@ -124,8 +124,15 @@ const Signup = () => {
             </span>
           </div>
           <h2 className="text-center text-3xl font-serif font-bold tracking-tight text-on-surface">
-            {step === 1 ? 'Join the ' : 'Dual Verify '}
-            <span className="italic text-primary">Sanctum</span>
+            {step === 1 ? (
+              <>
+                Sign <span className="italic text-primary">Up</span>
+              </>
+            ) : (
+              <>
+                Dual Verify <span className="italic text-primary">Email</span>
+              </>
+            )}
           </h2>
         </div>
 

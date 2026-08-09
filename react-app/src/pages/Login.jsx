@@ -76,10 +76,10 @@ const Login = () => {
             <span className="material-symbols-outlined text-3xl text-primary font-light">lock</span>
           </div>
           <h2 className="text-center text-3xl font-serif font-bold tracking-tight text-on-surface">
-            Enter the <span className="italic text-primary">Sanctum</span>
+            Sign In
           </h2>
           <p className="mt-3 text-center text-sm text-on-surface-variant/80">
-            Log in with your IITK credentials to manage your events, profile, and matches.
+            Log in with your IITK credentials to manage your profile and register for upcoming tournaments
           </p>
         </div>
 
