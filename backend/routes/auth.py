@@ -40,27 +40,51 @@ def send_custom_email(receiver_email, subject, body):
 
 @auth_bp.route('/send-otp', methods=['POST'])
 def generate_otp():
-    data = request.get_json()
-    primary_email = data.get('email')
-    secondary_email = data.get('secondary_email')
+    data = request.get_json() or {}
+    primary_email = (data.get('email') or '').strip()
+    secondary_email = (data.get('secondary_email') or '').strip()
+    chess_username = (data.get('chess_username') or '').strip()
 
     if not primary_email or not primary_email.endswith('@iitk.ac.in'):
         return jsonify({"error": "You must use a valid @iitk.ac.in email address."}), 400
     
-    if not primary_email or not secondary_email:
-        return jsonify({"error": "Both primary and secondary emails are required."}), 400
+    if not secondary_email:
+        return jsonify({"error": "Secondary recovery email is required."}), 400
+
+    if primary_email.lower() == secondary_email.lower():
+        return jsonify({"error": "Secondary email must be different from your primary IITK email."}), 400
+
+    if not chess_username:
+        return jsonify({"error": "Chess.com ID is required before sending verification code."}), 400
+
+    # 1. Validate Chess.com Username existence BEFORE sending OTP
+    headers = {"User-Agent": "ChessClubIITK-Signup-App/1.0 (Contact: chessclub@iitk.ac.in)"}
+    chess_api_url = f"https://api.chess.com/pub/player/{chess_username.lower()}"
+    
+    try:
+        chess_response = requests.get(chess_api_url, headers=headers, timeout=5)
+        if chess_response.status_code == 404:
+            return jsonify({"error": f"Chess.com ID '{chess_username}' does not exist. Please enter a valid Chess.com username."}), 400
+        elif chess_response.status_code != 200:
+            return jsonify({"error": "Could not verify Chess.com ID right now. Please try again."}), 502
+    except requests.exceptions.RequestException:
+        return jsonify({"error": "Failed to connect to Chess.com servers for ID verification."}), 502
 
     primary_otp = str(random.randint(100000, 999999))
-    secondary_otp=str(random.randint(100000, 999999))
+    secondary_otp = str(random.randint(100000, 999999))
 
     connection = None
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:
-            # Check if user already exists
-            cursor.execute("SELECT id FROM users WHERE email = %s", (primary_email,))
-            if cursor.fetchone():
-                return jsonify({"error": "This email is already registered."}), 409
+            # Check if user already exists with email or chess.com id
+            cursor.execute("SELECT id, email, chess_username FROM users WHERE LOWER(email) = LOWER(%s) OR LOWER(chess_username) = LOWER(%s)", (primary_email, chess_username))
+            existing_user = cursor.fetchone()
+            if existing_user:
+                if existing_user[1].lower() == primary_email.lower():
+                    return jsonify({"error": "This IITK email is already registered."}), 409
+                else:
+                    return jsonify({"error": f"Chess.com ID '{chess_username}' is already linked to an existing account."}), 409
 
             # Save/Renew temporary OTP record
             sql = """
@@ -72,12 +96,6 @@ def generate_otp():
             cursor.execute(sql, (secondary_email, secondary_otp))
             connection.commit()
 
-        # print(f"\n--- [DEV TEST TOOL: OTP SECURITY DISPATCH] ---")
-        # print(f"▸ PRIMARY OTP ({primary_email}): {primary_otp}")
-        # print(f"▸ SECONDARY OTP ({secondary_email}): {secondary_otp}")
-        # print(f"-----------------------------------------------\n")
-        # return jsonify({"message": "OTPs sent successfully!"}), 200
-        
         email_body_1 = f"Welcome to the Sanctum!\n\nYour verification code is: {primary_otp}\n\nUse this to complete your registration."
         email_body_2 = f"Welcome to the Sanctum!\n\nYour verification code is: {secondary_otp}\n\nUse this to complete your registration."
         primary_sent = send_custom_email(primary_email, 'Chess Club IITK - Verification Code', email_body_1)

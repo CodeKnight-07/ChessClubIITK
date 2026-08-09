@@ -40,14 +40,21 @@ const Signup = () => {
       return;
     }
 
+    if (!chessUsername.trim()) {
+      setError("Please enter your Chess.com username.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: email,
-          secondary_email: secondaryEmail
-         }),
+          email: email.trim(),
+          secondary_email: secondaryEmail.trim(),
+          chess_username: chessUsername.trim()
+        }),
       });
 
       const data = await response.json();

@@ -327,9 +327,9 @@ const Landing = () => {
           >
             <div className="text-center mb-8 max-w-2xl mx-auto">
               <span className="text-primary font-label text-xs tracking-[0.3em] uppercase">Impact & Heritage</span>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-on-surface mt-1">Club by the Numbers</h2>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-on-surface mt-1">Our Impact</h2>
               <p className="mt-3 text-zinc-400 text-xs sm:text-sm leading-relaxed">
-                Empowering minds, hosting world-class grandmasters, and fostering high-stakes competitive chess across IIT Kanpur.
+                Fostering high-stakes competitive chess and empowering strategic thinkers across IIT Kanpur.
               </p>
             </div>
 
