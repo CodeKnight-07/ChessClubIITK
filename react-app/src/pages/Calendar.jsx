@@ -282,19 +282,18 @@ const Calendar = () => {
 return (
     <>
       <motion.main
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
         className="mx-auto min-h-screen max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10"
       >
         <div className="mb-8 md:mb-10">
           <div className="max-w-3xl">
             <h2 className="text-4xl font-serif leading-tight text-on-surface sm:text-5xl">
-              Mastering the <span className="text-primary">Tides of Time</span>
+Upcoming Events: <span className="text-primary">IITK Chess Club</span>
             </h2>
             <p className="mt-3 text-sm font-light leading-relaxed text-on-surface-variant/80 sm:text-base">
-              View the collective assembly of the IITK Chess Community&apos;s upcoming
-              stratagems, workshops, and championship cycles.
+              Stay up to date with the IITK Chess Community's upcoming tournaments, workshops, and events.
             </p>
           </div>
         </div>
@@ -425,9 +424,7 @@ return (
                             const dayEvents = allEvents.filter((e) => isEventOnDate(e, cell.dateStr));
                             
                             const bgClass = isCurrent
-                              ? isToday 
-                                ? 'bg-primary/5 transition-colors hover:bg-primary/10' 
-                                : 'bg-transparent transition-colors hover:bg-surface-container-high'
+                              ? 'bg-transparent transition-colors hover:bg-surface-container-high'
                               : 'bg-surface-container-lowest opacity-30';
 
                             return (
@@ -438,7 +435,7 @@ return (
                                 <span
                                   className={`flex h-6 w-6 items-center justify-center rounded-full text-xs ${
                                     isToday
-                                      ? 'bg-primary text-black font-bold'
+                                      ? 'bg-primary text-black font-bold shadow-[0_0_12px_rgba(242,202,80,0.8)] ring-1 ring-primary/40'
                                       : dayEvents.length > 0 && isCurrent
                                       ? 'font-bold text-primary'
                                       : 'font-medium text-on-surface/80'

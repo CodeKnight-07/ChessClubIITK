@@ -611,21 +611,12 @@ const Gallery = () => {
   return (
     <div className="px-6 md:px-12 pb-20 max-w-7xl mx-auto min-h-screen text-on-surface">
       <header className="py-16 text-center">
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-primary font-label text-xs tracking-[0.4em] uppercase mb-4"
-        >
+        <p className="text-primary font-label text-xs tracking-[0.4em] uppercase mb-4">
           Visual Archive
-        </motion.p>
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-5xl sm:text-6xl font-serif italic mb-8"
-        >
+        </p>
+        <h1 className="text-5xl sm:text-6xl font-serif italic mb-8">
           The Gallery of <span className="text-primary">Kings</span>
-        </motion.h1>
+        </h1>
       </header>
 
       {/* Category selector filter bar */}
@@ -650,10 +641,10 @@ const Gallery = () => {
         {showSpotlight && fideTournament && (
           <motion.div
             key="spotlight"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
             className="mb-20 bg-surface-container-low rounded-2xl overflow-hidden border border-outline-variant/10 hover:border-primary/20 hover:shadow-lg transition-all shadow-2xl max-w-5xl mx-auto group"
           >
             <div className="flex flex-col lg:flex-row">
@@ -751,9 +742,9 @@ const Gallery = () => {
       <AnimatePresence mode="wait">
         {(activeCategory === 'All' || activeCategory === 'Socials') && (
           <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="mb-24 max-w-5xl mx-auto"
           >
             <div className="text-center md:text-left mb-10">
@@ -767,12 +758,8 @@ const Gallery = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {CURRENT_YEAR_EVENTS.map((event) => (
-                <motion.div
+                <div
                   key={event.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5 }}
                   className="bg-surface-container-low rounded-2xl overflow-hidden border border-outline-variant/10 hover:border-primary/20 hover:shadow-[0_12px_40px_rgba(242,202,80,0.08)] transition-all duration-300 flex flex-col justify-between group relative shadow-lg"
                 >
                   <div className="relative aspect-[16/11] overflow-hidden">
@@ -808,7 +795,7 @@ const Gallery = () => {
                       <span>View event archive</span>
                     </button>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </motion.section>
@@ -829,12 +816,8 @@ const Gallery = () => {
         {filteredGridEvents.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {filteredGridEvents.map((event) => (
-              <motion.div
+              <div
                 key={event.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
                 className="bg-surface-container-low rounded-2xl overflow-hidden border border-outline-variant/10 hover:border-primary/20 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative shadow-lg"
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
@@ -867,7 +850,7 @@ const Gallery = () => {
                     <span>View Gallery ({event.photos ? event.photos.length : 0})</span>
                   </button>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         ) : (
@@ -881,9 +864,9 @@ const Gallery = () => {
       <AnimatePresence mode="wait">
         {(activeCategory === 'All' || activeCategory === 'Socials') && (
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="relative w-full border-t border-outline-variant/10 pt-20"
             ref={containerRef}
           >

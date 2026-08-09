@@ -426,12 +426,9 @@ const Events = () => {
     const eventEndDate = event.endDate ? new Date(event.endDate) : null;
     
     return (
-      <motion.div 
+      <div 
         key={event.id}
         id={event.id}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
         className={`bg-[#1a1a1a] border rounded-xl overflow-hidden transition-all duration-700 ${
           highlightedId === event.id
             ? 'border-yellow-400 shadow-[0_0_35px_rgba(242,202,80,0.3)] scale-[1.01]'
@@ -568,7 +565,7 @@ const Events = () => {
             )}
           </motion.div>
         )}
-      </motion.div>
+      </div>
     );
   };
 
@@ -584,7 +581,7 @@ const Events = () => {
             </h1>
             <p className="text-gray-400 text-lg">
               The curated schedule of major club events, workshops, and tournaments. 
-              For your personal match schedule, please consult the Calendar.
+              
             </p>
           </div>
 

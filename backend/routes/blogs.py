@@ -24,6 +24,7 @@ def create_blog():
     # Read the text box values typed by the writer
     author_name = data.get('author_name', 'Chess Club Team')
     author_position = data.get('author_position', 'Coordinator, Chess Club IITK')
+    created_at = data.get('created_at') # Optional date (None / ISO string)
 
     if not all([email, title, content]):
         return jsonify({"error": "Missing required fields (email, title, content)."}), 400
@@ -36,10 +37,10 @@ def create_blog():
                 return jsonify({"error": "Access Denied: Admin privileges required."}), 403
 
             sql = """
-                INSERT INTO blogs (title, subtitle, content, cover_image, author_email, author_name, author_position)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO blogs (title, subtitle, content, cover_image, author_email, author_name, author_position, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """
-            cursor.execute(sql, (title, subtitle, content, cover_image, email, author_name, author_position))
+            cursor.execute(sql, (title, subtitle, content, cover_image, email, author_name, author_position, created_at))
             connection.commit()
             return jsonify({"message": "Blog post published successfully!"}), 201
     except Exception as e:
@@ -64,13 +65,41 @@ def get_all_blogs():
                     COALESCE(author_name, 'Chess Club Team') AS author_name,
                     COALESCE(author_position, 'Coordinator, Chess Club IITK') AS author_position
                 FROM blogs
-                ORDER BY created_at DESC
+                ORDER BY created_at DESC NULLS LAST, id DESC
             """
             cursor.execute(sql)
             blogs = cursor.fetchall()
             return jsonify(blogs), 200
     except Exception as e:
         print(f"Fetch Blogs Error: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+    finally:
+        if connection:
+            connection.close()
+
+
+# --- READ ONE: Fetch Single Blog by ID (Public) ---
+@blogs_bp.route('/blogs/<int:blog_id>', methods=['GET'])
+def get_single_blog(blog_id):
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor(row_factory=dict_row) as cursor:
+            sql = """
+                SELECT 
+                    id, title, subtitle, content, cover_image, author_email, created_at,
+                    COALESCE(author_name, 'Chess Club Team') AS author_name,
+                    COALESCE(author_position, 'Coordinator, Chess Club IITK') AS author_position
+                FROM blogs
+                WHERE id = %s
+            """
+            cursor.execute(sql, (blog_id,))
+            blog = cursor.fetchone()
+            if not blog:
+                return jsonify({"error": "Blog post not found"}), 404
+            return jsonify(blog), 200
+    except Exception as e:
+        print(f"Fetch Single Blog Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
         if connection:
@@ -126,7 +155,7 @@ def update_blog(blog_id):
             if not verify_admin_privileges(cursor, email):
                 return jsonify({"error": "Access Denied: Admin privileges required."}), 403
 
-            if created_at:
+            if 'created_at' in data:
                 sql = """
                     UPDATE blogs 
                     SET title = %s, subtitle = %s, content = %s, cover_image = %s, author_name = %s, author_position = %s, created_at = %s
