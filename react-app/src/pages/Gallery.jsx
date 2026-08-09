@@ -609,7 +609,8 @@ const Gallery = () => {
   );
 
   return (
-    <div className="px-6 md:px-12 pb-20 max-w-7xl mx-auto min-h-screen text-on-surface">
+    <>
+      <div className="px-6 md:px-12 pb-20 max-w-7xl mx-auto min-h-screen text-on-surface">
       <header className="py-16 text-center">
         <p className="text-primary font-label text-xs tracking-[0.4em] uppercase mb-4">
           Visual Archive
@@ -1119,14 +1120,11 @@ const Gallery = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
 
-      {/* Footer Decoration */}
-      <footer className="mt-32 pt-16 border-t border-outline-variant/5 text-center">
-        <p className="text-[10px] font-label uppercase tracking-[0.5em] text-on-surface-variant/30">
-          Capturing the soul of the move since 2007
-        </p>
-      </footer>
-    </div>
+      {/* Global Footer */}
+      <Footer />
+    </>
   );
 };
 
