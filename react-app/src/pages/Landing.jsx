@@ -339,7 +339,7 @@ const Landing = () => {
                   icon: "groups",
                   value: "800+",
                   label: "Community",
-                  desc: "Active campus members, rated contenders, and grandmaster enthusiasts."
+                  desc: "Students, contenders, and enthusiasts."
                 },
                 {
                   icon: "emoji_events",

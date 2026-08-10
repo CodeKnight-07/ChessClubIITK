@@ -144,48 +144,39 @@ const PreviousTeams = () => {
 
             {/* Right Column: Team Members Sections */}
             <div className="w-full md:w-3/4">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeTeam}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                  className="space-y-12"
-                >
-                  {/* Coordinators Section */}
+              <div key={activeTeam} className="space-y-12">
+                {/* Coordinators Section */}
+                <div>
+                  <div className="mb-6 border-b border-outline-variant/20 pb-4">
+                    <h3 className="text-3xl sm:text-4xl font-serif font-bold text-on-surface">
+                      Coordinators
+                    </h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+                    {TEAMS_DATA[activeTeam].map((person, idx) => (
+                      <MemberCard key={`coord-${activeTeam}-${idx}`} person={person} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Secretaries Section (for 25-26 or any team with secretaries) */}
+                {SECRETARIES_DATA[activeTeam] && SECRETARIES_DATA[activeTeam].length > 0 && (
                   <div>
                     <div className="mb-6 border-b border-outline-variant/20 pb-4">
                       <h3 className="text-3xl sm:text-4xl font-serif font-bold text-on-surface">
-                        Coordinators
+                        Secretaries
                       </h3>
                     </div>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-                      {TEAMS_DATA[activeTeam].map((person, idx) => (
-                        <MemberCard key={`coord-${activeTeam}-${idx}`} person={person} />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {SECRETARIES_DATA[activeTeam].map((person, idx) => (
+                        <MemberCard key={`sec-${activeTeam}-${idx}`} person={person} />
                       ))}
                     </div>
                   </div>
-
-                  {/* Secretaries Section (for 25-26 or any team with secretaries) */}
-                  {SECRETARIES_DATA[activeTeam] && SECRETARIES_DATA[activeTeam].length > 0 && (
-                    <div>
-                      <div className="mb-6 border-b border-outline-variant/20 pb-4">
-                        <h3 className="text-3xl sm:text-4xl font-serif font-bold text-on-surface">
-                          Secretaries
-                        </h3>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {SECRETARIES_DATA[activeTeam].map((person, idx) => (
-                          <MemberCard key={`sec-${activeTeam}-${idx}`} person={person} />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-              </AnimatePresence>
+                )}
+              </div>
             </div>
           </div>
         </section>
