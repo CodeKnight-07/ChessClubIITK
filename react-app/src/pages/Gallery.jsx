@@ -749,11 +749,8 @@ const Gallery = () => {
             className="mb-24 max-w-5xl mx-auto"
           >
             <div className="text-center md:text-left mb-10">
-              <p className="text-primary font-label text-xs tracking-[0.3em] uppercase mb-2">
-                Active Season
-              </p>
               <h2 className="text-4xl font-serif text-on-surface">
-                This year events
+                Active Season
               </h2>
             </div>
 
