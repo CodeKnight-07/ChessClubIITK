@@ -275,7 +275,7 @@ import gs10 from '../Gallery/grand swiss/10.jpg';
 import gs11 from '../Gallery/grand swiss/11.jpg';
 
 const FCL_PHOTOS = [fcl1, fcl2, fcl3, fcl4, fcl5, fcl6, fcl7, fcl9, fcl10, fcl11, fcl12, fcl13];
-const GRAND_SWISS_PHOTOS = [gs1, gs2, gs3, gs4, gs5, gs6, gs7, gs8, gs9, gs10, gs11];
+const IITK_GRAND_SWISS_PHOTOS = [gs1, gs2, gs3, gs4, gs5, gs6, gs7, gs8, gs9, gs10, gs11];
 
 const PREVIOUS_YEARS = ['25-26'];
 const PREVIOUS_YEARS_DATA = {
@@ -293,8 +293,8 @@ const PREVIOUS_YEARS_DATA = {
       category: "TOURNAMENTS",
       title: "IITK Grand Swiss",
       description: "The grandest chess tournament of the year.",
-      photos: GRAND_SWISS_PHOTOS,
-      image: GRAND_SWISS_PHOTOS[0]
+      photos: IITK_GRAND_SWISS_PHOTOS,
+      image: IITK_GRAND_SWISS_PHOTOS[0]
     }
   ]
 };
