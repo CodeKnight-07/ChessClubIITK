@@ -1,33 +1,61 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-import { OFFICIAL_EVENTS } from './Events';
+import { OFFICIAL_EVENTS } from '../constants/events';
+import { API_BASE_URL } from '../config';
 
 const EventRegistration = () => {
   const { id } = useParams();
-  const event = OFFICIAL_EVENTS.find(e => e.id === parseInt(id, 10));
-
+  const [event, setEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({ name: '', rollNo: '', phone: '', email: '', remarks: '' });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Fallback if event is completely invalid
-  if (!event) {
-    return (
-      <div className="px-12 py-20 max-w-3xl mx-auto text-center min-h-screen">
-        <h2 className="text-3xl font-serif text-on-surface mb-4">Event Not Found</h2>
-        <Link to="/events" className="text-primary hover:underline font-label uppercase tracking-widest text-xs">Return to Directory</Link>
-      </div>
-    );
-  }
+  useEffect(() => {
+    let found = OFFICIAL_EVENTS.find(e => String(e.id) === String(id));
+    if (found) {
+      setEvent(found);
+      setLoading(false);
+      return;
+    }
+    
+    const fetchEvent = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/events`);
+        if (response.ok) {
+          const dbEvents = await response.json();
+          const cleanId = String(id).replace('db-', '');
+          const dbFound = dbEvents.find(e => String(e.id) === cleanId);
+          if (dbFound) {
+            setEvent({
+              id: `db-${dbFound.id}`,
+              title: dbFound.title,
+              date: dbFound.event_date,
+              endDate: dbFound.event_end_date,
+              tag: dbFound.event_type,
+              time: dbFound.event_time,
+              location: dbFound.location,
+              format: dbFound.format,
+              shortDesc: dbFound.short_description,
+              fullDesc: dbFound.event_briefing
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching event for registration:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvent();
+  }, [id]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Save to localStorage
     const savedParticipations = JSON.parse(localStorage.getItem('chess-club-participations') || '[]');
-    // Check if already registered for this event (optional, but good practice)
     if (!savedParticipations.find(p => p.eventId === event.id)) {
       const newParticipation = {
         id: `rsvp_${Date.now()}`,
@@ -42,7 +70,6 @@ const EventRegistration = () => {
       localStorage.setItem('chess-club-participations', JSON.stringify(savedParticipations));
     }
 
-    // Simulate API network delay to make it feel premium/real
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
@@ -54,6 +81,23 @@ const EventRegistration = () => {
       });
     }, 800);
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20 min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className="px-12 py-20 max-w-3xl mx-auto text-center min-h-screen">
+        <h2 className="text-3xl font-serif text-on-surface mb-4">Event Not Found</h2>
+        <Link to="/events" className="text-primary hover:underline font-label uppercase tracking-widest text-xs">Return to Directory</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="px-6 md:px-12 py-12 max-w-4xl mx-auto min-h-screen flex flex-col">

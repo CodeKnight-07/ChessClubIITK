@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -18,7 +19,33 @@ h1, h2, h3, h4, h5, h6, .font-serif { font-family: 'Newsreader', serif; }
 .ghost-border { border: 1px solid rgba(77, 70, 53, 0.15); }
 .primary-gradient { background: linear-gradient(135deg, #f2ca50 0%, #d4af37 100%); }
 
-.blog-content p { margin-bottom: 1.5rem; line-height: 1.8; color: #d0c5af; }
-.blog-content h3 { font-family: 'Newsreader', serif; font-size: 2rem; margin-top: 3rem; margin-bottom: 1rem; color: #e5e2e1; font-weight: bold; }
-.blog-content blockquote { border-left: 4px solid #f2ca50; padding-left: 1.5rem; margin: 2rem 0; font-family: 'Newsreader', serif; font-style: normal; font-size: 1.5rem; color: #f2ca50; }
+.blog-content p { 
+  margin-bottom: 1.75rem; 
+  line-height: 1.85; 
+  color: #d0c5af; 
+}
+.blog-content p:last-child {
+  margin-bottom: 0;
+}
+.blog-content h2, .blog-content h3 { 
+  font-family: 'Newsreader', serif; 
+  margin-top: 2.75rem; 
+  margin-bottom: 1.25rem; 
+  color: #e5e2e1; 
+  font-weight: bold; 
+}
+.blog-content blockquote { 
+  border-left: 4px solid #f2ca50; 
+  padding-left: 1.5rem; 
+  margin: 2rem 0; 
+  font-family: 'Newsreader', serif; 
+  font-style: normal; 
+  font-size: 1.5rem; 
+  color: #f2ca50; 
+}
+
+.font-handwritten {
+  font-family: 'Caveat', cursive;
+}
+
 

@@ -4,7 +4,8 @@ import smtplib
 from email.mime.text import MIMEText
 from flask import Blueprint, request, jsonify
 import bcrypt
-import pymysql
+import psycopg
+from psycopg.rows import dict_row
 import requests
 from config.db import get_db_connection
 from google.cloud import storage
@@ -39,44 +40,62 @@ def send_custom_email(receiver_email, subject, body):
 
 @auth_bp.route('/send-otp', methods=['POST'])
 def generate_otp():
-    data = request.get_json()
-    primary_email = data.get('email')
-    secondary_email = data.get('secondary_email')
+    data = request.get_json() or {}
+    primary_email = (data.get('email') or '').strip()
+    secondary_email = (data.get('secondary_email') or '').strip()
+    chess_username = (data.get('chess_username') or '').strip()
 
     if not primary_email or not primary_email.endswith('@iitk.ac.in'):
         return jsonify({"error": "You must use a valid @iitk.ac.in email address."}), 400
     
-    if not primary_email or not secondary_email:
-        return jsonify({"error": "Both primary and secondary emails are required."}), 400
+    if not secondary_email:
+        return jsonify({"error": "Secondary recovery email is required."}), 400
+
+    if primary_email.lower() == secondary_email.lower():
+        return jsonify({"error": "Secondary email must be different from your primary IITK email."}), 400
+
+    if not chess_username:
+        return jsonify({"error": "Chess.com ID is required before sending verification code."}), 400
+
+    # 1. Validate Chess.com Username existence BEFORE sending OTP
+    headers = {"User-Agent": "ChessClubIITK-Signup-App/1.0 (Contact: chessclub@iitk.ac.in)"}
+    chess_api_url = f"https://api.chess.com/pub/player/{chess_username.lower()}"
+    
+    try:
+        chess_response = requests.get(chess_api_url, headers=headers, timeout=5)
+        if chess_response.status_code == 404:
+            return jsonify({"error": f"Chess.com ID '{chess_username}' does not exist. Please enter a valid Chess.com username."}), 400
+        elif chess_response.status_code != 200:
+            return jsonify({"error": "Could not verify Chess.com ID right now. Please try again."}), 502
+    except requests.exceptions.RequestException:
+        return jsonify({"error": "Failed to connect to Chess.com servers for ID verification."}), 502
 
     primary_otp = str(random.randint(100000, 999999))
-    secondary_otp=str(random.randint(100000, 999999))
+    secondary_otp = str(random.randint(100000, 999999))
 
     connection = None
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:
-            # Check if user already exists
-            cursor.execute("SELECT id FROM users WHERE email = %s", (primary_email,))
-            if cursor.fetchone():
-                return jsonify({"error": "This email is already registered."}), 409
+            # Check if user already exists with email or chess.com id
+            cursor.execute("SELECT id, email, chess_username FROM users WHERE LOWER(email) = LOWER(%s) OR LOWER(chess_username) = LOWER(%s)", (primary_email, chess_username))
+            existing_user = cursor.fetchone()
+            if existing_user:
+                if existing_user[1].lower() == primary_email.lower():
+                    return jsonify({"error": "This IITK email is already registered."}), 409
+                else:
+                    return jsonify({"error": f"Chess.com ID '{chess_username}' is already linked to an existing account."}), 409
 
             # Save/Renew temporary OTP record
             sql = """
                 INSERT INTO pending_otps (email, otp) 
                 VALUES (%s, %s) 
-                ON DUPLICATE KEY UPDATE otp = VALUES(otp), created_at = CURRENT_TIMESTAMP
+                ON CONFLICT (email) DO UPDATE SET otp = EXCLUDED.otp, created_at = CURRENT_TIMESTAMP
             """
             cursor.execute(sql, (primary_email, primary_otp))
             cursor.execute(sql, (secondary_email, secondary_otp))
             connection.commit()
 
-        # print(f"\n--- [DEV TEST TOOL: OTP SECURITY DISPATCH] ---")
-        # print(f"▸ PRIMARY OTP ({primary_email}): {primary_otp}")
-        # print(f"▸ SECONDARY OTP ({secondary_email}): {secondary_otp}")
-        # print(f"-----------------------------------------------\n")
-        # return jsonify({"message": "OTPs sent successfully!"}), 200
-        
         email_body_1 = f"Welcome to the Sanctum!\n\nYour verification code is: {primary_otp}\n\nUse this to complete your registration."
         email_body_2 = f"Welcome to the Sanctum!\n\nYour verification code is: {secondary_otp}\n\nUse this to complete your registration."
         primary_sent = send_custom_email(primary_email, 'Chess Club IITK - Verification Code', email_body_1)
@@ -90,7 +109,7 @@ def generate_otp():
         print(f"OTP Generation Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 
@@ -159,7 +178,7 @@ def verify_and_register():
         print(f"Registration Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 
@@ -189,7 +208,7 @@ def forgot_password():
             otp = str(random.randint(100000, 999999))
             sql = """
                 INSERT INTO pending_otps (email, otp) VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE otp = VALUES(otp), created_at = CURRENT_TIMESTAMP
+                ON CONFLICT (email) DO UPDATE SET otp = EXCLUDED.otp, created_at = CURRENT_TIMESTAMP
             """
             cursor.execute(sql, (email, otp))
             connection.commit()
@@ -205,7 +224,7 @@ def forgot_password():
         print(f"Forgot Password Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 
@@ -245,7 +264,7 @@ def reset_password():
         print(f"Reset Password Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 @auth_bp.route('/user/profile/<email>', methods=['GET'])
@@ -260,7 +279,7 @@ def get_user_profile(email):
     connection = None
     try:
         connection = get_db_connection()
-        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+        with connection.cursor(row_factory=dict_row) as cursor:
             sql = "SELECT name, roll_no AS rollNo, contact, email, chess_username AS chesscom, avatar, secondary_email FROM users WHERE email = %s"
             cursor.execute(sql, (email,))
             profile = cursor.fetchone()
@@ -274,7 +293,7 @@ def get_user_profile(email):
         print(f"Profile Retrieval Failure: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 
@@ -316,7 +335,7 @@ def update_user_profile():
         print(f"Profile Update Failure: {e}")
         return jsonify({"error": "Internal server error."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
             connection.close()
 
 # --- DELETE REQUEST ---
@@ -364,5 +383,67 @@ def delete_user_account():
         print(f"Critical Account Deletion Error: {e}")
         return jsonify({"error": "Internal server error during account erasure."}), 500
     finally:
-        if connection and connection.open:
+        if connection:
+            connection.close()
+
+# --- LEAGUE OF LEGENDS 6.0 EVENT REGISTRATION ---
+
+@auth_bp.route('/register-lol', methods=['POST'])
+@jwt_required()
+def register_lol():
+    data = request.get_json()
+    email = data.get('email')
+    name = data.get('name')
+    roll_no = data.get('roll_no')
+    chess_username = data.get('chess_username')
+    contact = data.get('contact')
+    secondary_email = data.get('secondary_email')
+
+    if not all([email, name, roll_no, chess_username, contact]):
+        return jsonify({"error": "All fields are required."}), 400
+
+    current_user_email = get_jwt_identity()
+    if current_user_email != email:
+        return jsonify({"error": "Unauthorized registration identity mismatch."}), 403
+
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            # Check if user is already registered
+            cursor.execute('SELECT id FROM "lolEntries" WHERE email = %s', (email,))
+            if cursor.fetchone():
+                return jsonify({"error": "You are already registered for this event."}), 409
+
+            # Insert registration record
+            cursor.execute(
+                'INSERT INTO "lolEntries" (email, name, roll_no, chess_username, contact, secondary_email) VALUES (%s, %s, %s, %s, %s, %s)',
+                (email, name, roll_no, chess_username, contact, secondary_email or '')
+            )
+            connection.commit()
+            return jsonify({"message": "Successfully registered for League of Legends 6.0!"}), 201
+
+    except Exception as e:
+        print(f"LoL Registration Error: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+    finally:
+        if connection:
+            connection.close()
+
+@auth_bp.route('/register-lol/status', methods=['GET'])
+@jwt_required()
+def register_lol_status():
+    email = get_jwt_identity()
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT id FROM "lolEntries" WHERE email = %s', (email,))
+            is_registered = cursor.fetchone() is not None
+            return jsonify({"is_registered": is_registered}), 200
+    except Exception as e:
+        print(f"LoL Registration Status Error: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+    finally:
+        if connection:
             connection.close()

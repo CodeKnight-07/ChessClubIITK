@@ -1,6 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import profileImg from '../assets/profile_image.webp';
+import ineshImg from "../assets/coordinators/inesh.jpeg";
+import lakshImg from "../assets/coordinators/laksh.jpeg";
+import rishiImg from "../assets/coordinators/rishi.jpeg";
+import rudraImg from "../assets/coordinators/rudra.jpeg";
+import shauryaImg from "../assets/coordinators/shaurya.jpeg";
 import aarushWaghImg from "../assets/secretaries/aarush_wagh.jpg";
 import adityaImg from "../assets/secretaries/aditya.jpg";
 import akshatImg from "../assets/secretaries/akshat.jpeg";
@@ -32,41 +37,45 @@ const COORDINATORS = [
     id: 'coord-0',
     name: "Inesh Aggarwal",
     role: "Coordinator",
-    funnyDescription: `"Placeholder funny quote or description goes here. Maybe they like cats or play e4 exclusively?"`,
-    email: `ineshag24@iitk.ac.in`,
-    image: profileImg
+    funnyDescription: `"I wake up and eat parathas with samosational level of enthusiasm"`,
+    email: "ineshag24@iitk.ac.in",
+    image: ineshImg
+
   },
   {
     id: 'coord-1',
     name: "Laksh Dhir",
     role: "Coordinator",
-    funnyDescription: `"Placeholder funny quote or description goes here. Maybe they like cats or play e4 exclusively?"`,
-    email: `laksh24@iitk.ac.in`,
-    image: profileImg
+    funnyDescription: `"If you find a bottle or ID card at random places on campus, there’s a decent chance it’s mine.."`,
+    email: "laksh24@iitk.ac.in",
+    image: lakshImg
   },
   {
     id: 'coord-2',
     name: "Rishi Gupta",
     role: "Coordinator",
-    funnyDescription: `"Placeholder funny quote or description goes here. Maybe they like cats or play e4 exclusively?"`,
-    email: `rishi24@iitk.ac.in`,
-    image: profileImg
+     funnyDescription: `"Achievement:
+ Got a 1-month Diamond membership on Samay’s stream after Guki became the World Champ!
+"`,
+    email: "rishig24@iitk.ac.in",
+    image: rishiImg
   },
   {
     id: 'coord-3',
     name: "Rudra Dwivedi",
     role: "Coordinator",
-    funnyDescription: `"Placeholder funny quote or description goes here. Maybe they like cats or play e4 exclusively?"`,
-    email: `rudra24@iitk.ac.in`,
-    image: profileImg
+    funnyDescription: `"I look strict to juniors. Then I start talking...
+It gets worse."`,
+    email: "rudrad24@iitk.ac.in",
+    image: rudraImg
   },
   {
     id: 'coord-4',
     name: "Shaurya Vats",
     role: "Coordinator",
-    funnyDescription: `"Placeholder funny quote or description goes here. Maybe they like cats or play e4 exclusively?"`,
-    email: `shaurya24@iitk.ac.in`,
-    image: profileImg
+    funnyDescription: `"Running on chewing gum and the annual 'this is DC's year' agenda."`,
+    email: `shauryav24@iitk.ac.in`,
+    image: shauryaImg
   }
 ];
 
@@ -267,7 +276,7 @@ const SECRETARIES = [
 ];
 const ContactCard = ({ person }) => (
   <div
-    className="group relative bg-surface-container-low rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_20px_40px_rgba(242,202,80,0.15)] transition-all duration-500 hover:-translate-y-2 flex flex-col h-full border border-outline-variant/5 hover:border-primary/30 cursor-pointer"
+    className="group relative bg-surface-container-low rounded-2xl overflow-hidden shadow-lg hover:shadow-[0_20px_40px_rgba(242,202,80,0.15)] transition-all duration-500 flex flex-col h-full border border-outline-variant/5 hover:border-primary/30 cursor-pointer"
   >
     <div className="relative h-72 overflow-hidden flex-shrink-0">
       <img
@@ -277,13 +286,11 @@ const ContactCard = ({ person }) => (
       />
       <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent transition-opacity duration-500 opacity-90 group-hover:opacity-60"></div>
 
-      <div className="absolute top-4 left-4 z-20">
-        <span className="bg-surface-container-highest/80 backdrop-blur-md border border-outline-variant/20 px-3 py-1 text-[9px] font-bold tracking-[0.2em] uppercase text-on-surface rounded-full shadow-lg transition-colors group-hover:bg-primary group-hover:text-on-primary group-hover:border-primary">{person.role}</span>
-      </div>
-
       <div className="absolute bottom-0 left-0 w-full p-6 translate-y-6 group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
         <h5 className="text-2xl font-serif font-bold text-on-surface mb-1 drop-shadow-md group-hover:text-primary transition-colors duration-300">{person.name}</h5>
-        <a href={`mailto:${person.email}`} className="text-[11px] font-mono text-primary hover:text-primary/70 transition-colors tracking-wider block opacity-0 group-hover:opacity-100 duration-500 delay-100 ease-out">{person.email}</a>
+        {person.email && (
+          <a href={`mailto:${person.email}`} className="text-[11px] font-mono text-primary hover:text-primary/70 transition-colors tracking-wider block opacity-0 group-hover:opacity-100 duration-500 delay-100 ease-out">{person.email}</a>
+        )}
       </div>
     </div>
 

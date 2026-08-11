@@ -2,36 +2,84 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { OFFICIAL_EVENTS } from '../pages/Events';
+import { globalCache } from '../utils/cache';
 import Navbar from '../components/Navbar';
 import ScrollToTopButton from '../components/ScrollToTopButton';
+import { API_BASE_URL } from '../config';
 
 const MainLayout = ({ children }) => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, token } = useAuth();
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRegisteredForLol, setIsRegisteredForLol] = useState(false);
+  const [nextEvent, setNextEvent] = useState(null);
 
-  // Helper to find the next upcoming event relative to local time
-  const getNextEvent = () => {
-    const now = new Date();
-    // Zero out time for date comparison
-    const nowTime = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  useEffect(() => {
+    const fetchNextEvent = async () => {
+      let data = globalCache.events;
+      if (!data) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/events`);
+          if (res.ok) {
+            data = await res.json();
+            globalCache.events = data;
+          }
+        } catch (e) {}
+      }
+      if (data && Array.isArray(data)) {
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        
+        const upcoming = data.map(evt => ({
+          id: evt.id,
+          title: evt.title,
+          date: evt.event_date,
+          endDate: evt.event_end_date,
+          tag: evt.event_type,
+          shortDesc: evt.short_description,
+          fullDesc: evt.event_briefing,
+          location: evt.location,
+          time: evt.event_time,
+          format: evt.format
+        })).filter(evt => {
+          const compareDate = new Date(evt.endDate || evt.date);
+          compareDate.setHours(0,0,0,0);
+          return compareDate >= today;
+        });
+        
+        if (upcoming.length > 0) {
+          upcoming.sort((a, b) => new Date(a.date) - new Date(b.date));
+          setNextEvent(upcoming[0]);
+        }
+      }
+    };
+    fetchNextEvent();
+  }, []);
 
-    const futureEvents = OFFICIAL_EVENTS.filter(event => {
-      const eventDate = new Date(event.date);
-      const eventTime = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate()).getTime();
-      return eventTime >= nowTime;
-    });
+  const isLolEvent = nextEvent?.title?.toLowerCase().includes("league of legends");
 
-    if (futureEvents.length === 0) return null;
-
-    // Sort ascending by date
-    futureEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    return futureEvents[0];
-  };
-
-  const nextEvent = getNextEvent();
+  useEffect(() => {
+    if (isLoggedIn && token && nextEvent && isLolEvent) {
+      const checkLolStatus = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/register-lol/status`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setIsRegisteredForLol(data.is_registered);
+          }
+        } catch (e) {
+          console.error("Error checking lol registration status in layout:", e);
+        }
+      };
+      checkLolStatus();
+    } else {
+      setIsRegisteredForLol(false);
+    }
+  }, [isLoggedIn, token, nextEvent, isLolEvent]);
 
   useEffect(() => {
     const handleOpenModal = () => setIsModalOpen(true);
@@ -243,13 +291,23 @@ const MainLayout = ({ children }) => {
                   Close
                 </button>
                 {isLoggedIn ? (
-                  <Link
-                    to={`/events/register/${nextEvent.id}`}
-                    onClick={() => setIsModalOpen(false)}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#f2ca50] to-[#d4af37] text-xs font-bold uppercase tracking-wider text-[#3c2f00] shadow-lg transition-transform hover:scale-[1.02]"
-                  >
-                    Register Now
-                  </Link>
+                  isRegisteredForLol && isLolEvent ? (
+                    <button
+                      disabled
+                      className="px-6 py-2.5 rounded-xl bg-gray-800 text-gray-500 text-xs font-bold uppercase tracking-wider border border-gray-700 cursor-not-allowed"
+                    >
+                      REGISTERED ✓
+                    </button>
+                  ) : (
+                    <Link
+                      to={isLolEvent ? "/events" : `/events/register/${nextEvent.id}`}
+                      state={isLolEvent ? { openRegisterLol: true } : undefined}
+                      onClick={() => setIsModalOpen(false)}
+                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#f2ca50] to-[#d4af37] text-xs font-bold uppercase tracking-wider text-[#3c2f00] shadow-lg transition-transform hover:scale-[1.02]"
+                    >
+                      Register Now
+                    </Link>
+                  )
                 ) : (
                   <Link
                     to="/login"
