@@ -48,7 +48,9 @@ const COORDINATORS = [
     role: "Coordinator",
     funnyDescription: `"If you find a bottle or ID card at random places on campus, there’s a decent chance it’s mine.."`,
     email: "laksh24@iitk.ac.in",
-    image: lakshImg
+    image: lakshImg,
+    instagram: "https://www.instagram.com/laksh_dhir30",
+    linkedin: "https://www.linkedin.com/in/laksh-dhir-1374b5321"
   },
   {
     id: 'coord-2',
@@ -288,9 +290,6 @@ const ContactCard = ({ person }) => (
 
       <div className="absolute bottom-0 left-0 w-full p-6 translate-y-6 group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
         <h5 className="text-2xl font-serif font-bold text-on-surface mb-1 drop-shadow-md group-hover:text-primary transition-colors duration-300">{person.name}</h5>
-        {person.email && (
-          <a href={`mailto:${person.email}`} className="text-[11px] font-mono text-primary hover:text-primary/70 transition-colors tracking-wider block opacity-0 group-hover:opacity-100 duration-500 delay-100 ease-out">{person.email}</a>
-        )}
       </div>
     </div>
 
@@ -300,6 +299,55 @@ const ContactCard = ({ person }) => (
       <p className="text-sm text-on-surface-variant leading-relaxed relative z-10 group-hover:text-on-surface/90 transition-colors duration-500">
         {person.funnyDescription}
       </p>
+
+      {/* Social / Contact Icons Bar */}
+      <div className="flex items-center justify-center gap-6 relative z-10 pt-4 border-t border-outline-variant/10">
+        {person.instagram && (
+          <a
+            href={person.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-on-surface-variant hover:text-primary transition-colors duration-300"
+            aria-label="Instagram"
+          >
+            {/* Instagram SVG goes here */}
+            <svg className="w-4 h-4 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+          </a>
+        )}
+
+        {person.linkedin && (
+          <a
+            href={person.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-on-surface-variant hover:text-primary transition-colors duration-300"
+            aria-label="LinkedIn"
+          >
+            {/* LinkedIn SVG goes here */}
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452z"/>
+            </svg>
+          </a>
+        )}
+
+        {person.email && (
+          <a
+            href={`mailto:${person.email}`}
+            className="text-on-surface-variant hover:text-primary transition-colors duration-300"
+            aria-label="Email"
+          >
+            {/* Mail SVG goes here */}
+            <svg className="w-4 h-4 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+          </a>
+        )}
+      </div>
     </div>
   </div>
 );
