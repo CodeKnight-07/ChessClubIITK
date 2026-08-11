@@ -250,17 +250,17 @@ const DiaryPage = ({ photoUrl, pageNumber, isLeftPage, isAdmin, photoIdx, onDele
 };
 
 import fcl1 from '../Gallery/FCL/fcl/1.jpg';
-import fcl2 from '../Gallery/FCL/fcl/2.jpg';
-import fcl3 from '../Gallery/FCL/fcl/3.jpg';
-import fcl4 from '../Gallery/FCL/fcl/4.jpg';
-import fcl5 from '../Gallery/FCL/fcl/5.jpg';
-import fcl6 from '../Gallery/FCL/fcl/6.jpg';
-import fcl7 from '../Gallery/FCL/fcl/7.jpg';
-import fcl9 from '../Gallery/FCL/fcl/9.jpg';
+import fcl2 from '../Gallery/FCL/fcl/2.JPG';
+import fcl3 from '../Gallery/FCL/fcl/3.JPG';
+import fcl4 from '../Gallery/FCL/fcl/4.JPG';
+import fcl5 from '../Gallery/FCL/fcl/5.JPG';
+import fcl6 from '../Gallery/FCL/fcl/6.JPG';
+import fcl7 from '../Gallery/FCL/fcl/7.JPG';
+import fcl9 from '../Gallery/FCL/fcl/9.JPG';
 import fcl10 from '../Gallery/FCL/fcl/10.jpg';
-import fcl11 from '../Gallery/FCL/fcl/11.jpg';
-import fcl12 from '../Gallery/FCL/fcl/12.jpg';
-import fcl13 from '../Gallery/FCL/fcl/13.jpg';
+import fcl11 from '../Gallery/FCL/fcl/11.JPG';
+import fcl12 from '../Gallery/FCL/fcl/12.JPG';
+import fcl13 from '../Gallery/FCL/fcl/13.JPG';
 
 const FCL_PHOTOS = [fcl1, fcl2, fcl3, fcl4, fcl5, fcl6, fcl7, fcl9, fcl10, fcl11, fcl12, fcl13];
 
