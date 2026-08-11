@@ -262,7 +262,20 @@ import fcl11 from '../Gallery/FCL/fcl/11.JPG';
 import fcl12 from '../Gallery/FCL/fcl/12.JPG';
 import fcl13 from '../Gallery/FCL/fcl/13.JPG';
 
+import gs1 from '../Gallery/grand swiss/1.jpg';
+import gs2 from '../Gallery/grand swiss/2.jpg';
+import gs3 from '../Gallery/grand swiss/3.jpg';
+import gs4 from '../Gallery/grand swiss/4.jpg';
+import gs5 from '../Gallery/grand swiss/5.jpg';
+import gs6 from '../Gallery/grand swiss/6.jpg';
+import gs7 from '../Gallery/grand swiss/7.jpg';
+import gs8 from '../Gallery/grand swiss/8.jpg';
+import gs9 from '../Gallery/grand swiss/9.jpg';
+import gs10 from '../Gallery/grand swiss/10.jpg';
+import gs11 from '../Gallery/grand swiss/11.jpg';
+
 const FCL_PHOTOS = [fcl1, fcl2, fcl3, fcl4, fcl5, fcl6, fcl7, fcl9, fcl10, fcl11, fcl12, fcl13];
+const GRAND_SWISS_PHOTOS = [gs1, gs2, gs3, gs4, gs5, gs6, gs7, gs8, gs9, gs10, gs11];
 
 const PREVIOUS_YEARS = ['25-26'];
 const PREVIOUS_YEARS_DATA = {
@@ -277,11 +290,11 @@ const PREVIOUS_YEARS_DATA = {
     },
     {
       id: "event-2",
-      category: "WORKSHOPS",
-      title: "Opening Principles",
-      description: "Mastering the first 10 moves.",
-      photos: [],
-      image: workshopImg
+      category: "TOURNAMENTS",
+      title: "IITK Grand Swiss",
+      description: "The grandest chess tournament of the year.",
+      photos: GRAND_SWISS_PHOTOS,
+      image: GRAND_SWISS_PHOTOS[0]
     }
   ]
 };
