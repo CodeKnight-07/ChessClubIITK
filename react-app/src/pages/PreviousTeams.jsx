@@ -70,7 +70,7 @@ const SECRETARIES_DATA = {
     { name: "Prakhar", role: "Secretary", image: secPrakhar },
     { name: "Prithvijeet", role: "Secretary", image: secPrithvijeet },
     { name: "Rishi", role: "Secretary", image: secRishi },
-    { name: "Roz Anandan", role: "Secretary", image: secRozAnandan },
+    { name: "Anandan", role: "Secretary", image: secRozAnandan },
     { name: "Rudra", role: "Secretary", image: secRudra },
     { name: "Shaurya", role: "Secretary", image: secShaurya }
   ]
@@ -90,9 +90,6 @@ const MemberCard = ({ person }) => (
       
       <div className="absolute bottom-0 left-0 w-full p-4 translate-y-2 group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
         <h5 className="text-xl font-serif font-bold text-on-surface mb-1 drop-shadow-md group-hover:text-primary transition-colors duration-300">{person.name}</h5>
-        {person.email && (
-          <a href={`mailto:${person.email}`} className="text-[10px] font-mono text-primary hover:text-primary/70 transition-colors tracking-wider block opacity-0 group-hover:opacity-100 duration-500 delay-100 ease-out">{person.email}</a>
-        )}
       </div>
     </div>
   </div>
