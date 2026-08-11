@@ -249,8 +249,41 @@ const DiaryPage = ({ photoUrl, pageNumber, isLeftPage, isAdmin, photoIdx, onDele
   );
 };
 
+const PREVIOUS_YEARS = ['2024-25', '2023-24'];
+const PREVIOUS_YEARS_DATA = {
+  '2024-25': [
+    {
+      id: "event-1",
+      category: "TOURNAMENTS",
+      title: "Inter-Hall Chess Championship",
+      description: "Fierce competition between halls.",
+      photos: [],
+      image: tournamentImg
+    },
+    {
+      id: "event-2",
+      category: "WORKSHOPS",
+      title: "Opening Principles",
+      description: "Mastering the first 10 moves.",
+      photos: [],
+      image: workshopImg
+    }
+  ],
+  '2023-24': [
+    {
+      id: "event-3",
+      category: "SOCIALS",
+      title: "Farewell Blitz",
+      description: "Saying goodbye with 3-minute games.",
+      photos: [],
+      image: socialImg
+    }
+  ]
+};
+
 const Gallery = () => {
   const [activeCategory, setActiveCategory] = useState('All');
+  const [activeYear, setActiveYear] = useState(PREVIOUS_YEARS[0]);
   const [isOpenLightbox, setIsOpenLightbox] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [slideshowIndex, setSlideshowIndex] = useState(0);
@@ -798,7 +831,92 @@ const Gallery = () => {
             </div>
           </motion.section>
         )}
-      </AnimatePresence>
+        </AnimatePresence>
+
+      {/* Past Seasons Section */}
+      <section className="mb-24 max-w-7xl mx-auto px-4 md:px-0">
+        <div className="text-center md:text-left mb-10">
+          <p className="text-primary font-label text-xs tracking-[0.3em] uppercase mb-2">
+            Our Legacy
+          </p>
+          <h2 className="text-4xl font-serif text-on-surface">
+            Past Seasons
+          </h2>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-12 mt-8">
+          {/* Left Column: Navigation Buttons */}
+          <div className="w-full md:w-1/4 flex flex-col gap-4">
+            {PREVIOUS_YEARS.map((year) => (
+              <button
+                key={year}
+                onClick={() => setActiveYear(year)}
+                className={`w-full px-6 py-4 rounded-2xl text-sm font-bold uppercase tracking-widest transition-all duration-300 relative overflow-hidden flex items-center justify-between group
+                  ${activeYear === year 
+                    ? 'bg-primary text-on-primary shadow-lg shadow-primary/30 border-none' 
+                    : 'bg-surface-container-low border border-outline-variant/30 text-on-surface hover:border-primary hover:text-primary'
+                  }`}
+              >
+                <span className="relative z-10 flex items-center gap-3">
+                  <span className="material-symbols-outlined text-[18px] opacity-80">
+                    history
+                  </span>
+                  {year}
+                </span>
+                {activeYear === year && (
+                  <span className="material-symbols-outlined relative z-10 text-[18px]">
+                    chevron_right
+                  </span>
+                )}
+                {activeYear !== year && (
+                  <div className="absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-[0%] transition-transform duration-500 ease-out"></div>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Right Column: Event Cards */}
+          <div className="w-full md:w-3/4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {PREVIOUS_YEARS_DATA[activeYear]?.map((event) => (
+                <div
+                  key={event.id}
+                  className="bg-surface-container-low rounded-2xl overflow-hidden border border-outline-variant/10 hover:border-primary/20 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative shadow-lg cursor-pointer"
+                  onClick={() => openExhibition(event.photos, event.title)}
+                >
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <img
+                      src={event.image}
+                      alt={event.title}
+                      className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low via-transparent to-transparent pointer-events-none opacity-85" />
+                    <div className="absolute top-3 left-3 bg-primary/10 text-primary border border-primary/20 backdrop-blur-sm font-label text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full shadow-sm">
+                      {event.category}
+                    </div>
+                  </div>
+
+                  <div className="p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-lg font-serif font-bold text-on-surface mb-3 group-hover:text-primary transition-colors leading-tight">
+                        {event.title}
+                      </h3>
+                      <p className="text-xs text-on-surface-variant leading-relaxed mb-6 line-clamp-3">
+                        {event.description}
+                      </p>
+                    </div>
+
+                    <div className="w-full bg-surface-container group-hover:bg-primary text-on-surface group-hover:text-[#3c2f00] font-label text-[10px] font-bold uppercase tracking-widest py-3 rounded-xl border border-outline-variant/10 group-hover:border-primary transition-all flex items-center justify-center gap-2 mt-auto">
+                      <span className="material-symbols-outlined text-sm font-bold">photo_library</span>
+                      <span>View Gallery</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Archives Card Grid (Preserves all other 9 static events in a beautiful cards grid!) */}
       <section className="mb-24 max-w-5xl mx-auto">
