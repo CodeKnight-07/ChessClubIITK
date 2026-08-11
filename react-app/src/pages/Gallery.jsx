@@ -638,27 +638,12 @@ const Gallery = () => {
         <p className="text-primary font-label text-xs tracking-[0.4em] uppercase mb-4">
           Visual Archive
         </p>
-        <h1 className="text-5xl sm:text-6xl font-serif italic mb-8">
+        <h1 className="text-5xl sm:text-6xl font-serif mb-8">
           The Gallery of <span className="text-primary">Kings</span>
         </h1>
       </header>
 
-      {/* Category selector filter bar */}
-      <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-16">
-        {CATEGORIES.map(cat => (
-          <button
-            key={cat}
-            onClick={() => handleCategoryChange(cat)}
-            className={`px-6 py-2.5 rounded-full border text-xs font-label uppercase tracking-widest transition-all ${
-              activeCategory === cat
-                ? 'bg-primary text-[#3c2f00] border-primary shadow-lg shadow-primary/10 font-bold'
-                : 'bg-surface-container border-outline-variant/30 text-on-surface-variant hover:border-primary/50'
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
+
 
       {/* Featured FIDE Tournament Spotlight (Top) */}
       <AnimatePresence mode="wait">
