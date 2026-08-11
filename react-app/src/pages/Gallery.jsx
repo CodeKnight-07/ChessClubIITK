@@ -249,9 +249,9 @@ const DiaryPage = ({ photoUrl, pageNumber, isLeftPage, isAdmin, photoIdx, onDele
   );
 };
 
-const PREVIOUS_YEARS = ['2024-25', '2023-24'];
+const PREVIOUS_YEARS = ['25-26'];
 const PREVIOUS_YEARS_DATA = {
-  '2024-25': [
+  '25-26': [
     {
       id: "event-1",
       category: "TOURNAMENTS",
@@ -267,16 +267,6 @@ const PREVIOUS_YEARS_DATA = {
       description: "Mastering the first 10 moves.",
       photos: [],
       image: workshopImg
-    }
-  ],
-  '2023-24': [
-    {
-      id: "event-3",
-      category: "SOCIALS",
-      title: "Farewell Blitz",
-      description: "Saying goodbye with 3-minute games.",
-      photos: [],
-      image: socialImg
     }
   ]
 };
@@ -781,7 +771,7 @@ const Gallery = () => {
             exit={{ opacity: 0 }}
             className="mb-24 max-w-5xl mx-auto"
           >
-            <div className="text-center md:text-left mb-10">
+            <div className="text-center mb-10">
               <h2 className="text-4xl font-serif text-on-surface">
                 Active Season
               </h2>
@@ -835,7 +825,7 @@ const Gallery = () => {
 
       {/* Past Seasons Section */}
       <section className="mb-24 max-w-7xl mx-auto px-4 md:px-0">
-        <div className="text-center md:text-left mb-10">
+        <div className="text-center mb-10">
           <p className="text-primary font-label text-xs tracking-[0.3em] uppercase mb-2">
             Our Legacy
           </p>
