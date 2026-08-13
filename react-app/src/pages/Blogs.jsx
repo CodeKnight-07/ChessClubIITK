@@ -9,7 +9,7 @@ import Footer from '../components/Footer';
 import fresherImg from '../assets/fcl.png';
 import tournamentImg from '../assets/fide.png';
 import winnerImg from '../assets/anuj_shivratri.png';
-import defaultBlogHero from '../assets/chessboard.jpg';
+import defaultBlogHero from '../assets/chessclubiitklogo.jpeg';
 
 // Dynamic Read Time Calculator Utility
 const calculateReadTime = (text) => {
@@ -51,7 +51,7 @@ const getBlogExcerpt = (post, maxLength = 180) => {
     }
     return clean;
   }
-  return "Read the full dispatch from the Chess Club IITK.";
+  return "Read the full dispatch from the Chess Club.";
 };
 
 const getTime = (p) => {
@@ -102,7 +102,7 @@ const LEGACY_BACKUP_POSTS = [
     tag: "Tournament News",
     excerpt: "Top seed IM Anuj Shrivatri wins SBI GIC Fide Rated Rapid Tournament 2026 at IIT Kanpur. Anuj scored 8/9 points to secure the victory. He was leading the event with 8/8 points going into the 9th round.",
     author: "Laksh Dhir",
-    authorRole: "Coordinator, Chess Club IITK",
+    authorRole: "Coordinator, Chess Club",
     readTime: "6 Min Read",
     image: winnerImg
   },
@@ -113,7 +113,7 @@ const LEGACY_BACKUP_POSTS = [
     tag: "Tournament News",
     excerpt: "IIT Kanpur steps onto the rated chess map with its first FIDE-rated rapid tournament, a 9-round Swiss event carrying a prize pool of INR 2,00,000.",
     author: "Laksh Dhir",
-    authorRole: "Coordinator, Chess Club IITK",
+    authorRole: "Coordinator, Chess Club",
     readTime: "5 Min Read",
     image: tournamentImg
   }
@@ -134,9 +134,15 @@ const Blogs = () => {
 
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedYear, setSelectedYear] = useState('26-27');
+  const [selectedYear, setSelectedYear] = useState(() => {
+    return localStorage.getItem('selectedBlogYear') || '26-27 Tenure';
+  });
   const [viewMode, setViewMode] = useState('grid');
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    localStorage.setItem('selectedBlogYear', selectedYear);
+  }, [selectedYear]);
 
   // Create/Edit Mode Form Inputs 
   const [showEditor, setShowEditor] = useState(false);
@@ -154,22 +160,30 @@ const Blogs = () => {
   const [deleteTargetId, setDeleteTargetId] = useState(null);
 
   const getPostYear = (post) => {
-    if (!post) return '26-27';
+    if (!post) return '26-27 Tenure';
     const raw = post.created_at || post.date;
-    if (!raw) return '26-27';
+    if (!raw) return '26-27 Tenure';
     const d = new Date(raw);
-    let yearNum = 2026;
-    if (!isNaN(d.getTime())) {
-      yearNum = d.getFullYear();
-    } else {
+    let dateObj = d;
+    if (isNaN(d.getTime())) {
       const match = String(raw).match(/\b(20\d\d)\b/);
-      if (match) yearNum = parseInt(match[1], 10);
+      if (match) {
+        dateObj = new Date(parseInt(match[1], 10), 5, 1);
+      } else {
+        return '26-27 Tenure';
+      }
     }
-    if (yearNum >= 2026) return '26-27';
-    if (yearNum === 2025) return '25-26';
-    if (yearNum === 2024) return '24-25';
-    const y = yearNum % 100;
-    return `${y.toString().padStart(2, '0')}-${((y + 1) % 100).toString().padStart(2, '0')}`;
+    const year = dateObj.getFullYear();
+    const month = dateObj.getMonth(); // 0-indexed: 0 = Jan, 4 = May, 5 = June
+    let startYear;
+    if (month >= 5) {
+      startYear = year;
+    } else {
+      startYear = year - 1;
+    }
+    const y = startYear % 100;
+    const yNext = (startYear + 1) % 100;
+    return `${y.toString().padStart(2, '0')}-${yNext.toString().padStart(2, '0')} Tenure`;
   };
 
   const getImageUrl = (url) => {
@@ -238,7 +252,7 @@ const Blogs = () => {
     }
   }, []);
 
-  const defaultYears = ['26-27', '25-26'];
+  const defaultYears = ['26-27 Tenure', '25-26 Tenure'];
   const uniqueYears = Array.from(new Set(posts.map(p => getPostYear(p))))
     .sort((a, b) => b.localeCompare(a));
   const yearsList = Array.from(new Set([...defaultYears, ...uniqueYears]))
@@ -369,7 +383,7 @@ const Blogs = () => {
               }} 
               className="bg-primary text-[#3c2f00] hover:bg-[#d4af37] px-6 py-2.5 rounded-xl font-bold text-xs font-label uppercase tracking-widest transition-colors shadow-lg shrink-0 cursor-pointer flex items-center gap-2"
             >
-              <span className="material-symbols-outlined text-sm">{showEditor ? "expand_less" : "add"}</span>
+
               <span>{showEditor ? "Collapse Drawer" : "+ Draft Article"}</span>
             </button>
           )}

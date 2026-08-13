@@ -12,6 +12,8 @@ import premImg from "../assets/exCoordinators/Prem.png";
 import parvImg from "../assets/exCoordinators/parv.jpg";
 import navankurImg from "../assets/exCoordinators/navankur.jpg";
 import abhijeetImg from "../assets/exCoordinators/abhijeet.jpg";
+import ayushImg from "../assets/exCoordinators/ayush.jpg";
+import tejasImg from "../assets/exCoordinators/tejas.jpg";
 
 // 25-26 Secretaries imports
 import secArjit from '../assets/secretaries_25_26/arjit.jpg';
@@ -44,9 +46,9 @@ const TEAMS_DATA = {
   ],
   '23-24 Team': [
     { name: "Abhijeet Verma", email: "abhiteet21@iitk.ac.in", image: abhijeetImg, funnyDescription: "Placeholder description for 23-24 team." },
-    { name: "Ayush Yadav", email: "ayushy21@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 23-24 team." },
+    { name: "Ayush Yadav", email: "ayushy21@iitk.ac.in", image: ayushImg, funnyDescription: "Placeholder description for 23-24 team." },
     { name: "Navankur Shrotriya", email: "navankurs21@iitk.ac.in", image: navankurImg, funnyDescription: "Placeholder description for 23-24 team." },
-    { name: "Tejas Goyal", email: "tejasg21@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 23-24 team." }
+    { name: "Tejas Goyal", email: "tejasg21@iitk.ac.in", image: tejasImg, funnyDescription: "Placeholder description for 23-24 team." }
   ],
   '22-23 Team': [
     { name: "Himanshu Beniwal", email: "‎ ", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." },

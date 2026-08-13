@@ -410,6 +410,17 @@ def register_lol():
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:
+            # 1. Prevent registration if the event date has already passed
+            cursor.execute("SELECT event_date, event_end_date FROM events WHERE title ILIKE '%league of legends%' ORDER BY event_date DESC LIMIT 1;")
+            row = cursor.fetchone()
+            if row:
+                from datetime import date
+                event_date = row[0]
+                event_end_date = row[1]
+                compare_date = event_end_date if event_end_date else event_date
+                if compare_date and compare_date < date.today():
+                    return jsonify({"error": "Registration is closed. This event has already ended."}), 400
+
             # Check if user is already registered
             cursor.execute('SELECT id FROM "lolEntries" WHERE email = %s', (email,))
             if cursor.fetchone():

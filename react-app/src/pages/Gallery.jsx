@@ -160,7 +160,7 @@ const DiaryPage = ({ photoUrl, pageNumber, isLeftPage, isAdmin, photoIdx, onDele
           <span className="material-symbols-outlined text-primary text-5xl animate-pulse">menu_book</span>
           <div>
             <h3 className="font-serif text-2xl text-primary tracking-wide leading-tight mb-2">Club Memories</h3>
-            <p className="font-label text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/80">Chess Club IITK</p>
+            <p className="font-label text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/80">Chess Club</p>
           </div>
           <div className="h-0.5 w-12 bg-primary/30" />
           <p className="text-[9px] font-label text-on-surface-variant/60 uppercase tracking-widest max-w-[160px]">
@@ -177,7 +177,7 @@ const DiaryPage = ({ photoUrl, pageNumber, isLeftPage, isAdmin, photoIdx, onDele
       <div className="absolute inset-0 bg-gradient-to-bl from-amber-950 to-amber-900 flex flex-col justify-center items-center p-6 text-center border-r-4 border-amber-800 shadow-inner rounded-l-xl select-none">
         <div className="border border-[#d4af37]/20 rounded-lg p-4 w-full h-full flex flex-col justify-center items-center gap-4">
           <span className="material-symbols-outlined text-primary text-4xl">emoji_events</span>
-          <h3 className="font-serif text-lg text-[#d4af37] tracking-wider">Chess Club IITK</h3>
+          <h3 className="font-serif text-lg text-[#d4af37] tracking-wider">Chess Club</h3>
           <p className="text-[9px] font-label text-on-surface-variant/50 max-w-[150px]">
             Thank you for being part of our chess journey.
           </p>
@@ -277,9 +277,9 @@ import gs11 from '../Gallery/grand swiss/11.jpg';
 const FCL_PHOTOS = [fcl1, fcl2, fcl3, fcl4, fcl5, fcl6, fcl7, fcl9, fcl10, fcl11, fcl12, fcl13];
 const IITK_GRAND_SWISS_PHOTOS = [gs1, gs2, gs3, gs4, gs5, gs6, gs7, gs8, gs9, gs10, gs11];
 
-const PREVIOUS_YEARS = ['25-26'];
+const PREVIOUS_YEARS = ['25-26 Tenure'];
 const PREVIOUS_YEARS_DATA = {
-  '25-26': [
+  '25-26 Tenure': [
     {
       id: "event-1",
       category: "TOURNAMENTS",

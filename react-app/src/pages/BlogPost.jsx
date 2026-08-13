@@ -6,7 +6,7 @@ import { globalCache } from '../utils/cache';
 import tournamentImg from '../assets/fide.png';
 import fresherImg from '../assets/fcl.png';
 import winnerImg from '../assets/anuj_shivratri.png';
-import defaultBlogHero from '../assets/chessboard.jpg';
+import defaultBlogHero from '../assets/chessclubiitklogo.jpeg';
 
 // Helper to fix and format injected HTML or plain-text paragraph content
 const formatInjectedContent = (rawContent) => {
@@ -61,7 +61,7 @@ const LEGACY_POSTS_MAP = {
     created_at: "February 15, 2026",
     tag: "Tournament News",
     author_name: "Laksh Dhir",
-    author_position: "Coordinator, Chess Club IITK",
+    author_position: "Coordinator, Chess Club",
     cover_image: winnerImg,
     content: `<p class="text-2xl text-on-surface font-serif leading-relaxed mb-10 first-letter:float-left first-letter:text-7xl first-letter:pr-4 first-letter:font-serif first-letter:text-primary">Top seed Anuj Shrivatri wins SBI GIC Fide Rated Rapid Tournament 2026 at IIT Kanpur. Anuj scored 8/9 points to secure the victory. He was leading the event with 8/8 points going into the 9th round, Anuj lost to Arnav Agrawal, a young talent from the host state Uttar Pradesh. This important win helped Arnav to secure second place with 8/9 points. India's latest GM Aaryav Varshney and IM Aaditya Dhingra also scored 8/9 points to secure 3rd and 4th positions, respectively, on tiebreaks. This one-day rapid-rated event was organized in the IIT Kanpur campus on 7th February with a total cash prize of ₹2,00,000.</p><h2 class="text-3xl font-serif font-bold text-on-surface mt-16 mb-6 border-b border-outline-variant/15 pb-2">Anuj's 4th-Rated Tournament victory this year!!</h2><p>IM Anuj Shrivatri is on an unstoppable winning run right now. This is Anuj's 4th rated tournament victory, and the year just started.</p>`
   },
@@ -71,7 +71,7 @@ const LEGACY_POSTS_MAP = {
     created_at: "January 26, 2026",
     tag: "Tournament News",
     author_name: "Laksh Dhir",
-    author_position: "Coordinator, Chess Club IITK",
+    author_position: "Coordinator, Chess Club",
     cover_image: tournamentImg,
     content: `<p class="text-2xl text-on-surface font-serif leading-relaxed mb-10 first-letter:float-left first-letter:text-7xl first-letter:pr-4 first-letter:font-serif first-letter:text-primary">IIT Kanpur steps onto the rated chess map with its first FIDE-rated rapid tournament, a 9-round Swiss event carrying a prize pool of INR 2,00,000.</p>`
   }
@@ -161,7 +161,7 @@ const BlogPost = () => {
             setEditContent(matchingNode.content || "");
             setEditCover(matchingNode.cover_image || "");
             setEditAuthorName(matchingNode.author_name || "Chess Club Team");    
-            setEditAuthorPosition(matchingNode.author_position || "Coordinator, Chess Club IITK");
+            setEditAuthorPosition(matchingNode.author_position || "Coordinator, Chess Club");
             if (matchingNode.created_at) {
               const d = new Date(matchingNode.created_at);
               if (!isNaN(d.getTime())) {
@@ -192,7 +192,7 @@ const BlogPost = () => {
             setEditContent(matchingNode.content || "");
             setEditCover(matchingNode.cover_image || "");
             setEditAuthorName(matchingNode.author_name || "Chess Club Team");    
-            setEditAuthorPosition(matchingNode.author_position || "Coordinator, Chess Club IITK");
+            setEditAuthorPosition(matchingNode.author_position || "Coordinator, Chess Club");
             if (matchingNode.created_at) {
               const d = new Date(matchingNode.created_at);
               if (!isNaN(d.getTime())) {
@@ -372,7 +372,7 @@ const BlogPost = () => {
                   {dbPost.author_name || "Chess Club Team"}
                 </p>
                 <p className="text-[10px] text-on-surface-variant font-label uppercase tracking-widest !m-0 !leading-none !mt-1">
-                  {dbPost.author_position || "Coordinator, Chess Club IITK"}
+                  {dbPost.author_position || "Coordinator, Chess Club"}
                 </p>
               </div>
             </div>

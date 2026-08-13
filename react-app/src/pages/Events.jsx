@@ -15,8 +15,20 @@ const Events = () => {
   const [highlightedId, setHighlightedId] = useState(null);
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('upcoming');
-  const [selectedYear, setSelectedYear] = useState('26-27');
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('selectedEventTab') || 'upcoming';
+  });
+  const [selectedYear, setSelectedYear] = useState(() => {
+    return localStorage.getItem('selectedEventYear') || '26-27 Tenure';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('selectedEventTab', activeTab);
+  }, [activeTab]);
+
+  useEffect(() => {
+    localStorage.setItem('selectedEventYear', selectedYear);
+  }, [selectedYear]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState(null);
@@ -86,9 +98,7 @@ const Events = () => {
       const isPast = targetEvent && new Date(targetEvent.endDate || targetEvent.date) < today;
       
       if (isPast && targetEvent) {
-        const compareDate = new Date(targetEvent.endDate || targetEvent.date);
-        const y = compareDate.getFullYear() % 100;
-        const eventYear = `${y.toString().padStart(2, '0')}-${((y + 1) % 100).toString().padStart(2, '0')}`;
+        const eventYear = getEventTenure(targetEvent.endDate || targetEvent.date);
         setSelectedYear(eventYear);
         setActiveTab('past');
       } else {
@@ -391,14 +401,27 @@ const Events = () => {
     return compareDate >= today;
   });
 
-  // Calculate dynamic list of tenures available for past events (e.g. 26-27)
+  // Calculate dynamic list of tenures available for past events (e.g. 26-27 Tenure)
   const getEventTenure = (dateStr) => {
     try {
       const d = new Date(dateStr);
-      const y = d.getFullYear() % 100;
-      return `${y.toString().padStart(2, '0')}-${((y + 1) % 100).toString().padStart(2, '0')}`;
+      let dateObj = d;
+      if (isNaN(d.getTime())) {
+        return "26-27 Tenure";
+      }
+      const year = dateObj.getFullYear();
+      const month = dateObj.getMonth(); // 0-indexed: 0 = Jan, 4 = May, 5 = June
+      let startYear;
+      if (month >= 5) {
+        startYear = year;
+      } else {
+        startYear = year - 1;
+      }
+      const y = startYear % 100;
+      const yNext = (startYear + 1) % 100;
+      return `${y.toString().padStart(2, '0')}-${yNext.toString().padStart(2, '0')} Tenure`;
     } catch {
-      return "26-27";
+      return "26-27 Tenure";
     }
   };
 
@@ -412,7 +435,7 @@ const Events = () => {
       .map(e => getEventTenure(e.endDate || e.date))
   )).sort((a, b) => b.localeCompare(a));
   
-  const defaultYears = ['26-27', '25-26'];
+  const defaultYears = ['26-27 Tenure', '25-26 Tenure'];
   const yearsList = Array.from(new Set([...(availableYears.length > 0 ? availableYears : []), ...defaultYears])).sort((a, b) => b.localeCompare(a));
 
   const pastEvents = events
@@ -522,33 +545,58 @@ const Events = () => {
                 )}
 
                 <div className="pt-2">
-                  {isLolEvent ? (
-                    isRegisteredForLol ? (
-                      <button
-                        disabled
-                        className="block w-full text-center bg-surface-container-high text-on-surface-variant/60 py-3 rounded-xl font-bold cursor-not-allowed border border-outline-variant/20 text-xs font-label uppercase tracking-widest"
-                      >
-                        REGISTERED ✓
-                      </button>
-                    ) : (
-                      <button 
-                        onClick={handleRegisterLolClick}
-                        disabled={isFetchingLolProfile}
-                        className="block w-full text-center bg-primary text-[#3c2f00] py-3 rounded-xl font-bold hover:bg-[#d4af37] transition-colors text-xs font-label uppercase tracking-widest shadow-md shadow-primary/10"
-                      >
-                        {isFetchingLolProfile ? "LOADING PROFILE..." : "REGISTER"}
-                      </button>
-                    )
-                  ) : event.register_link && (
-                    <a 
-                      href={event.register_link} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="block w-full text-center bg-primary text-[#3c2f00] py-3 rounded-xl font-bold hover:bg-[#d4af37] transition-colors text-xs font-label uppercase tracking-widest shadow-md shadow-primary/10"
-                    >
-                      REGISTER
-                    </a>
-                  )}
+                  {(() => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const compareDate = eventEndDate ? new Date(eventEndDate) : new Date(eventStartDate);
+                    compareDate.setHours(0, 0, 0, 0);
+                    const isPastEvent = compareDate < today;
+
+                    if (isPastEvent) {
+                      return (
+                        <button
+                          disabled
+                          className="block w-full text-center bg-surface-container-high text-on-surface-variant/40 py-3 rounded-xl font-bold cursor-not-allowed border border-outline-variant/10 text-xs font-label uppercase tracking-widest"
+                        >
+                          REGISTRATION CLOSED
+                        </button>
+                      );
+                    }
+
+                    if (isLolEvent) {
+                      return isRegisteredForLol ? (
+                        <button
+                          disabled
+                          className="block w-full text-center bg-surface-container-high text-on-surface-variant/60 py-3 rounded-xl font-bold cursor-not-allowed border border-outline-variant/20 text-xs font-label uppercase tracking-widest"
+                        >
+                          REGISTERED ✓
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={handleRegisterLolClick}
+                          disabled={isFetchingLolProfile}
+                          className="block w-full text-center bg-primary text-[#3c2f00] py-3 rounded-xl font-bold hover:bg-[#d4af37] transition-colors text-xs font-label uppercase tracking-widest shadow-md shadow-primary/10"
+                        >
+                          {isFetchingLolProfile ? "LOADING PROFILE..." : "REGISTER"}
+                        </button>
+                      );
+                    }
+
+                    if (event.register_link) {
+                      return (
+                        <a 
+                          href={event.register_link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="block w-full text-center bg-primary text-[#3c2f00] py-3 rounded-xl font-bold hover:bg-[#d4af37] transition-colors text-xs font-label uppercase tracking-widest shadow-md shadow-primary/10"
+                        >
+                          REGISTER
+                        </a>
+                      );
+                    }
+
+                    return null;
+                  })()}
                 </div>
               </div>
             </div>

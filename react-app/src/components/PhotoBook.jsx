@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const PhotoBook = ({ photos = [], title = "Current Tenure", subtitle = "Chess Club IITK" }) => {
+const PhotoBook = ({ photos = [], title = "Current Tenure", subtitle = "Chess Club" }) => {
   const [spreadIndex, setSpreadIndex] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
   const [flipDirection, setFlipDirection] = useState('next');
