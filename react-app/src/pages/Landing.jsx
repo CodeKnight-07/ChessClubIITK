@@ -343,7 +343,7 @@ const Landing = () => {
                 },
                 {
                   icon: "emoji_events",
-                  value: "₹2.5L+",
+                  value: "₹15L+",
                   label: "Prize Pool Awarded",
                   desc: "Cash prizes and trophies distributed across official championships."
                 },
@@ -355,7 +355,7 @@ const Landing = () => {
                 },
                 {
                   icon: "event_available",
-                  value: "60+",
+                  value: "200+",
                   label: "Events Conducted",
                   desc: "FIDE Opens, CMPL, Blitz Arenas, and international guest talk shows."
                 }

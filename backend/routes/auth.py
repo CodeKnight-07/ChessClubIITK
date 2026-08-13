@@ -447,3 +447,58 @@ def register_lol_status():
     finally:
         if connection:
             connection.close()
+
+
+@auth_bp.route('/alumni-request', methods=['POST'])
+def handle_alumni_request():
+    data = request.get_json() or {}
+    name = (data.get('name') or '').strip()
+    email = (data.get('email') or '').strip()
+    roll_no = (data.get('roll_no') or data.get('rollNo') or '').strip()
+    graduation_year = (data.get('graduation_year') or data.get('graduationYear') or '').strip()
+    chess_username = (data.get('chess_username') or data.get('chessUsername') or '').strip()
+    contact = (data.get('contact') or '').strip()
+    notes = (data.get('notes') or '').strip()
+
+    if not name or not email:
+        return jsonify({"error": "Full name and personal email are required."}), 400
+
+    if '@' not in email or '.' not in email.split('@')[-1]:
+        return jsonify({"error": "Please provide a valid email address."}), 400
+
+    # Validate Chess.com ID if provided
+    if chess_username:
+        try:
+            chess_res = requests.get(
+                f"https://api.chess.com/pub/player/{chess_username}",
+                headers={"User-Agent": "ChessClubIITK-App/1.0 (contact: chessclubiitk@gmail.com)"},
+                timeout=5
+            )
+            if chess_res.status_code == 404:
+                return jsonify({"error": f"Chess.com ID '{chess_username}' does not exist. Please enter a valid username."}), 400
+        except Exception as err:
+            print("Chess.com API check error:", err)
+
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO alumni_requests (name, email, roll_no, graduation_year, chess_username, contact, notes, status)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, 'pending')
+                RETURNING id;
+            """, (name, email, roll_no, graduation_year, chess_username, contact, notes))
+            
+            if hasattr(connection, 'commit'):
+                connection.commit()
+    except Exception as e:
+        print(f"Database Alumni Request Error: {e}")
+        return jsonify({"error": "Failed to record alumni request in database."}), 500
+    finally:
+        if connection:
+            connection.close()
+
+    return jsonify({
+        "success": True,
+        "message": "Admins have been notified. Please wait while your request is processed."
+    }), 200

@@ -309,10 +309,13 @@ const Contact = () => {
     <div>
       <div className="px-4 sm:px-6 md:px-12 pb-20 max-w-7xl mx-auto">
         {/* Coordinators Section */}
-        <section className="mb-20 mt-12">
-          <div className="flex flex-col items-center mb-12 text-center">
-            <h3 className="text-xs font-label uppercase tracking-[0.2em] text-primary mb-2">The Leadership</h3>
-            <h2 className="text-5xl font-serif font-bold tracking-tighter text-on-surface">Coordinators</h2>
+        <section className="mb-16 mt-8">
+          <div className="flex flex-col items-center mb-10 text-center max-w-3xl mx-auto">
+
+            <h1 className="text-4xl font-serif leading-tight text-on-surface sm:text-5xl">Coordinators </h1>
+            {/* <p className="mt-3 text-sm font-light leading-relaxed text-on-surface-variant/80 sm:text-base">
+              Get in touch with the executive leadership and team members of Chess Club IIT Kanpur.
+            </p> */}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
             {COORDINATORS.map((person, idx) => (
@@ -324,7 +327,7 @@ const Contact = () => {
         {/* Secretaries Section */}
         <section className="mb-20">
           <div className="flex flex-col items-center mb-12 text-center">
-            <h3 className="text-xs font-label uppercase tracking-[0.2em] text-primary mb-2">The Core Team</h3>
+
             <h2 className="text-5xl font-serif font-bold tracking-tighter text-on-surface">Secretaries</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
