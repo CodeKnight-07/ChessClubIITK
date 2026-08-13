@@ -16,8 +16,7 @@ const Events = () => {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('upcoming');
-  const [selectedYear, setSelectedYear] = useState('2026');
-  const [isYearModalOpen, setIsYearModalOpen] = useState(false);
+  const [selectedYear, setSelectedYear] = useState('26-27');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState(null);
@@ -88,7 +87,8 @@ const Events = () => {
       
       if (isPast && targetEvent) {
         const compareDate = new Date(targetEvent.endDate || targetEvent.date);
-        const eventYear = compareDate.getFullYear().toString();
+        const y = compareDate.getFullYear() % 100;
+        const eventYear = `${y.toString().padStart(2, '0')}-${((y + 1) % 100).toString().padStart(2, '0')}`;
         setSelectedYear(eventYear);
         setActiveTab('past');
       } else {
@@ -391,7 +391,17 @@ const Events = () => {
     return compareDate >= today;
   });
 
-  // Calculate dynamic list of years available for past events
+  // Calculate dynamic list of tenures available for past events (e.g. 26-27)
+  const getEventTenure = (dateStr) => {
+    try {
+      const d = new Date(dateStr);
+      const y = d.getFullYear() % 100;
+      return `${y.toString().padStart(2, '0')}-${((y + 1) % 100).toString().padStart(2, '0')}`;
+    } catch {
+      return "26-27";
+    }
+  };
+
   const availableYears = Array.from(new Set(
     events
       .filter(e => {
@@ -399,26 +409,23 @@ const Events = () => {
         compareDate.setHours(0,0,0,0);
         return compareDate < today;
       })
-      .map(e => {
-        try {
-          return new Date(e.endDate || e.date).getFullYear().toString();
-        } catch (err) {
-          return '2026';
-        }
-      })
+      .map(e => getEventTenure(e.endDate || e.date))
   )).sort((a, b) => b.localeCompare(a));
   
-  const yearsList = availableYears.length > 0 ? availableYears : ['2026'];
+  const defaultYears = ['26-27', '25-26'];
+  const yearsList = Array.from(new Set([...(availableYears.length > 0 ? availableYears : []), ...defaultYears])).sort((a, b) => b.localeCompare(a));
 
-  const pastEvents = events.filter(e => {
-    const compareDate = new Date(e.endDate || e.date);
-    compareDate.setHours(0,0,0,0);
-    const isPast = compareDate < today;
-    if (!isPast) return false;
-    
-    const eventYear = compareDate.getFullYear().toString();
-    return eventYear === selectedYear;
-  });
+  const pastEvents = events
+    .filter(e => {
+      const compareDate = new Date(e.endDate || e.date);
+      compareDate.setHours(0,0,0,0);
+      const isPast = compareDate < today;
+      if (!isPast) return false;
+      
+      const eventTenure = getEventTenure(e.endDate || e.date);
+      return eventTenure === selectedYear;
+    })
+    .sort((a, b) => new Date(b.endDate || b.date) - new Date(a.endDate || a.date));
 
   const renderEventCard = (event) => {
     const isLolEvent = event.title.toLowerCase().includes("league of legends");
@@ -429,10 +436,10 @@ const Events = () => {
       <div 
         key={event.id}
         id={event.id}
-        className={`bg-[#1a1a1a] border rounded-xl overflow-hidden transition-all duration-700 ${
+        className={`bg-surface-container-low border rounded-2xl overflow-hidden transition-all duration-700 ${
           highlightedId === event.id
-            ? 'border-yellow-400 shadow-[0_0_35px_rgba(242,202,80,0.3)] scale-[1.01]'
-            : 'border-gray-800 hover:border-gray-700'
+            ? 'border-primary shadow-[0_0_35px_rgba(242,202,80,0.25)] scale-[1.01]'
+            : 'border-outline-variant/15 hover:border-outline-variant/30'
         }`}
       >
         {/* Event Header (Always Visible) */}
@@ -441,8 +448,8 @@ const Events = () => {
           onClick={() => toggleExpand(event.id)}
         >
           <div className="flex-1">
-            <div className="flex items-center gap-3 text-xs font-bold tracking-widest text-gray-500 mb-3 uppercase">
-              <span className="text-yellow-400">{event.tag}</span>
+            <div className="flex items-center gap-3 text-xs font-bold tracking-widest text-on-surface-variant/70 mb-3 uppercase">
+              <span className="text-primary">{event.tag}</span>
               <span>•</span>
               <span>
                 {eventEndDate ? (
@@ -452,20 +459,20 @@ const Events = () => {
                 )}
               </span>
             </div>
-            <h3 className="text-2xl font-serif text-gray-100 mb-3">{event.title}</h3>
-            <p className="text-gray-400 leading-relaxed max-w-3xl">
+            <h3 className="text-2xl font-serif text-on-surface mb-3">{event.title}</h3>
+            <p className="text-on-surface-variant leading-relaxed max-w-3xl text-sm sm:text-base font-light">
               {event.shortDesc}
             </p>
           </div>
           
           <div className="flex items-center justify-between md:flex-col md:items-end gap-4 min-w-[140px]">
             <div className="text-left md:text-right">
-              <div className="text-xs text-gray-500 tracking-wider mb-1 uppercase">Time</div>
-              <div className="font-medium text-gray-200">{event.time}</div>
+              <div className="text-xs text-on-surface-variant/70 tracking-wider mb-1 uppercase font-mono">Time</div>
+              <div className="font-medium text-on-surface">{event.time}</div>
             </div>
             <button 
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-                expandedId === event.id ? 'bg-yellow-400 text-black' : 'bg-gray-800 text-white hover:bg-gray-700'
+                expandedId === event.id ? 'bg-primary text-[#3c2f00]' : 'bg-surface-container border border-outline-variant/20 text-on-surface hover:bg-surface-container-high'
               }`}
             >
               <svg 
@@ -485,32 +492,32 @@ const Events = () => {
           <motion.div 
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
-            className="border-t border-gray-800 bg-[#161616] p-6 md:p-8"
+            className="border-t border-outline-variant/10 bg-surface-container/40 p-6 md:p-8"
           >
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
               <div className="lg:col-span-2">
-                <h4 className="text-xs font-bold tracking-widest text-yellow-400 mb-4 uppercase">Event Briefing</h4>
-                <p className="text-gray-300 leading-relaxed whitespace-pre-line">
+                <h4 className="text-xs font-bold tracking-widest text-primary mb-4 uppercase font-label">Event Briefing</h4>
+                <p className="text-on-surface-variant leading-relaxed whitespace-pre-line text-sm sm:text-base font-light">
                   {event.fullDesc}
                 </p>
               </div>
               
               <div className="space-y-6">
                 {event.location && (
-                  <div className="bg-[#111111] p-5 rounded-lg border border-gray-800">
-                    <h4 className="text-xs font-bold tracking-widest text-gray-500 mb-2 uppercase flex items-center gap-2">
+                  <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/15">
+                    <h4 className="text-xs font-bold tracking-widest text-on-surface-variant/70 mb-2 uppercase flex items-center gap-2 font-mono">
                       Location
                     </h4>
-                    <p className="text-gray-200">{event.location}</p>
+                    <p className="text-on-surface text-sm">{event.location}</p>
                   </div>
                 )}
                 
                 {event.format && (
-                  <div className="bg-[#111111] p-5 rounded-lg border border-gray-800">
-                    <h4 className="text-xs font-bold tracking-widest text-gray-500 mb-2 uppercase flex items-center gap-2">
+                  <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/15">
+                    <h4 className="text-xs font-bold tracking-widest text-on-surface-variant/70 mb-2 uppercase flex items-center gap-2 font-mono">
                       Match Format
                     </h4>
-                    <p className="text-gray-200">{event.format}</p>
+                    <p className="text-on-surface text-sm">{event.format}</p>
                   </div>
                 )}
 
@@ -519,7 +526,7 @@ const Events = () => {
                     isRegisteredForLol ? (
                       <button
                         disabled
-                        className="block w-full text-center bg-gray-800 text-gray-500 py-3 rounded-lg font-bold cursor-not-allowed border border-gray-700"
+                        className="block w-full text-center bg-surface-container-high text-on-surface-variant/60 py-3 rounded-xl font-bold cursor-not-allowed border border-outline-variant/20 text-xs font-label uppercase tracking-widest"
                       >
                         REGISTERED ✓
                       </button>
@@ -527,7 +534,7 @@ const Events = () => {
                       <button 
                         onClick={handleRegisterLolClick}
                         disabled={isFetchingLolProfile}
-                        className="block w-full text-center bg-yellow-400 text-black py-3 rounded-lg font-bold hover:bg-yellow-500 transition-colors"
+                        className="block w-full text-center bg-primary text-[#3c2f00] py-3 rounded-xl font-bold hover:bg-[#d4af37] transition-colors text-xs font-label uppercase tracking-widest shadow-md shadow-primary/10"
                       >
                         {isFetchingLolProfile ? "LOADING PROFILE..." : "REGISTER"}
                       </button>
@@ -537,7 +544,7 @@ const Events = () => {
                       href={event.register_link} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="block w-full text-center bg-yellow-400 text-black py-3 rounded-lg font-bold hover:bg-yellow-500 transition-colors"
+                      className="block w-full text-center bg-primary text-[#3c2f00] py-3 rounded-xl font-bold hover:bg-[#d4af37] transition-colors text-xs font-label uppercase tracking-widest shadow-md shadow-primary/10"
                     >
                       REGISTER
                     </a>
@@ -548,16 +555,16 @@ const Events = () => {
             
             {/* Admin Edit/Delete Controls */}
             {isAdmin && (
-              <div className="mt-8 pt-6 border-t border-gray-800 flex flex-wrap items-center gap-4">
+              <div className="mt-8 pt-6 border-t border-outline-variant/10 flex flex-wrap items-center gap-4">
                 <button 
                   onClick={() => openEditModal(event)}
-                  className="bg-gray-800 text-yellow-400 px-5 py-2 rounded-md font-bold text-sm hover:bg-gray-700 transition-colors"
+                  className="bg-surface-container-high text-primary border border-primary/30 px-5 py-2 rounded-lg font-bold text-xs uppercase font-label tracking-wider hover:bg-surface-container-highest transition-colors"
                 >
                   Edit Event
                 </button>
                 <button 
                   onClick={() => handleDelete(event.id)}
-                  className="bg-red-900/50 text-red-400 border border-red-900 px-5 py-2 rounded-md font-bold text-sm hover:bg-red-900 hover:text-red-200 transition-colors"
+                  className="bg-red-900/30 text-red-400 border border-red-900/50 px-5 py-2 rounded-lg font-bold text-xs uppercase font-label tracking-wider hover:bg-red-900/60 hover:text-red-200 transition-colors"
                 >
                   Delete Event
                 </button>
@@ -570,18 +577,17 @@ const Events = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#111111] text-white pt-24 font-sans relative">
+    <div className="min-h-screen text-on-surface pt-4 sm:pt-6 font-sans relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 relative">
         
         {/* Header Section */}
-        <div className="flex justify-between items-end border-b border-gray-800 pb-8 mb-12">
+        <div className="flex justify-between items-end border-b border-outline-variant/10 pb-8 mb-10">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-serif text-gray-100 mb-4 font-bold">
+            <h1 className="text-4xl font-serif leading-tight text-on-surface sm:text-5xl">
               Club Events
             </h1>
-            <p className="text-gray-400 text-lg">
-              The curated schedule of major club events, workshops, and tournaments. 
-              
+            <p className="mt-3 text-sm font-light leading-relaxed text-on-surface-variant/80 sm:text-base">
+              The curated schedule of major club events, workshops, and tournaments.
             </p>
           </div>
 
@@ -604,7 +610,7 @@ const Events = () => {
                 });
                 setIsModalOpen(true);
               }}
-              className="bg-yellow-400 text-black px-6 py-2 rounded-md font-bold text-sm hover:bg-yellow-500 transition-colors shadow-lg shrink-0"
+              className="bg-primary text-[#3c2f00] px-6 py-2.5 rounded-xl font-bold text-xs font-label uppercase tracking-widest hover:bg-[#d4af37] transition-colors shadow-lg shrink-0 cursor-pointer"
             >
               + Create Event
             </button>
@@ -612,36 +618,35 @@ const Events = () => {
         </div>
 
         {/* Tab Selection Sub-Navbar with divider */}
-        <div className="flex border-b border-gray-800 mb-10 pb-4 items-center gap-6">
+        <div className="flex border-b border-outline-variant/10 mb-10 pb-4 items-center gap-6">
           <button 
             type="button"
             onClick={() => setActiveTab('upcoming')}
-            className={`text-xl font-serif transition-colors outline-none ${
-              activeTab === 'upcoming' ? 'text-yellow-400 font-bold' : 'text-gray-400 hover:text-gray-200'
+            className={`text-xl font-serif transition-colors outline-none cursor-pointer ${
+              activeTab === 'upcoming' ? 'text-primary font-bold' : 'text-on-surface-variant/70 hover:text-on-surface'
             }`}
           >
             Upcoming Events
           </button>
           
           {/* Vertical Title Divider */}
-          <div className="h-5 w-[1px] bg-gray-800" />
+          <div className="h-5 w-[1px] bg-outline-variant/20" />
           
           <button 
             type="button"
-            onClick={() => setIsYearModalOpen(true)}
-            className={`text-xl font-serif transition-colors flex items-center gap-1.5 outline-none ${
-              activeTab === 'past' ? 'text-yellow-400 font-bold' : 'text-gray-400 hover:text-gray-200'
+            onClick={() => setActiveTab('past')}
+            className={`text-xl font-serif transition-colors outline-none cursor-pointer ${
+              activeTab === 'past' ? 'text-primary font-bold' : 'text-on-surface-variant/70 hover:text-on-surface'
             }`}
           >
-            <span>Past Events</span>
-            <span className="material-symbols-outlined text-sm">expand_more</span>
+            Past Events
           </button>
         </div>
 
         {/* Loading State */}
         {isLoading ? (
           <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
           </div>
         ) : (
           <div>
@@ -656,61 +661,57 @@ const Events = () => {
                 )}
               </div>
             ) : (
-              <div>
-                {pastEvents.length === 0 ? (
-                  <p className="text-gray-500 italic py-8">No past events recorded for {selectedYear}.</p>
-                ) : (
-                  <div className="space-y-6">
-                    {pastEvents.map(event => renderEventCard(event))}
+              <div className="flex flex-col md:flex-row gap-12 mt-8">
+                {/* Left Column: Year Navigation Buttons matching PreviousTeams */}
+                <div className="w-full md:w-1/4 flex flex-col gap-4">
+                  {yearsList.map((year) => (
+                    <button
+                      key={year}
+                      type="button"
+                      onClick={() => setSelectedYear(year)}
+                      className={`w-full px-6 py-4 rounded-2xl text-sm font-bold uppercase tracking-widest transition-all duration-300 relative overflow-hidden flex items-center justify-between group cursor-pointer
+                        ${selectedYear === year 
+                          ? 'bg-primary text-on-primary shadow-lg shadow-primary/30 border-none' 
+                          : 'bg-surface-container-low border border-outline-variant/30 text-on-surface hover:border-primary hover:text-primary'
+                        }`}
+                    >
+                      <span className="relative z-10 flex items-center gap-3">
+                        <span className="material-symbols-outlined text-[18px] opacity-80">
+                          calendar_month
+                        </span>
+                        {year}
+                      </span>
+                      {selectedYear === year && (
+                        <span className="material-symbols-outlined relative z-10 text-[18px]">
+                          chevron_right
+                        </span>
+                      )}
+                      {/* Subtle hover effect for inactive buttons */}
+                      {selectedYear !== year && (
+                        <div className="absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-[0%] transition-transform duration-500 ease-out"></div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Right Column: Events for Selected Year */}
+                <div className="w-full md:w-3/4">
+                  <div className="mb-6 border-b border-outline-variant/20 pb-4">
+                    <h3 className="text-3xl sm:text-4xl font-serif font-bold text-on-surface">
+                      {selectedYear} Events
+                    </h3>
                   </div>
-                )}
+
+                  {pastEvents.length === 0 ? (
+                    <p className="text-gray-500 italic py-8">No past events recorded for {selectedYear}.</p>
+                  ) : (
+                    <div className="space-y-6">
+                      {pastEvents.map(event => renderEventCard(event))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
-          </div>
-        )}
-
-        {/* Year Selection Modal with Backdrop Blur */}
-        {isYearModalOpen && (
-          <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50 p-4 animate-[fadeIn_0.2s_ease-out]"
-            onClick={() => setIsYearModalOpen(false)}
-          >
-            <div 
-              className="bg-[#161616] p-8 rounded-xl max-w-xs w-full border border-gray-800 shadow-2xl relative"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button 
-                onClick={() => setIsYearModalOpen(false)}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-300 transition-colors"
-              >
-                <span className="material-symbols-outlined text-sm">close</span>
-              </button>
-
-              <h3 className="text-lg text-yellow-400 font-serif font-bold mb-6 text-center">
-                Select Year
-              </h3>
-
-              <div className="flex flex-col gap-2.5">
-                {yearsList.map(year => (
-                  <button
-                    key={year}
-                    type="button"
-                    onClick={() => {
-                      setSelectedYear(year);
-                      setActiveTab('past');
-                      setIsYearModalOpen(false);
-                    }}
-                    className={`w-full py-3 rounded-lg border text-sm font-semibold transition-all ${
-                      selectedYear === year 
-                        ? 'bg-yellow-400 text-black border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.25)]' 
-                        : 'bg-[#222]/40 text-gray-200 border-gray-800/80 hover:border-gray-700 hover:bg-[#2a2a2a]/60'
-                    }`}
-                  >
-                    {year}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         )}
       </div>

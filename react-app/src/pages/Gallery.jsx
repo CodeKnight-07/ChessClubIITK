@@ -611,13 +611,16 @@ const Gallery = () => {
   return (
     <>
       <div className="px-6 md:px-12 pb-20 max-w-7xl mx-auto min-h-screen text-on-surface">
-      <header className="py-16 text-center">
-        <p className="text-primary font-label text-xs tracking-[0.4em] uppercase mb-4">
+      <header className="py-10 text-center max-w-3xl mx-auto">
+        <p className="text-primary font-label text-xs tracking-[0.3em] uppercase mb-3">
           Visual Archive
         </p>
-        <h1 className="text-5xl sm:text-6xl font-serif italic mb-8">
+        <h1 className="text-4xl font-serif leading-tight text-on-surface sm:text-5xl mb-3">
           The Gallery of <span className="text-primary">Kings</span>
         </h1>
+        <p className="text-sm font-light leading-relaxed text-on-surface-variant/80 sm:text-base mb-6">
+          Moments of triumph, intense calculations, and community memories captured through the lens.
+        </p>
       </header>
 
       {/* Category selector filter bar */}

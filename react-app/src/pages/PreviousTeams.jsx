@@ -102,9 +102,12 @@ const PreviousTeams = () => {
     <div>
       <div className="px-4 sm:px-6 md:px-12 pb-20 max-w-7xl mx-auto min-h-[70vh]">
         <section className="mb-20 mt-12">
-          <div className="flex flex-col items-center mb-12 text-center">
-            <h3 className="text-xs font-label uppercase tracking-[0.2em] text-primary mb-2">Our Legacy</h3>
-            <h2 className="text-5xl font-serif font-bold tracking-tighter text-on-surface">Previous Teams</h2>
+          <div className="flex flex-col items-center mb-10 text-center max-w-3xl mx-auto">
+            <p className="text-xs font-label uppercase tracking-[0.3em] text-primary mb-3">Our Legacy</p>
+            <h1 className="text-4xl font-serif leading-tight text-on-surface sm:text-5xl">Previous Teams</h1>
+            <p className="mt-3 text-sm font-light leading-relaxed text-on-surface-variant/80 sm:text-base">
+              Honoring the coordinators and team members who built and shaped the IITK Chess Community.
+            </p>
           </div>
 
           <div className="flex flex-col md:flex-row gap-12 mt-8">

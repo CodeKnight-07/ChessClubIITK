@@ -9,13 +9,13 @@ import { API_BASE_URL } from '../config';
 
 const PRE_SCHEDULED_EVENTS = [
   { id: 'pre-6', type: 'tournament', title: 'International Chess Day', location: 'chess.com', time: 'TBD', date: '2026-07-20' },
-  { id: 'pre-8', type: 'tournament', title: 'Candidates Start', location: 'chess.com', time: 'TBD', date: '2026-08-19' },
-  { id: 'pre-10', type: 'tournament', title: 'Candidates End', location: 'Online', time: 'TBD', date: '2026-09-04' },
-  { id: 'pre-12', type: 'tournament', title: 'IITK Chess Championship Starts', location: 'TBD', time: 'TBD', date: '2026-09-22' },
-  { id: 'pre-15', type: 'tournament', title: 'IITK Chess Championship Ends', location: 'TBD', time: 'TBD', date: '2026-10-08' },
-  { id: 'pre-14', type: 'tournament', title: 'FIDE Rated Open Rapid Chess Championship', location: 'TBD', time: 'TBD', date: '2026-10-11' },
-  { id: 'pre-16', type: 'workshop', title: 'FIDE Permissions & Designing', location: 'TBD', time: 'TBD', date: '2026-10-15' },
-  { id: 'pre-17', type: 'workshop', title: 'Puzzles Quiz', location: 'TBD', time: 'TBD', date: '2026-10-27' },
+  { id: 'pre-8', type: 'tournament', title: 'Candidates Start', location: 'chess.com', time: 'TBD', date: '2026-08-15' },
+
+  
+  
+  
+  
+ 
 ];
 // A dictionary to map event types to their specific colors
 const eventTheme = {
@@ -290,7 +290,7 @@ return (
         <div className="mb-8 md:mb-10">
           <div className="max-w-3xl">
             <h2 className="text-4xl font-serif leading-tight text-on-surface sm:text-5xl">
-Upcoming Events: <span className="text-primary">IITK Chess Club</span>
+Upcoming Events
             </h2>
             <p className="mt-3 text-sm font-light leading-relaxed text-on-surface-variant/80 sm:text-base">
               Stay up to date with the IITK Chess Community's upcoming tournaments, workshops, and events.
