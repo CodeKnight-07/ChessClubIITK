@@ -39,7 +39,9 @@ const COORDINATORS = [
     role: "Coordinator",
     funnyDescription: `"I wake up and eat parathas with samosational level of enthusiasm"`,
     email: "ineshag24@iitk.ac.in",
-    image: ineshImg
+    image: ineshImg,
+    instagram: "https://www.instagram.com/inesh_aggarwal29/",
+    linkedin: "https://www.linkedin.com/in/inesh-aggarwal-579373337/"
 
   },
   {
@@ -60,7 +62,9 @@ const COORDINATORS = [
  Got a 1-month Diamond membership on Samay’s stream after Guki became the World Champ!
 "`,
     email: "rishig24@iitk.ac.in",
-    image: rishiImg
+    image: rishiImg,
+    instagram: "https://www.instagram.com/rishig.007/",
+    linkedin: "https://www.linkedin.com/in/rishi-gupta-19459231a/"
   },
   {
     id: 'coord-3',
@@ -69,7 +73,9 @@ const COORDINATORS = [
     funnyDescription: `"I look strict to juniors. Then I start talking...
 It gets worse."`,
     email: "rudrad24@iitk.ac.in",
-    image: rudraImg
+    image: rudraImg,
+    instagram: "https://www.instagram.com/rudra.dwivedi_18/",
+    // linkedin: "https://www.linkedin.com/in/rishi-gupta-19459231a/"
   },
   {
     id: 'coord-4',
@@ -77,7 +83,9 @@ It gets worse."`,
     role: "Coordinator",
     funnyDescription: `"Running on chewing gum and the annual 'this is DC's year' agenda."`,
     email: `shauryav24@iitk.ac.in`,
-    image: shauryaImg
+    image: shauryaImg,
+    instagram: "https://www.instagram.com/shaurya_vats2006/",
+    linkedin: "https://www.linkedin.com/in/shaurya-vats-120859312/"
   }
 ];
 
@@ -301,53 +309,52 @@ const ContactCard = ({ person }) => (
       </p>
 
       {/* Social / Contact Icons Bar */}
-      <div className="flex items-center justify-center gap-6 relative z-10 pt-4 border-t border-outline-variant/10">
-        {person.instagram && (
-          <a
-            href={person.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-on-surface-variant hover:text-primary transition-colors duration-300"
-            aria-label="Instagram"
-          >
-            {/* Instagram SVG goes here */}
-            <svg className="w-4 h-4 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-            </svg>
-          </a>
-        )}
+      {(person.instagram || person.linkedin || person.email) && (
+        <div className="flex items-center justify-center gap-6 relative z-10 pt-4 border-t border-outline-variant/10">
+          {person.instagram && (
+            <a
+              href={person.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-zinc-400 hover:text-primary transition-colors duration-300"
+              aria-label="Instagram"
+            >
+              <svg className="w-4 h-4 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+            </a>
+          )}
 
-        {person.linkedin && (
-          <a
-            href={person.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-on-surface-variant hover:text-primary transition-colors duration-300"
-            aria-label="LinkedIn"
-          >
-            {/* LinkedIn SVG goes here */}
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452z"/>
-            </svg>
-          </a>
-        )}
+          {person.linkedin && (
+            <a
+              href={person.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-zinc-400 hover:text-primary transition-colors duration-300"
+              aria-label="LinkedIn"
+            >
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452z"/>
+              </svg>
+            </a>
+          )}
 
-        {person.email && (
-          <a
-            href={`mailto:${person.email}`}
-            className="text-on-surface-variant hover:text-primary transition-colors duration-300"
-            aria-label="Email"
-          >
-            {/* Mail SVG goes here */}
-            <svg className="w-4 h-4 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-              <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>
-          </a>
-        )}
-      </div>
+          {person.email && (
+            <a
+              href={`mailto:${person.email}`}
+              className="text-zinc-400 hover:text-primary transition-colors duration-300"
+              aria-label="Email"
+            >
+              <svg className="w-4 h-4 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            </a>
+          )}
+        </div>
+      )}
     </div>
   </div>
 );

@@ -11,7 +11,7 @@ import { API_BASE_URL } from './config';
 import { globalCache } from './utils/cache';
 
 // Import critical images for preloading
-import chessboardImg from './assets/chessboard.jpg';
+import chessboardImg from './assets/chessclubiitklogo.jpeg';
 import homePgBg from './pages/home-pg-bg.png';
 import logoImg from './assets/chessclubiitklogo.jpeg';
 
@@ -55,7 +55,7 @@ const GlobalPreloader = () => (
         <img src={logoImg} alt="Chess Club Logo" className="w-full h-full object-cover animate-none" />
       </div>
       <div className="space-y-1">
-        <h1 className="text-3xl font-serif tracking-tight text-white">Chess Club IITK</h1>
+        <h1 className="text-3xl font-serif tracking-tight text-white">Chess Club</h1>
         <p className="text-[10px] uppercase tracking-[0.25em] text-[#d4af37] font-semibold">IIT Kanpur</p>
       </div>
       <div className="w-40 h-[2px] bg-zinc-800 rounded-full overflow-hidden relative">

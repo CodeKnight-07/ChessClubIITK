@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/chessclubiitklogo.jpeg';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,6 +28,9 @@ const Navbar = () => {
     { name: 'Previous Teams', path: '/previous-teams' },
   ];
 
+  const location = useLocation();
+  const isHomepage = location.pathname === '/';
+
   return (
     <motion.nav
       initial={{ opacity: 0, y: -18 }}
@@ -43,12 +46,14 @@ const Navbar = () => {
       >
         <Link to="/" className="flex items-center gap-3 sm:gap-4 group">
           <img
-            alt="Chess Club IITK Seal"
+            alt="Chess Club Seal"
             className="w-10 h-10 rounded-full border border-primary-container/20 group-hover:border-primary transition-all duration-300 shadow-md object-cover"
             src={logo}
           />
           <div className="flex flex-col">
-            <span className="text-lg sm:text-xl font-headline text-primary leading-none">Chess Club IITK</span>
+            <span className="text-lg sm:text-xl font-headline text-primary leading-none">
+              Chess Club
+            </span>
             <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/60 font-bold">IIT Kanpur</span>
           </div>
         </Link>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import fresherImg from '../assets/fresher_league_recap_1775765383248.png';
 import grandSwissImg from '../assets/grand_swiss_recap_1775765397656.png';
 import fideImg from '../assets/fide.png';
-import featuredEventImg from '../assets/featured_event.png';
+import logoImg from '../assets/chessclubiitklogo.jpeg';
 import lolImg from "../assets/lol_poster.png";
 import { useAuth } from '../context/AuthContext';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -61,6 +61,13 @@ const Landing = () => {
   const eventVisibility = useTransform(scrollYProgress, v => (v < 0.66 ? 'none' : 'flex'));
 
   useEffect(() => {
+    document.title = "Chess Club";
+    return () => {
+      document.title = "Chess Club";
+    };
+  }, []);
+
+  useEffect(() => {
     // Delay preloading by 2 seconds to prioritize main landing page resources
     const timer = setTimeout(() => {
       const imagesToPreload = [tanmayImg, akshatImg, kushagraImg, pulkitImg, handLeftImg, handRightImg, kingBeigeImg, queenGreenImg];
@@ -116,13 +123,7 @@ const Landing = () => {
 
   // Helper to map event to image
   const getEventImage = (event) => {
-    if (!event) return featuredEventImg;
-    const t = String(event.title).toLowerCase();
-    if (t.includes('league of legends')) return lolImg;
-    if (t.includes("fresher's chess") || t.includes("freshers chess")) return fresherImg;
-    if (t.includes('grand swiss')) return grandSwissImg;
-    if (t.includes('fide rated') || t.includes('fide open')) return fideImg;
-    return featuredEventImg;
+    return logoImg;
   };
 
   return (
