@@ -14,6 +14,7 @@ import navankurImg from "../assets/exCoordinators/navankur.jpg";
 import abhijeetImg from "../assets/exCoordinators/abhijeet.jpg";
 import ayushImg from "../assets/exCoordinators/ayush.jpg";
 import tejasImg from "../assets/exCoordinators/tejas.jpg";
+import vaibhavImg from "../assets/exCoordinators/vaibhav.jpg";
 
 // 25-26 Secretaries imports
 import secArjit from '../assets/secretaries_25_26/arjit.jpg';
@@ -54,7 +55,7 @@ const TEAMS_DATA = {
     { name: "Himanshu Beniwal", email: "‎ ", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." },
     { name: "Pranshu Gaur", email: "‎ ", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." },
     { name: "Prem Milind Gujrathi", email: "‎ ", image: premImg, funnyDescription: "Placeholder description for 22-23 team." },
-    { name: "Vaibhav Waghmare", email: "‎ ", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." }
+    { name: "Vaibhav Waghmare", email: "‎ ", image: vaibhavImg, funnyDescription: "Placeholder description for 22-23 team." }
   ]
 };
 

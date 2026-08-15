@@ -435,8 +435,13 @@ const Events = () => {
       .map(e => getEventTenure(e.endDate || e.date))
   )).sort((a, b) => b.localeCompare(a));
   
-  const defaultYears = ['26-27 Tenure', '25-26 Tenure'];
-  const yearsList = Array.from(new Set([...(availableYears.length > 0 ? availableYears : []), ...defaultYears])).sort((a, b) => b.localeCompare(a));
+  const yearsList = availableYears.length > 0 ? availableYears : ['26-27 Tenure'];
+
+  useEffect(() => {
+    if (yearsList.length > 0 && !yearsList.includes(selectedYear)) {
+      setSelectedYear(yearsList[0]);
+    }
+  }, [yearsList, selectedYear]);
 
   const pastEvents = events
     .filter(e => {

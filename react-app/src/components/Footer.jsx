@@ -43,7 +43,7 @@ const Footer = () => {
             </li>
             <li>
               <Link to="/contact" className="cursor-pointer transition-colors hover:text-primary">
-                Core Committee
+                Core Team
               </Link>
             </li>
             <li>

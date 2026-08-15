@@ -252,11 +252,9 @@ const Blogs = () => {
     }
   }, []);
 
-  const defaultYears = ['26-27 Tenure', '25-26 Tenure'];
   const uniqueYears = Array.from(new Set(posts.map(p => getPostYear(p))))
     .sort((a, b) => b.localeCompare(a));
-  const yearsList = Array.from(new Set([...defaultYears, ...uniqueYears]))
-    .sort((a, b) => b.localeCompare(a));
+  const yearsList = uniqueYears.length > 0 ? uniqueYears : ['26-27 Tenure'];
 
   useEffect(() => {
     if (yearsList.length > 0 && !yearsList.includes(selectedYear)) {
