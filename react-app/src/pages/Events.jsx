@@ -438,10 +438,10 @@ const Events = () => {
   const yearsList = availableYears.length > 0 ? availableYears : ['26-27 Tenure'];
 
   useEffect(() => {
-    if (yearsList.length > 0 && !yearsList.includes(selectedYear)) {
+    if (!isLoading && yearsList.length > 0 && !yearsList.includes(selectedYear)) {
       setSelectedYear(yearsList[0]);
     }
-  }, [yearsList, selectedYear]);
+  }, [isLoading, yearsList, selectedYear]);
 
   const pastEvents = events
     .filter(e => {
