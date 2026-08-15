@@ -177,7 +177,7 @@ const Signup = () => {
           <h2 className="text-center text-3xl font-serif font-bold tracking-tight text-on-surface">
             {mode === 'alumni' ? (
               <>
-                Alumni <span className="text-primary">Access</span>
+                Alumnus <span className="text-primary">Access</span>
               </>
             ) : step === 1 ? (
               <>
@@ -208,7 +208,7 @@ const Signup = () => {
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              Current Student
+              Active Member
             </button>
             <button
               type="button"
@@ -219,7 +219,7 @@ const Signup = () => {
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              Alumni
+              Alumnus
             </button>
           </div>
         )}

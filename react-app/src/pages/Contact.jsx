@@ -194,15 +194,7 @@ const SECRETARIES = [
 
     image: hariomImg,
   },
-  {
-    id: "sec-14",
-    name: "Kratagya Jain",
-    role: "Secretary",
-    funnyDescription: `"Discovering creative ways not to win at chess"`,
 
-    image: kratagyaImg,
-  },
-  
   {
     id: "sec-16",
     name: "Mayank Bhakhand",
