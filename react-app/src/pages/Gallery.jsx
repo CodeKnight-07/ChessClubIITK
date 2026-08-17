@@ -274,8 +274,21 @@ import gs9 from '../Gallery/grand swiss/9.jpg';
 import gs10 from '../Gallery/grand swiss/10.jpg';
 import gs11 from '../Gallery/grand swiss/11.jpg';
 
+import cd1 from '../Gallery/CANDIDATES 2025/1.JPG';
+import cd2 from '../Gallery/CANDIDATES 2025/2.JPG';
+import cd3 from '../Gallery/CANDIDATES 2025/3.JPG';
+import cd4 from '../Gallery/CANDIDATES 2025/4.JPG';
+import cd5 from '../Gallery/CANDIDATES 2025/5.JPG';
+import cd6 from '../Gallery/CANDIDATES 2025/6.JPG';
+import cd7 from '../Gallery/CANDIDATES 2025/7.JPG';
+import cd8 from '../Gallery/CANDIDATES 2025/8.JPG';
+import cd9 from '../Gallery/CANDIDATES 2025/9.JPG';
+import cd10 from '../Gallery/CANDIDATES 2025/10.JPG';
+import cd11 from '../Gallery/CANDIDATES 2025/11.JPG';
+
 const FCL_PHOTOS = [fcl1, fcl2, fcl3, fcl4, fcl5, fcl6, fcl7, fcl9, fcl10, fcl11, fcl12, fcl13];
 const IITK_GRAND_SWISS_PHOTOS = [gs1, gs2, gs3, gs4, gs5, gs6, gs7, gs8, gs9, gs10, gs11];
+const CANDIDATES_2025_PHOTOS = [cd1, cd2, cd3, cd4, cd5, cd6, cd7, cd8, cd9, cd10, cd11];
 
 const PREVIOUS_YEARS = ['25-26 Tenure'];
 const PREVIOUS_YEARS_DATA = {
@@ -295,6 +308,14 @@ const PREVIOUS_YEARS_DATA = {
       description: "The grandest chess tournament of the year.",
       photos: IITK_GRAND_SWISS_PHOTOS,
       image: IITK_GRAND_SWISS_PHOTOS[0]
+    },
+    {
+      id: "event-3",
+      category: "TOURNAMENTS",
+      title: "IITK Candidates 2025",
+      description: "Who will challenge the champion?",
+      photos: CANDIDATES_2025_PHOTOS,
+      image: CANDIDATES_2025_PHOTOS[0]
     }
   ]
 };
@@ -307,14 +328,18 @@ const Gallery = () => {
   const [slideshowIndex, setSlideshowIndex] = useState(0);
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  // Replace lightbox states with Diary Modal states
+  const [isOpenDiaryModal, setIsOpenDiaryModal] = useState(false);
+  const [diaryPhotos, setDiaryPhotos] = useState([]);
+  const [diaryTitle, setDiaryTitle] = useState('');
   const [lightboxPhotos, setLightboxPhotos] = useState([]);
   const [lightboxTitle, setLightboxTitle] = useState('');
-
-  // 3D Book spread state variables
-  const [spreadIndex, setSpreadIndex] = useState(0);
-  const [previousSpread, setPreviousSpread] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [animDirection, setAnimDirection] = useState('next');
+  
+  // Keep/reset 3D book spread index when opening a new diary
+  const [diarySpreadIndex, setDiarySpreadIndex] = useState(0);
+  const [diaryPrevSpread, setDiaryPrevSpread] = useState(0);
+  const [diaryIsAnimating, setDiaryIsAnimating] = useState(false);
+  const [diaryAnimDirection, setDiaryAnimDirection] = useState('next');
 
   // Pull login / admin auth status
   const { isLoggedIn, token } = useAuth();
@@ -452,7 +477,7 @@ const Gallery = () => {
       });
       if (response.ok) {
         setClubMemoriesPhotos(prev => prev.filter((_, i) => i !== index));
-        setSpreadIndex(0);
+        setDiarySpreadIndex(0);
       } else {
         alert("Failed to delete photo.");
       }
@@ -538,20 +563,15 @@ const Gallery = () => {
 
   const handleSpotlightClick = () => {
     if (SLIDESHOW_PHOTOS.length === 0) return;
-    const currentPhoto = SLIDESHOW_PHOTOS[slideshowIndex];
-    const mainIndex = FIDE_RATED_PHOTOS.indexOf(currentPhoto);
-    setLightboxPhotos(FIDE_RATED_PHOTOS);
-    setLightboxTitle('SBI GIC Ltd. Presents FIDE Rated Open Rapid Chess Tournament 2026');
-    setLightboxIndex(mainIndex !== -1 ? mainIndex : 0);
-    setIsOpenLightbox(true);
+    openExhibition(FIDE_RATED_PHOTOS, 'SBI GIC Ltd. Presents FIDE Rated Open Rapid Chess Tournament 2026');
   };
 
-  const openExhibition = (photos, title, startIdx = 0) => {
+  const openExhibition = (photos, title) => {
     if (!photos || photos.length === 0) return;
-    setLightboxPhotos(photos);
-    setLightboxTitle(title);
-    setLightboxIndex(startIdx);
-    setIsOpenLightbox(true);
+    setDiaryPhotos(photos);
+    setDiaryTitle(title);
+    setDiarySpreadIndex(0);
+    setIsOpenDiaryModal(true);
   };
 
   // Measure container width
@@ -569,31 +589,31 @@ const Gallery = () => {
 
   const handleCategoryChange = (cat) => {
     setActiveCategory(cat);
-    setSpreadIndex(0);
-    setIsAnimating(false);
+    setDiarySpreadIndex(0);
+    setDiaryIsAnimating(false);
   };
 
   // Pagination for dynamic memories 3D book
   const totalSpreads = Math.floor(clubMemoriesPhotos.length / 2) + 2;
 
   const handleNext = () => {
-    if (isAnimating || totalSpreads <= 1) return;
-    setAnimDirection('next');
-    setPreviousSpread(spreadIndex);
-    setSpreadIndex(prev => (prev + 1) % totalSpreads);
-    setIsAnimating(true);
+    if (diaryIsAnimating || totalSpreads <= 1) return;
+    setDiaryAnimDirection('next');
+    setDiaryPrevSpread(diarySpreadIndex);
+    setDiarySpreadIndex(prev => (prev + 1) % totalSpreads);
+    setDiaryIsAnimating(true);
   };
 
   const handlePrev = () => {
     if (isAnimating || totalSpreads <= 1) return;
-    setAnimDirection('prev');
-    setPreviousSpread(spreadIndex);
-    setSpreadIndex(prev => (prev - 1 + totalSpreads) % totalSpreads);
-    setIsAnimating(true);
+    setDiaryAnimDirection('prev');
+    setDiaryPrevSpread(diarySpreadIndex);
+    setDiarySpreadIndex(prev => (prev - 1 + totalSpreads) % totalSpreads);
+    setDiaryIsAnimating(true);
   };
 
   const handleAnimationComplete = () => {
-    setIsAnimating(false);
+    setDiaryIsAnimating(false);
   };
 
   const handleNextPhoto = () => {
@@ -1029,29 +1049,29 @@ const Gallery = () => {
                       {/* Left Side Static Page */}
                       <div className="w-1/2 h-full">
                         {getBookPageContent(
-                          isAnimating
-                            ? (animDirection === 'next' ? previousSpread * 2 - 1 : spreadIndex * 2 - 1)
-                            : spreadIndex * 2 - 1
+                          diaryIsAnimating
+                            ? (diaryAnimDirection === 'next' ? diaryPrevSpread * 2 - 1 : diarySpreadIndex * 2 - 1)
+                            : diarySpreadIndex * 2 - 1
                         )}
                       </div>
 
                       {/* Right Side Static Page */}
                       <div className="w-1/2 h-full">
                         {getBookPageContent(
-                          isAnimating
-                            ? (animDirection === 'next' ? spreadIndex * 2 : previousSpread * 2)
-                            : spreadIndex * 2
+                          diaryIsAnimating
+                            ? (diaryAnimDirection === 'next' ? diarySpreadIndex * 2 : diaryPrevSpread * 2)
+                            : diarySpreadIndex * 2
                         )}
                       </div>
 
                       {/* Turning Page Overlay */}
                       <AnimatePresence mode="wait">
-                        {isAnimating && (
+                        {diaryIsAnimating && (
                           <motion.div
-                            key={`${spreadIndex}-${animDirection}`}
-                            initial={{ rotateY: animDirection === 'next' ? 0 : -180 }}
-                            animate={{ rotateY: animDirection === 'next' ? -180 : 0 }}
-                            exit={{ rotateY: animDirection === 'next' ? -180 : 0 }}
+                            key={`${diarySpreadIndex}-${diaryAnimDirection}`}
+                            initial={{ rotateY: diaryAnimDirection === 'next' ? 0 : -180 }}
+                            animate={{ rotateY: diaryAnimDirection === 'next' ? -180 : 0 }}
+                            exit={{ rotateY: diaryAnimDirection === 'next' ? -180 : 0 }}
                             transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
                             onAnimationComplete={handleAnimationComplete}
                             style={{
@@ -1080,7 +1100,7 @@ const Gallery = () => {
                               }}
                             >
                               {getBookPageContent(
-                                animDirection === 'next' ? previousSpread * 2 : spreadIndex * 2
+                                diaryAnimDirection === 'next' ? diaryPrevSpread * 2 : diarySpreadIndex * 2
                               )}
                             </div>
 
@@ -1098,7 +1118,7 @@ const Gallery = () => {
                               }}
                             >
                               {getBookPageContent(
-                                animDirection === 'next' ? spreadIndex * 2 - 1 : previousSpread * 2 - 1
+                                diaryAnimDirection === 'next' ? diarySpreadIndex * 2 - 1 : diaryPrevSpread * 2 - 1
                               )}
                             </div>
                           </motion.div>
@@ -1110,7 +1130,7 @@ const Gallery = () => {
                       <div className="absolute left-1/2 -translate-x-1/2 top-0 h-full w-[1px] bg-black/30 pointer-events-none z-30" />
 
                       {/* Clicking targets */}
-                      {!isAnimating && totalSpreads > 1 && (
+                      {!diaryIsAnimating && totalSpreads > 1 && (
                         <>
                           <div
                             onClick={handlePrev}
@@ -1131,14 +1151,14 @@ const Gallery = () => {
                       <>
                         <button
                           onClick={handlePrev}
-                          disabled={isAnimating}
+                          disabled={diaryIsAnimating}
                           className="absolute left-[-20px] sm:left-[-35px] md:left-[-56px] top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-low/95 border border-outline-variant/20 hover:border-primary/50 text-on-surface flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-40 disabled:scale-100 disabled:pointer-events-none transition-all shadow-xl outline-none"
                         >
                           <span className="material-symbols-outlined text-xl sm:text-2xl">chevron_left</span>
                         </button>
                         <button
                           onClick={handleNext}
-                          disabled={isAnimating}
+                          disabled={diaryIsAnimating}
                           className="absolute right-[-20px] sm:right-[-35px] md:right-[-56px] top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-low/95 border border-outline-variant/20 hover:border-primary/50 text-on-surface flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-40 disabled:scale-100 disabled:pointer-events-none transition-all shadow-xl outline-none"
                         >
                           <span className="material-symbols-outlined text-xl sm:text-2xl">chevron_right</span>
@@ -1151,7 +1171,7 @@ const Gallery = () => {
                   {totalSpreads > 1 && (
                     <div className="mt-6 text-xs font-label uppercase tracking-widest text-on-surface-variant/60 flex items-center gap-2 select-none">
                       <span className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                      <span>Spread {spreadIndex + 1} of {totalSpreads} • Memories ({clubMemoriesPhotos.length} photos)</span>
+                      <span>Spread {diarySpreadIndex + 1} of {totalSpreads} • Memories ({clubMemoriesPhotos.length} photos)</span>
                     </div>
                   )}
                 </div>
@@ -1165,78 +1185,167 @@ const Gallery = () => {
         )}
       </AnimatePresence>
 
-      {/* Full-Screen Image Lightbox Modal */}
+      {/* Full-Screen 3D Diary Book Modal */}
       <AnimatePresence>
-        {isOpenLightbox && lightboxPhotos.length > 0 && (
+        {isOpenDiaryModal && diaryPhotos.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 md:p-8 outline-none"
+            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 md:p-8 outline-none overflow-y-auto"
           >
             {/* Header Controls */}
-            <div className="flex justify-between items-center w-full max-w-7xl mx-auto h-12">
-              <div className="text-on-surface/75 text-xs md:text-sm font-label uppercase tracking-widest truncate max-w-[70%]">
-                {lightboxTitle} Capture ({lightboxIndex + 1} / {lightboxPhotos.length})
+            <div className="flex justify-between items-center w-full max-w-5xl mx-auto h-12 flex-shrink-0">
+              <div className="text-primary text-xs md:text-sm font-label uppercase tracking-widest truncate max-w-[80%]">
+                {diaryTitle} • Scrapbook Archives ({diaryPhotos.length} Photos)
               </div>
               <button
-                onClick={() => setIsOpenLightbox(false)}
-                className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary transition-colors text-on-surface hover:text-[#3c2f00] flex items-center justify-center outline-none shadow-lg"
+                onClick={() => setIsOpenDiaryModal(false)}
+                className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary transition-colors text-on-surface hover:text-[#3c2f00] flex items-center justify-center outline-none shadow-lg cursor-pointer"
               >
                 <span className="material-symbols-outlined text-xl">close</span>
               </button>
             </div>
 
-            {/* Main Photo Area */}
-            <div className="flex-1 flex items-center justify-center relative max-w-7xl mx-auto w-full my-4">
-              {/* Previous Button */}
-              <button
-                onClick={handlePrevPhoto}
-                className="absolute left-2 md:left-4 z-10 w-12 h-12 rounded-full bg-surface-container-low/80 hover:bg-primary text-on-surface hover:text-[#3c2f00] flex items-center justify-center hover:scale-105 active:scale-95 transition-all outline-none"
-              >
-                <span className="material-symbols-outlined text-2xl">chevron_left</span>
-              </button>
+            {/* Main 3D Book Container */}
+            <div className="flex-1 flex flex-col items-center justify-center relative max-w-5xl mx-auto w-full my-auto py-4">
+              {(() => {
+                const totalSpreads = Math.floor(diaryPhotos.length / 2) + 2;
 
-              {/* Active Image */}
-              <div className="relative max-h-[68vh] max-w-[85vw] flex items-center justify-center overflow-hidden rounded-xl shadow-2xl border border-outline-variant/10">
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={lightboxIndex}
-                    src={lightboxPhotos[lightboxIndex]}
-                    alt={`${lightboxTitle} Photo ${lightboxIndex + 1}`}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.25 }}
-                    className="max-h-[68vh] max-w-full object-contain rounded-xl"
-                  />
-                </AnimatePresence>
-              </div>
+                const handleDiaryNext = () => {
+                  if (diaryIsAnimating || totalSpreads <= 1) return;
+                  setDiaryAnimDirection('next');
+                  setDiaryPrevSpread(diarySpreadIndex);
+                  setDiarySpreadIndex(prev => (prev + 1) % totalSpreads);
+                  setDiaryIsAnimating(true);
+                };
 
-              {/* Next Button */}
-              <button
-                onClick={handleNextPhoto}
-                className="absolute right-2 md:right-4 z-10 w-12 h-12 rounded-full bg-surface-container-low/80 hover:bg-primary text-on-surface hover:text-[#3c2f00] flex items-center justify-center hover:scale-105 active:scale-95 transition-all outline-none"
-              >
-                <span className="material-symbols-outlined text-2xl">chevron_right</span>
-              </button>
-            </div>
+                const handleDiaryPrev = () => {
+                  if (diaryIsAnimating || totalSpreads <= 1) return;
+                  setDiaryAnimDirection('prev');
+                  setDiaryPrevSpread(diarySpreadIndex);
+                  setDiarySpreadIndex(prev => (prev - 1 + totalSpreads) % totalSpreads);
+                  setDiaryIsAnimating(true);
+                };
 
-            {/* Thumbnails Footer */}
-            <div className="w-full max-w-7xl mx-auto py-4 overflow-x-auto flex justify-center gap-2 border-t border-outline-variant/10">
-              {lightboxPhotos.map((photo, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setLightboxIndex(idx)}
-                  className={`w-16 h-12 md:w-20 md:h-14 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all ${
-                    idx === lightboxIndex
-                      ? 'border-primary scale-105 shadow-md shadow-primary/20'
-                      : 'border-transparent opacity-50 hover:opacity-100'
-                  }`}
-                >
-                  <img src={photo} alt="" className="w-full h-full object-cover" />
-                </button>
-              ))}
+                const getModalPageContent = (pageNum) => {
+                  if (pageNum < 0 || pageNum > diaryPhotos.length + 1) return null;
+                  if (pageNum === 0) return <DiaryPage pageNumber={0} isLeftPage={false} />;
+                  if (pageNum === diaryPhotos.length + 1) return <DiaryPage pageNumber={999} isLeftPage={true} />;
+
+                  const photoIdx = pageNum - 1;
+                  const photoUrl = diaryPhotos[photoIdx];
+                  return (
+                    <DiaryPage
+                      photoUrl={photoUrl}
+                      pageNumber={pageNum}
+                      isLeftPage={pageNum % 2 !== 0}
+                      isAdmin={false} // Turn off admin destructive edit controls inside modals if preferred, or pass `isAdmin`
+                    />
+                  );
+                };
+
+                return (
+                  <div className="w-full flex flex-col items-center">
+                    <div
+                      className="w-full max-w-[900px] aspect-[16/10] sm:aspect-[16/9.5] relative rounded-2xl bg-[#2d1f10] border-4 border-[#3e2c17] shadow-[0_25px_60px_rgba(0,0,0,0.8),inset_0_0_30px_rgba(0,0,0,0.8)] p-2 sm:p-3"
+                      style={{ perspective: '2000px', transformStyle: 'preserve-3d' }}
+                    >
+                      {/* Book Corners */}
+                      <div className="absolute top-1 left-1 w-6 h-6 border-t-2 border-l-2 border-[#d4af37]/80 rounded-tl-lg pointer-events-none z-30" />
+                      <div className="absolute top-1 right-1 w-6 h-6 border-t-2 border-r-2 border-[#d4af37]/80 rounded-tr-lg pointer-events-none z-30" />
+                      <div className="absolute bottom-1 left-1 w-6 h-6 border-b-2 border-l-2 border-[#d4af37]/80 rounded-bl-lg pointer-events-none z-30" />
+                      <div className="absolute bottom-1 right-1 w-6 h-6 border-b-2 border-r-2 border-[#d4af37]/80 rounded-br-lg pointer-events-none z-30" />
+
+                      {/* Pages Wrapper */}
+                      <div className="w-full h-full relative rounded-lg overflow-hidden flex shadow-inner" style={{ transformStyle: 'preserve-3d' }}>
+                        <div className="w-1/2 h-full">
+                          {getModalPageContent(
+                            diaryIsAnimating
+                              ? (diaryAnimDirection === 'next' ? diaryPrevSpread * 2 - 1 : diarySpreadIndex * 2 - 1)
+                              : diarySpreadIndex * 2 - 1
+                          )}
+                        </div>
+                        <div className="w-1/2 h-full">
+                          {getModalPageContent(
+                            diaryIsAnimating
+                              ? (diaryAnimDirection === 'next' ? diarySpreadIndex * 2 : diaryPrevSpread * 2)
+                              : diarySpreadIndex * 2
+                          )}
+                        </div>
+
+                        {/* Animation Page Turnover */}
+                        <AnimatePresence mode="wait">
+                          {diaryIsAnimating && (
+                            <motion.div
+                              key={`${diarySpreadIndex}-${diaryAnimDirection}`}
+                              initial={{ rotateY: diaryAnimDirection === 'next' ? 0 : -180 }}
+                              animate={{ rotateY: diaryAnimDirection === 'next' ? -180 : 0 }}
+                              exit={{ rotateY: diaryAnimDirection === 'next' ? -180 : 0 }}
+                              transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
+                              onAnimationComplete={() => setDiaryIsAnimating(false)}
+                              style={{
+                                position: "absolute",
+                                top: 0,
+                                right: 0,
+                                width: "50%",
+                                height: "100%",
+                                transformOrigin: "left center",
+                                transformStyle: "preserve-3d",
+                                zIndex: 25,
+                                pointerEvents: "none"
+                              }}
+                            >
+                              <div style={{ position: "absolute", inset: 0, width: "100%", height: "100%", backfaceVisibility: "hidden", transform: "rotateY(0deg)" }}>
+                                {getModalPageContent(diaryAnimDirection === 'next' ? diaryPrevSpread * 2 : diarySpreadIndex * 2)}
+                              </div>
+                              <div style={{ position: "absolute", inset: 0, width: "100%", height: "100%", backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>
+                                {getModalPageContent(diaryAnimDirection === 'next' ? diarySpreadIndex * 2 - 1 : diaryPrevSpread * 2 - 1)}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        {/* Spine overlay */}
+                        <div className="absolute left-1/2 -translate-x-1/2 top-0 h-full w-[30px] pointer-events-none z-30 bg-gradient-to-r from-black/0 via-black/35 to-black/0" />
+                        
+                        {/* Click zones */}
+                        {!diaryIsAnimating && totalSpreads > 1 && (
+                          <>
+                            <div onClick={handleDiaryPrev} className="absolute left-0 top-0 w-1/2 h-full z-20 cursor-w-resize" title="Previous Page" />
+                            <div onClick={handleDiaryNext} className="absolute right-0 top-0 w-1/2 h-full z-20 cursor-e-resize" title="Next Page" />
+                          </>
+                        )}
+                      </div>
+
+                      {/* Book navigation arrows */}
+                      {totalSpreads > 1 && (
+                        <>
+                          <button
+                            onClick={handleDiaryPrev}
+                            disabled={diaryIsAnimating}
+                            className="absolute left-[-20px] sm:left-[-45px] top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-low/95 border border-outline-variant/20 hover:border-primary/50 text-on-surface flex items-center justify-center transition-all shadow-xl cursor-pointer"
+                          >
+                            <span className="material-symbols-outlined text-2xl">chevron_left</span>
+                          </button>
+                          <button
+                            onClick={handleDiaryNext}
+                            disabled={diaryIsAnimating}
+                            className="absolute right-[-20px] sm:right-[-45px] top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-low/95 border border-outline-variant/20 hover:border-primary/50 text-on-surface flex items-center justify-center transition-all shadow-xl cursor-pointer"
+                          >
+                            <span className="material-symbols-outlined text-2xl">chevron_right</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
+
+                    <div className="mt-6 text-xs font-label uppercase tracking-widest text-on-surface-variant/70 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      <span>Spread {diarySpreadIndex + 1} of {totalSpreads} • Click edges to flip pages</span>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </motion.div>
         )}
