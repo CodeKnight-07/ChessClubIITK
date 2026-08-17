@@ -7,16 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import { API_BASE_URL } from '../config';
 
-const PRE_SCHEDULED_EVENTS = [
-  { id: 'pre-6', type: 'tournament', title: 'International Chess Day', location: 'chess.com', time: 'TBD', date: '2026-07-20' },
-  { id: 'pre-8', type: 'tournament', title: 'Candidates Start', location: 'chess.com', time: 'TBD', date: '2026-08-15' },
-
-  
-  
-  
-  
- 
-];
+const PRE_SCHEDULED_EVENTS = [];
 // A dictionary to map event types to their specific colors
 const eventTheme = {
   tournament: { 

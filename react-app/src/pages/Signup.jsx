@@ -19,6 +19,7 @@ const Signup = () => {
   const [name, setName] = useState('');
   const [rollNo, setRollNo] = useState('');
   const [contact, setContact] = useState('');
+  const [gender, setGender] = useState('Male');
 
   // Alumni Specific Fields
   const [alumniGradYear, setAlumniGradYear] = useState('');
@@ -99,7 +100,8 @@ const Signup = () => {
           chess_username: chessUsername.trim(),
           name: name.trim(),
           rollNo: rollNo.trim(),
-          contact: contact.trim()
+          contact: contact.trim(),
+          gender: gender
         }),
       });
 
@@ -412,6 +414,21 @@ const Signup = () => {
                     placeholder="9876543210"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-1.5 ml-1" htmlFor="gender">Gender</label>
+                <select
+                  id="gender"
+                  required
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  className="relative block w-full px-4 py-2.5 border border-outline-variant/20 bg-surface-container-lowest text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-colors cursor-pointer"
+                >
+                  <option value="Male" className="bg-[#121212] text-on-surface">Male</option>
+                  <option value="Female" className="bg-[#121212] text-on-surface">Female</option>
+                  <option value="Prefer not to say" className="bg-[#121212] text-on-surface">Prefer not to say</option>
+                </select>
               </div>
 
               <div>

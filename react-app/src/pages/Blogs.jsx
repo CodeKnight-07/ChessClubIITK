@@ -83,41 +83,7 @@ const sortPostsChronologically = (list) => {
   });
 };
 
-const LEGACY_BACKUP_POSTS = [
-  {
-    id: 'legacy-fcl',
-    title: "Fresher's Chess League 2025: An Absolute Thriller!",
-    date: "August 25, 2025",
-    tag: "Event Recap",
-    excerpt: "Recapping the absolute hype surrounding the offline auctions in the Senate Hall, analyzing the intense Round Robin pool matches at the OAT, and spotlighting the brilliant knockout blunders that ultimately led the underdogs to gold memberships.",
-    author: "Tanmay Sahare",
-    authorRole: "Tournament Coordinator",
-    readTime: "3 Min Read",
-    image: fresherImg
-  },
-  {
-    id: 'legacy-anuj',
-    title: "Anuj Shrivatri emerges victorious at SBI GIC Fide Rated Rapid Tournament 2026 at IITK",
-    date: "February 15, 2026",
-    tag: "Tournament News",
-    excerpt: "Top seed IM Anuj Shrivatri wins SBI GIC Fide Rated Rapid Tournament 2026 at IIT Kanpur. Anuj scored 8/9 points to secure the victory. He was leading the event with 8/8 points going into the 9th round.",
-    author: "Laksh Dhir",
-    authorRole: "Coordinator, Chess Club",
-    readTime: "6 Min Read",
-    image: winnerImg
-  },
-  {
-    id: 'legacy-fide',
-    title: "IIT Kanpur's First FIDE-Rated Rapid Tournament: A New Chapter",
-    date: "January 26, 2026",
-    tag: "Tournament News",
-    excerpt: "IIT Kanpur steps onto the rated chess map with its first FIDE-rated rapid tournament, a 9-round Swiss event carrying a prize pool of INR 2,00,000.",
-    author: "Laksh Dhir",
-    authorRole: "Coordinator, Chess Club",
-    readTime: "5 Min Read",
-    image: tournamentImg
-  }
-];
+const LEGACY_BACKUP_POSTS = [];
 
 const Blogs = () => {
   // 1. Get user data from context safely using optional chaining
@@ -257,10 +223,10 @@ const Blogs = () => {
   const yearsList = uniqueYears.length > 0 ? uniqueYears : ['26-27 Tenure'];
 
   useEffect(() => {
-    if (yearsList.length > 0 && !yearsList.includes(selectedYear)) {
+    if (!loading && yearsList.length > 0 && !yearsList.includes(selectedYear)) {
       setSelectedYear(yearsList[0]);
     }
-  }, [yearsList, selectedYear]);
+  }, [loading, yearsList, selectedYear]);
 
   const filteredPosts = posts.filter(p => getPostYear(p) === selectedYear);
 
@@ -496,7 +462,7 @@ const Blogs = () => {
                     )}
                     <Link to={`/blog/${post.id}`} className={`flex bg-surface-container-low border border-outline-variant/10 rounded-2xl overflow-hidden hover:border-outline-variant/30 hover:shadow-xl transition-all duration-300 h-full ${viewMode === 'grid' ? 'flex-col' : 'flex-col md:flex-row'}`}>
                       <div className={`overflow-hidden relative ${viewMode === 'grid' ? 'h-52 w-full' : 'h-full w-48 flex-shrink-0'}`}>
-                        <img alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src={getImageUrl(post.cover_image || post.image)} onError={(e) => { e.currentTarget.src = defaultBlogHero; }} />
+                        <img alt={post.title} className="w-full h-full object-fill group-hover:scale-105 transition-transform duration-500" src={getImageUrl(post.cover_image || post.image)} onError={(e) => { e.currentTarget.src = defaultBlogHero; }} />
                         <div className="absolute top-3 left-3">
                           <span className="bg-surface/90 backdrop-blur-md px-3 py-1 text-[9px] font-label tracking-widest uppercase text-primary font-bold rounded-md shadow-sm">{getBlogTag(post)}</span>
                         </div>
