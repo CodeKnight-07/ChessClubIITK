@@ -75,7 +75,8 @@ It gets worse."`,
     email: "rudrad24@iitk.ac.in",
     image: rudraImg,
     instagram: "https://www.instagram.com/rudra.dwivedi_18/",
-    // linkedin: "https://www.linkedin.com/in/rishi-gupta-19459231a/"
+    linkedin: "https://www.linkedin.com/in/rudra-dwivedi-107a5936b"
+
   },
   {
     id: 'coord-4',
@@ -95,185 +96,230 @@ const SECRETARIES = [
     name: "Aarush Waghmare",
     role: "Secretary",
     funnyDescription: `"En croissant"`,
-
     image: aarushWaghImg,
+    email: "aarushw24@iitk.ac.in",
+    instagram: "https://www.instagram.com/aarush_waghmare/",
+    linkedin: "https://www.linkedin.com/in/aarush-waghmare/"
   },
   {
     id: "sec-1",
     name: "Aditya Dum",
     role: "Secretary",
     funnyDescription: `"I am high on chess,let's play and enjoy this addiction!!"`,
-
     image: adityaImg,
+    email: "adityasdum25@iitk.ac.in",
+    instagram: "https://www.instagram.com/adityadum_07?igsh=MW16MHF5azRzejl6cQ==",
+    linkedin: "https://www.linkedin.com/in/aditya-dum-69752a380?utm_source=share_via&utm_content=profile&utm_medium=member_android"
   },
   {
     id: "sec-2",
     name: "Akshat Joshi",
     role: "Secretary",
     funnyDescription: `"The plan was perfect until I played it"`,
-
     image: akshatImg,
+    email: "akshatj25@iitk.ac.in",
+    instagram: "https://www.instagram.com/akshatj_005?igsh=Mm5hcjE3aXdmeTc1",
+    linkedin: "https://www.linkedin.com/in/akshat-joshi-6a47a0377?utm_source=share_via&utm_content=profile&utm_medium=member_android"
   },
   {
     id: "sec-3",
     name: "Anant Singh",
     role: "Secretary",
     funnyDescription: `"Still looking for the best move"`,
-
     image: anantImg,
+    email: "anantsi25@iitk.ac.in",
+    instagram: "https://www.instagram.com/mr.infiinity/?hl=en",
+    linkedin: "https://www.linkedin.com/in/anant-singh-667228322/"
   },
   {
     id: "sec-4",
     name: "Arham Nadeem",
     role: "Secretary",
     funnyDescription: `"After every blunder, there is a great move !"`,
-
     image: arhamImg,
+    email: "arhamnadeem25@iitk.ac.in",
+    instagram: "https://www.instagram.com/arhamnadeem___/",
+    linkedin: "https://www.linkedin.com/in/arham-nadeem-043b35369/"
   },
   {
     id: "sec-5",
     name: "Arush Jain",
     role: "Secretary",
     funnyDescription: `"My opening preparation lasts longer than my actual games."`,
-
     image: arushImg,
+    email: "arushj24@iitk.ac.in",
+    instagram: "https://www.instagram.com/arush_jain/",
+    linkedin: "https://www.linkedin.com/in/arush-jain/"
   },
   {
     id: "sec-6",
     name: "Aryan Kurade",
     role: "Secretary",
     funnyDescription: `"My opponents fear my unpredictability, so do I."`,
-
     image: aryanImg,
+    email: "skaryan25@iitk.ac.in",
+    instagram: "https://www.instagram.com/aryankyayaar._?igsh=a28yZGI4ZmNwa2pz",
+    linkedin: "https://www.linkedin.com/in/aryankurade?utm_source=share_via&utm_content=profile&utm_medium=member_android"
   },
   {
     id: "sec-7",
     name: "B Madhav Krishna",
     role: "Secretary",
     funnyDescription: `"Chess is my number one priority"`,
-
     image: madhavImg,
+    email: "bmadhav25@iitk.ac.in",
+    // instagram: "https://www.instagram.com/madhav_krishna/",
+    linkedin: "https://www.linkedin.com/in/madhav-krishna-6035b6202/"
   },
   {
     id: "sec-8",
     name: "Chaitanya Malhotra",
     role: "Secretary",
     funnyDescription: `"Everything was satisfying until a bishop ruined my smoothered mate :-("`,
-
     image: chaitanyaImg,
+    email: "cmalhotra25@iitk.ac.in",
+    instagram: "https://www.instagram.com/chetta_iitk_1121?igsh=MTBiZTJ6aW83dHRhNw==",
+    linkedin: "https://www.linkedin.com/in/chaitanya-malhotra-500ba8376?utm_source=share_via&utm_content=profile&utm_medium=member_android"
   },
   {
     id: "sec-9",
     name: "Dipin Pandey",
     role: "Secretary",
     funnyDescription: `"In my defence, the knight jumped out of nowhere."`,
-
     image: dipinImg,
+    email: "dipinp24@iitk.ac.in",
+    instagram: "https://www.instagram.com/dipin_pandey/",
+    linkedin: "https://www.linkedin.com/in/dipin-pandey/"
   },
   {
     id: "sec-10",
     name: "Divyesh Bhattacharyya",
     role: "Secretary",
     funnyDescription: `"Arguing with idiots is like playing chess with a pigeon. No matter how good you are the bird is going to shit on the board"`,
-
     image: divyeshImg,
+    email: "divyeshb25@iitk.ac.in",
+    // instagram: "https://www.instagram.com/divyesh_bhattacharyya/",
+    linkedin: "https://www.linkedin.com/in/divyesh-bhattacharyya-836b78382/"
   },
   {
     id: "sec-11",
     name: "Furzaan S. Ullah",
     role: "Secretary",
     funnyDescription: `"Every game is a new puzzle to solve."`,
-
     image: furzaanImg,
+    email: "furzaan25@iitk.ac.in",
+    instagram: "https://www.instagram.com/furzaan2049?igsh=MWoyZjVkMmJ6emR6eQ==",
+    linkedin: "https://www.linkedin.com/in/furzaan-ullah-740604377?utm_source=share_via&utm_content=profile&utm_medium=member_android"
   },
   {
     id: "sec-12",
     name: "Hariom Mishra",
     role: "Secretary",
     funnyDescription: `"Chess taught me patience. My clock says otherwise"`,
-
     image: hariomImg,
+    email: "mhariom25@iitk.ac.in",
+    instagram: "https://www.instagram.com/hariom66425?igsh=MWh4c2J0bzhjZzB5aQ==",
+    linkedin: "https://www.linkedin.com/in/hariom-mishra-177773369?utm_source=share_via&utm_content=profile&utm_medium=member_android"
   },
-
   {
     id: "sec-16",
     name: "Mayank Bhakhand",
     role: "Secretary",
     funnyDescription: `"it is always better to sacrifice your opponent's pieces"`,
-
     image: mayankBhakhandImg,
+    email: "mayankb25@iitk.ac.in",
+    instagram: "https://www.instagram.com/mayankb9852?igsh=MXduOTl3aXM5MzN5dA==&igsi=MXduOTl3aXM5MzN5dA==",
+    linkedin: "https://www.linkedin.com/in/mayank-bhakhand-15b67736a?trk=contact-info"
   },
   {
     id: "sec-17",
     name: "Mayank Gautam",
     role: "Secretary",
     funnyDescription: `"I can spot tactics instantly—after the game."`,
-
     image: mayankGautamImg,
+    email: "gmayank25@iitk.ac.in",
+    instagram: "https://www.instagram.com/mayank.iitk?igsh=eWF6engyejNhZHg3",
+    linkedin: "https://www.linkedin.com/in/mayank-gautam-48b844376?utm_source=share_via&utm_content=profile&utm_medium=member_android"
   },
   {
     id: "sec-18",
     name: "Mishthy Khatwa",
     role: "Secretary",
     funnyDescription: `"My pieces have trust issues with me"`,
-
     image: mishthyImg,
+    email: "mishthyk24@iitk.ac.in",
+    instagram: "https://www.instagram.com/mishthy_khatwa/",
+    linkedin: "https://www.linkedin.com/in/mishthy-khatwa/"
   },
   {
     id: "sec-19",
     name: "Nishant",
     role: "Secretary",
     funnyDescription: `"Chess has made me redefine beauty!"`,
-
     image: nishantImg,
+    email: "nishantkr25@iitk.ac.in",
+    instagram: "https://www.instagram.com/kalonianishant/",
+    // linkedin: "https://www.linkedin.com/in/nishant/"
   },
   {
     id: "sec-20",
     name: "Piyush Agarwal",
     role: "Secretary",
     funnyDescription: `"The only thing I calculate accurately is how much rating I'm about to lose."`,
-
     image: piyushImg,
+    email: "piyushag25@iitk.ac.in",
+    instagram: "https://www.instagram.com/piyush.iitk?igsh=MXdjcHFmcjUwOHQ0Yg==",
+    linkedin: "https://www.linkedin.com/in/piyush-agarwal-733926393?utm_source=share_via&utm_content=profile&utm_medium=member_android"
   },
   {
     id: "sec-21",
     name: "Prajwal Ravi Rai",
     role: "Secretary",
     funnyDescription: `"I am better than magnus carlsen"`,
-
     image: prajwalImg,
+    email: "prajwalr24@iitk.ac.in",
+    instagram: "https://www.instagram.com/prajwal_rai/",
+    linkedin: "https://www.linkedin.com/in/prajwal-rai/"
   },
   {
     id: "sec-22",
     name: "Pratik Dhanuka",
     role: "Secretary",
     funnyDescription: `"I enjoy playing chess, chess enjoys playing with my emotions."`,
-
     image: pratikImg,
+    email: "pratikd24@iitk.ac.in",
+    instagram: "https://www.instagram.com/pratik_dhanuka/",
+    linkedin: "https://www.linkedin.com/in/pratik-dhanuka/"
   },
   {
     id: "sec-23",
     name: "Shaoni Mukherjee",
     role: "Secretary",
     funnyDescription: `"Life is like chess. I don't know how to play chess."`,
-
     image: shaoniImg,
+    email: "shaonim24@iitk.ac.in",
+    instagram: "https://www.instagram.com/shaoni_mukherjee/",
+    linkedin: "https://www.linkedin.com/in/shaoni-mukherjee/"
   },
   {
     id: "sec-24",
     name: "Siddhant Ghate",
     role: "Secretary",
     funnyDescription: `"My favourite chess opening is the one where my opponent doesn't show up."`,
-
     image: siddhantImg,
+    email: "gssiddhant25@iitk.ac.in",
+    instagram: "https://www.instagram.com/sidd070907/",
+    linkedin: "https://www.linkedin.com/in/siddhant-ghate-08214936a/"
   },
   {
     id: "sec-25",
     name: "Swayam Krishna Manohari",
     role: "Secretary",
     funnyDescription: `"I’m not a bad chess player, I’m the biggest philanthropist in the community. I generously donate my pieces to needy opponents every single game."`,
-
     image: swayamImg,
+    email: "mkswayam25@iitk.ac.in",
+    instagram: "https://www.instagram.com/swayam_boi/",
+    linkedin: "https://www.linkedin.com/in/swayam-krishna-manohari-44988b369/"
   }
 ];
 const ContactCard = ({ person }) => (

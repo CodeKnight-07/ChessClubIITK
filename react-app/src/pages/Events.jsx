@@ -16,11 +16,38 @@ const Events = () => {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem('selectedEventTab') || 'upcoming';
+    const isReload = window.performance && 
+      (window.performance.navigation?.type === 1 || 
+       (performance.getEntriesByType("navigation")[0] && performance.getEntriesByType("navigation")[0].type === 'reload'));
+    if (isReload) {
+      return localStorage.getItem('selectedEventTab') || 'upcoming';
+    }
+    return 'upcoming';
   });
+
   const [selectedYear, setSelectedYear] = useState(() => {
-    return localStorage.getItem('selectedEventYear') || '26-27 Tenure';
+    const isReload = window.performance && 
+      (window.performance.navigation?.type === 1 || 
+       (performance.getEntriesByType("navigation")[0] && performance.getEntriesByType("navigation")[0].type === 'reload'));
+    if (isReload) {
+      return localStorage.getItem('selectedEventYear') || '26-27 Tenure';
+    }
+    return '26-27 Tenure';
   });
+
+  const prevKeyRef = useRef(location.key);
+
+  useEffect(() => {
+    if (prevKeyRef.current !== location.key) {
+      prevKeyRef.current = location.key;
+      if (activeTab === 'past' && !location.state?.scrollToEventId) {
+        setActiveTab('upcoming');
+      }
+      if (selectedYear !== '26-27 Tenure' && !location.state?.scrollToEventId) {
+        setSelectedYear('26-27 Tenure');
+      }
+    }
+  }, [location, activeTab, selectedYear]);
 
   useEffect(() => {
     localStorage.setItem('selectedEventTab', activeTab);
@@ -559,12 +586,20 @@ const Events = () => {
 
                     if (isPastEvent) {
                       return (
-                        <button
-                          disabled
-                          className="block w-full text-center bg-surface-container-high text-on-surface-variant/40 py-3 rounded-xl font-bold cursor-not-allowed border border-outline-variant/10 text-xs font-label uppercase tracking-widest"
-                        >
-                          REGISTRATION CLOSED
-                        </button>
+                        <div className="space-y-3">
+                          <button
+                            disabled
+                            className="block w-full text-center bg-surface-container-high text-on-surface-variant/40 py-3 rounded-xl font-bold cursor-not-allowed border border-outline-variant/10 text-xs font-label uppercase tracking-widest"
+                          >
+                            REGISTRATION CLOSED
+                          </button>
+                          <Link
+                            to={`/events/results/${event.id}`}
+                            className="block w-full text-center bg-primary text-[#3c2f00] py-3 rounded-xl font-bold hover:bg-[#d4af37] transition-colors text-xs font-label uppercase tracking-widest shadow-md shadow-primary/10"
+                          >
+                            VIEW STANDINGS
+                          </Link>
+                        </div>
                       );
                     }
 
