@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE_URL } from '../config';
 import { useAuth } from '../context/AuthContext'; 
@@ -98,13 +98,31 @@ const Blogs = () => {
   // or if they have a real email session going during local tests
   const isAdmin = user?.is_admin === 1 || user?.is_admin === true;
 
+  const location = useLocation();
+  const prevKeyRef = useRef(location.key);
+
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedYear, setSelectedYear] = useState(() => {
-    return localStorage.getItem('selectedBlogYear') || '26-27 Tenure';
+    const isReload = window.performance && 
+      (window.performance.navigation?.type === 1 || 
+       (performance.getEntriesByType("navigation")[0] && performance.getEntriesByType("navigation")[0].type === 'reload'));
+    if (isReload) {
+      return localStorage.getItem('selectedBlogYear') || '26-27 Tenure';
+    }
+    return '26-27 Tenure';
   });
   const [viewMode, setViewMode] = useState('grid');
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (prevKeyRef.current !== location.key) {
+      prevKeyRef.current = location.key;
+      if (selectedYear !== '26-27 Tenure') {
+        setSelectedYear('26-27 Tenure');
+      }
+    }
+  }, [location, selectedYear]);
 
   useEffect(() => {
     localStorage.setItem('selectedBlogYear', selectedYear);
@@ -127,6 +145,9 @@ const Blogs = () => {
 
   const getPostYear = (post) => {
     if (!post) return '26-27 Tenure';
+    if (post.title && post.title.includes("The Story of Chess Club IITK")) {
+      return 'Club History';
+    }
     const raw = post.created_at || post.date;
     if (!raw) return '26-27 Tenure';
     const d = new Date(raw);
@@ -219,8 +240,10 @@ const Blogs = () => {
   }, []);
 
   const uniqueYears = Array.from(new Set(posts.map(p => getPostYear(p))))
+    .filter(y => y !== 'Club History')
     .sort((a, b) => b.localeCompare(a));
-  const yearsList = uniqueYears.length > 0 ? uniqueYears : ['26-27 Tenure'];
+  const hasHistory = posts.some(p => getPostYear(p) === 'Club History');
+  const yearsList = hasHistory ? [...uniqueYears, 'Club History'] : (uniqueYears.length > 0 ? uniqueYears : ['26-27 Tenure']);
 
   useEffect(() => {
     if (!loading && yearsList.length > 0 && !yearsList.includes(selectedYear)) {
@@ -418,7 +441,9 @@ const Blogs = () => {
                   }`}
               >
                 <span className="relative z-10 flex items-center gap-3">
-                  <span className="material-symbols-outlined text-[18px] opacity-80">calendar_month</span>
+                  <span className="material-symbols-outlined text-[18px] opacity-80">
+                    {year === 'Club History' ? 'history' : 'calendar_month'}
+                  </span>
                   {year}
                 </span>
                 {selectedYear === year && (

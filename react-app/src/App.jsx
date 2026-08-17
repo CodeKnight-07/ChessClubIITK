@@ -29,6 +29,7 @@ const Gallery = React.lazy(() => import('./pages/Gallery'));
 const Signup = React.lazy(() => import('./pages/Signup'));
 const Login = React.lazy(() => import('./pages/Login'));
 const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword'));
+const Results = React.lazy(() => import('./pages/Results'));
 
 // Premium, brand-aligned loading spinner fallback
 const PageLoader = () => (
@@ -138,6 +139,7 @@ function App() {
                 <Route path="/" element={<PageTransition><Landing /></PageTransition>} />
                 <Route path="/calendar" element={<PageTransition><Calendar /></PageTransition>} />
                 <Route path="/events" element={<PageTransition><Events /></PageTransition>} />
+                <Route path="/events/results/:id" element={<PageTransition><Results /></PageTransition>} />
                 <Route path="/events/register/:id" element={<PageTransition><EventRegistration /></PageTransition>} />
                 <Route path="/blogs" element={<PageTransition><Blogs /></PageTransition>} />
                 <Route path="/blog/:id" element={<PageTransition><BlogPost /></PageTransition>} />
