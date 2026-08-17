@@ -125,8 +125,9 @@ def verify_and_register():
     name = data.get('name')
     roll_no = data.get('rollNo')
     contact = data.get('contact')
+    gender = data.get('gender')
 
-    if not all([email, secondary_email, primary_user_otp, secondary_user_otp, password, chess_username, name, roll_no, contact]):
+    if not all([email, secondary_email, primary_user_otp, secondary_user_otp, password, chess_username, name, roll_no, contact, gender]):
         return jsonify({"error": "All fields are required."}), 400
 
     # 1. Validate Chess.com Username existence
@@ -164,8 +165,8 @@ def verify_and_register():
             password_hash = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
             
             cursor.execute(
-                "INSERT INTO users (email, chess_username, password_hash, name, roll_no, contact, secondary_email) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                (email, chess_username, password_hash, name, roll_no, contact, secondary_email)
+                "INSERT INTO users (email, chess_username, password_hash, name, roll_no, contact, secondary_email, gender) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                (email, chess_username, password_hash, name, roll_no, contact, secondary_email, gender)
             )
             
             # 4. Clean up transient database entries
