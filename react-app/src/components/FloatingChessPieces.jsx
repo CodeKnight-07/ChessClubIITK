@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import Matter from 'matter-js';
-import wK from '../assets/wK.svg';
-import wQ from '../assets/wQ.svg';
-import wR from '../assets/wR.svg';
-import wB from '../assets/wB.svg';
-import wN from '../assets/wN.svg';
-import wP from '../assets/wP.svg';
+import wK from '../assets/wk.png';
+import wQ from '../assets/wq.png';
+import wR from '../assets/wr.png';
+import wB from '../assets/wb.png';
+import wN from '../assets/wn.png';
+import wP from '../assets/wp.png';
 
 const FloatingChessPieces = () => {
   const sceneRef = useRef(null);
@@ -54,16 +54,8 @@ const FloatingChessPieces = () => {
     let width = window.innerWidth;
     let height = window.innerHeight;
 
-    // 2. Create invisible walls (padded outside so they bounce off-screen cleanly)
-    const wallOptions = { isStatic: true, restitution: 1, friction: 0 };
-    const pad = 100;
-    const walls = [
-      Bodies.rectangle(width / 2, -pad, width + pad * 2, 50, wallOptions), // Top
-      Bodies.rectangle(width / 2, height + pad, width + pad * 2, 50, wallOptions), // Bottom
-      Bodies.rectangle(-pad, height / 2, 50, height + pad * 2, wallOptions), // Left
-      Bodies.rectangle(width + pad, height / 2, 50, height + pad * 2, wallOptions) // Right
-    ];
-    World.add(engine.world, walls);
+    // 2. Padding for wrap-around
+    const pad = 150;
 
     // 3. Create piece bodies using a grid to ensure uniform distribution and prevent initial overlap
     const cols = Math.ceil(Math.sqrt(pieceConfig.length * (width / height)));
@@ -103,7 +95,7 @@ const FloatingChessPieces = () => {
     const renderLoop = () => {
       Engine.update(engine, 1000 / 60);
 
-      // Enforce constant velocity (restitution can eventually dampen float math)
+      // Enforce constant velocity and wrap around screen edges
       bodies.forEach((body) => {
          const speed = Math.sqrt(body.velocity.x ** 2 + body.velocity.y ** 2);
          const minSpeed = 0.2;
@@ -118,6 +110,19 @@ const FloatingChessPieces = () => {
               x: (body.velocity.x / speed) * maxSpeed, 
               y: (body.velocity.y / speed) * maxSpeed 
             });
+         }
+
+         // Wrapping logic
+         if (body.position.x > width + pad) {
+           Body.setPosition(body, { x: -pad, y: body.position.y });
+         } else if (body.position.x < -pad) {
+           Body.setPosition(body, { x: width + pad, y: body.position.y });
+         }
+         
+         if (body.position.y > height + pad) {
+           Body.setPosition(body, { x: body.position.x, y: -pad });
+         } else if (body.position.y < -pad) {
+           Body.setPosition(body, { x: body.position.x, y: height + pad });
          }
       });
 
@@ -137,18 +142,6 @@ const FloatingChessPieces = () => {
     const handleResize = () => {
        width = window.innerWidth;
        height = window.innerHeight;
-       Body.setPosition(walls[0], { x: width / 2, y: -pad });
-       // Resize and update walls for the new dimensions
-       Matter.Body.setVertices(walls[0], Matter.Bodies.rectangle(width / 2, -pad, width + pad * 2, 50).vertices);
-       
-       Body.setPosition(walls[1], { x: width / 2, y: height + pad });
-       Matter.Body.setVertices(walls[1], Matter.Bodies.rectangle(width / 2, height + pad, width + pad * 2, 50).vertices);
-
-       Body.setPosition(walls[2], { x: -pad, y: height / 2 });
-       Matter.Body.setVertices(walls[2], Matter.Bodies.rectangle(-pad, height / 2, 50, height + pad * 2).vertices);
-
-       Body.setPosition(walls[3], { x: width + pad, y: height / 2 });
-       Matter.Body.setVertices(walls[3], Matter.Bodies.rectangle(width + pad, height / 2, 50, height + pad * 2).vertices);
     };
     window.addEventListener('resize', handleResize);
 
