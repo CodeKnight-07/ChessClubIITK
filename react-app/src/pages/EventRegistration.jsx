@@ -192,7 +192,7 @@ const EventRegistration = () => {
                 <input
                   type="tel"
                   required
-                  placeholder="e.g. +91 9876543210"
+                  placeholder="e.g. 9876543210"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full bg-[#131313] border border-[#4d4635]/30 rounded-lg px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary transition-colors focus:shadow-[0_0_15px_rgba(212,175,55,0.1)]"

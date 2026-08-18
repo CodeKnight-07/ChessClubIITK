@@ -19,7 +19,7 @@ const Signup = () => {
   const [name, setName] = useState('');
   const [rollNo, setRollNo] = useState('');
   const [contact, setContact] = useState('');
-  const [gender, setGender] = useState('Male');
+  const [gender, setGender] = useState('');
 
   // Alumni Specific Fields
   const [alumniGradYear, setAlumniGradYear] = useState('');
@@ -40,6 +40,33 @@ const Signup = () => {
     setError('');
     setSuccess('');
     setIsLoading(true);
+
+    if (!gender) {
+      setError("Please select your gender.");
+      setIsLoading(false);
+      return;
+    }
+
+    const isIITK = (m) => m.toLowerCase().endsWith('@iitk.ac.in');
+    const isValidIITK = (m) => /\d{2}@iitk\.ac\.in$/i.test(m.trim());
+
+    if (isIITK(email) && !isValidIITK(email)) {
+      setError("IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in).");
+      setIsLoading(false);
+      return;
+    }
+    if (isIITK(secondaryEmail) && !isValidIITK(secondaryEmail)) {
+      setError("Secondary IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in).");
+      setIsLoading(false);
+      return;
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setError("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one special character.");
+      setIsLoading(false);
+      return;
+    }
 
     if (email.toLowerCase() === secondaryEmail.toLowerCase()) {
       setError("Secondary email must be different from your primary IITK email.");
@@ -123,12 +150,26 @@ const Signup = () => {
     }
   };
 
-  // --- ALUMNI: Notify Admins Flow ---
   const handleAlumniRequest = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
     setIsLoading(true);
+
+    if (!gender) {
+      setError("Please select your gender.");
+      setIsLoading(false);
+      return;
+    }
+
+    const isIITK = (m) => m.toLowerCase().endsWith('@iitk.ac.in');
+    const isValidIITK = (m) => /\d{2}@iitk\.ac\.in$/i.test(m.trim());
+
+    if (isIITK(email) && !isValidIITK(email)) {
+      setError("IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in).");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/alumni-request`, {
@@ -299,34 +340,22 @@ const Signup = () => {
                     onChange={(e) => setGender(e.target.value)}
                     className="relative block w-full px-4 py-2.5 border border-outline-variant/20 bg-surface-container-lowest text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm transition-colors cursor-pointer"
                   >
+                    <option value="" disabled className="bg-[#121212] text-on-surface-variant/40">Select Gender</option>
                     <option value="Male" className="bg-[#121212] text-on-surface">Male</option>
                     <option value="Female" className="bg-[#121212] text-on-surface">Female</option>
                     <option value="Prefer not to say" className="bg-[#121212] text-on-surface">Prefer not to say</option>
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-1 ml-1">Roll No / Batch</label>
-                    <input
-                      type="text"
-                      value={rollNo}
-                      onChange={(e) => setRollNo(e.target.value)}
-                      className="appearance-none relative block w-full px-4 py-2.5 border border-outline-variant/20 bg-surface-container-lowest placeholder-on-surface-variant/30 text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm transition-colors"
-                      placeholder="180123 / Y18"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-1 ml-1">Graduation Year</label>
-                    <input
-                      type="text"
-                      value={alumniGradYear}
-                      onChange={(e) => setAlumniGradYear(e.target.value)}
-                      className="appearance-none relative block w-full px-4 py-2.5 border border-outline-variant/20 bg-surface-container-lowest placeholder-on-surface-variant/30 text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm transition-colors"
-                      placeholder="e.g. 2022"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-1 ml-1">Roll No / Batch</label>
+                  <input
+                    type="text"
+                    value={rollNo}
+                    onChange={(e) => setRollNo(e.target.value)}
+                    className="appearance-none relative block w-full px-4 py-2.5 border border-outline-variant/20 bg-surface-container-lowest placeholder-on-surface-variant/30 text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm transition-colors"
+                    placeholder="180123"
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -348,7 +377,7 @@ const Signup = () => {
                       value={contact}
                       onChange={(e) => setContact(e.target.value)}
                       className="appearance-none relative block w-full px-4 py-2.5 border border-outline-variant/20 bg-surface-container-lowest placeholder-on-surface-variant/30 text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm transition-colors"
-                      placeholder="+91 9876543210"
+                      placeholder="9876543210"
                     />
                   </div>
                 </div>
@@ -441,6 +470,7 @@ const Signup = () => {
                   onChange={(e) => setGender(e.target.value)}
                   className="relative block w-full px-4 py-2.5 border border-outline-variant/20 bg-surface-container-lowest text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-colors cursor-pointer"
                 >
+                  <option value="" disabled className="bg-[#121212] text-on-surface-variant/40">Select Gender</option>
                   <option value="Male" className="bg-[#121212] text-on-surface">Male</option>
                   <option value="Female" className="bg-[#121212] text-on-surface">Female</option>
                   <option value="Prefer not to say" className="bg-[#121212] text-on-surface">Prefer not to say</option>

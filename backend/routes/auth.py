@@ -1,5 +1,6 @@
 import os
 import random
+import re
 import smtplib
 from email.mime.text import MIMEText
 from flask import Blueprint, request, jsonify
@@ -45,11 +46,17 @@ def generate_otp():
     secondary_email = (data.get('secondary_email') or '').strip()
     chess_username = (data.get('chess_username') or '').strip()
 
-    if not primary_email or not primary_email.endswith('@iitk.ac.in'):
+    if not primary_email or not primary_email.lower().endswith('@iitk.ac.in'):
         return jsonify({"error": "You must use a valid @iitk.ac.in email address."}), 400
     
+    if not re.search(r'\d{2}@iitk\.ac\.in$', primary_email, re.IGNORECASE):
+        return jsonify({"error": "IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in)."}), 400
+
     if not secondary_email:
         return jsonify({"error": "Secondary recovery email is required."}), 400
+
+    if secondary_email.lower().endswith('@iitk.ac.in') and not re.search(r'\d{2}@iitk\.ac\.in$', secondary_email, re.IGNORECASE):
+        return jsonify({"error": "Secondary IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in)."}), 400
 
     if primary_email.lower() == secondary_email.lower():
         return jsonify({"error": "Secondary email must be different from your primary IITK email."}), 400
@@ -129,6 +136,10 @@ def verify_and_register():
 
     if not all([email, secondary_email, primary_user_otp, secondary_user_otp, password, chess_username, name, roll_no, contact, gender]):
         return jsonify({"error": "All fields are required."}), 400
+
+    # 0. Validate password strength constraints
+    if len(password) < 8 or not re.search(r'[a-z]', password) or not re.search(r'[A-Z]', password) or not re.search(r'[^A-Za-z0-9]', password):
+        return jsonify({"error": "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one special character."}), 400
 
     # 1. Validate Chess.com Username existence
     headers = {"User-Agent": "ChessClubIITK-Signup-App/1.0 (Contact: your_email@iitk.ac.in)"}
@@ -478,6 +489,9 @@ def handle_alumni_request():
 
     if '@' not in email or '.' not in email.split('@')[-1]:
         return jsonify({"error": "Please provide a valid email address."}), 400
+
+    if email.lower().endswith('@iitk.ac.in') and not re.search(r'\d{2}@iitk\.ac\.in$', email, re.IGNORECASE):
+        return jsonify({"error": "IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in)."}), 400
 
     # Validate Chess.com ID if provided
     if chess_username:
