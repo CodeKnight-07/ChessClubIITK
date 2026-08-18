@@ -26,12 +26,12 @@ const FloatingChessPieces = () => {
       arr.push({
         id: i,
         icon: CHESS_PIECES[Math.floor(Math.random() * CHESS_PIECES.length)],
-        size: Math.random() * 40 + 20, // 20px to 60px
+        size: Math.random() * 80 + 40, // 40px to 120px
         startX: Math.random() * 100, // percentage across screen width
         startY: Math.random() * 100, // distribute them initially across the whole height
         duration: Math.random() * 30 + 25, // 25s to 55s slow drift
         delay: 0,
-        opacity: Math.random() * 0.08 + 0.03, // very faint (0.03 to 0.11 opacity) - completely non-glowing
+        opacity: Math.random() * 0.15 + 0.10, // brighter and more prominent (0.10 to 0.25 opacity)
         rotationOffset: Math.random() * 360, // starting rotation
         xDrift: (Math.random() - 0.5) * 20, // horizontal drift amount
       });

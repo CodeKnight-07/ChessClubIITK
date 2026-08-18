@@ -15,11 +15,6 @@ import pulkitImg from "../assets/exCoordinators/pulkit.jpg";
 import { API_BASE_URL } from '../config';
 import FloatingChessPieces from '../components/FloatingChessPieces';
 
-import handLeftImg from '../assets/hero/hand_left.png';
-import handRightImg from '../assets/hero/hand_right.png';
-import kingBeigeImg from '../assets/hero/king_beige.png';
-import queenGreenImg from '../assets/hero/queen_green.png';
-
 const Landing = () => {
   const { isLoggedIn } = useAuth();
   const [nextEvent, setNextEvent] = useState(null);
@@ -30,11 +25,6 @@ const Landing = () => {
     target: heroRef,
     offset: ["start start", "end end"]
   });
-
-  // STAGE 1: Smooth outward movement of hands when scrolling down (clears by 0.18)
-  const leftHandX = useTransform(scrollYProgress, [0, 0.18], ["0%", "-150%"]);
-  const rightHandX = useTransform(scrollYProgress, [0, 0.18], ["0%", "150%"]);
-  const handsOpacity = useTransform(scrollYProgress, [0, 0.12, 0.18], [1, 0.7, 0]);
 
   // Center "CHESS CLUB IITK" zooms forward into the screen and dissolves away
   const centerScale = useTransform(scrollYProgress, [0, 0.20], [1, 8]);
@@ -63,7 +53,7 @@ const Landing = () => {
   useEffect(() => {
     // Delay preloading by 2 seconds to prioritize main landing page resources
     const timer = setTimeout(() => {
-      const imagesToPreload = [tanmayImg, akshatImg, kushagraImg, pulkitImg, handLeftImg, handRightImg, kingBeigeImg, queenGreenImg];
+      const imagesToPreload = [tanmayImg, akshatImg, kushagraImg, pulkitImg];
       imagesToPreload.forEach(src => {
         const img = new Image();
         img.src = src;
@@ -173,57 +163,11 @@ const Landing = () => {
           <div className="absolute inset-0 bg-radial from-transparent via-[#121212]/50 to-[#121212] pointer-events-none z-0" />
           <div className="absolute w-[500px] h-[300px] rounded-full bg-primary/5 blur-[140px] pointer-events-none z-0" />
 
-          {/* STAGE 1: HERO (Hands + King & Queen + Center Title) */}
+          {/* STAGE 1: HERO (Center Title) */}
           <motion.div 
             style={{ display: heroVisibility }}
             className="absolute inset-0 pointer-events-none z-10 select-none"
           >
-            {/* Left Hand + Warm Beige King */}
-            <motion.div 
-              style={{ x: leftHandX, opacity: handsOpacity }}
-              className="absolute left-[-100px] sm:left--15 md:left--7 lg:left--0.001 top-1/2 -translate-y-1/2 pointer-events-none z-20 flex items-center"
-            >
-              <div className="relative w-[180px] sm:w-[260px] md:w-[320px] lg:w-[380px]">
-                {/* King piece in FRONT (#E0D5C1 warm beige with dot matrix positioned right at the fingertips) */}
-                <img 
-                  src={kingBeigeImg} 
-                  alt="Beige King" 
-                  className="absolute top-[48%] left-[88%] -translate-x-1/2 -translate-y-1/2 w-[46px] sm:w-[66px] md:w-[82px] lg:w-[98px] rotate-[28deg] drop-shadow-[0_12px_24px_rgba(0,0,0,0.9)]"
-                  style={{ zIndex: 10, filter: 'drop-shadow(0 0 1px rgba(224,213,193,0.3))' }}
-                />
-                {/* Left Hand in BACK */}
-                <img 
-                  src={handLeftImg} 
-                  alt="Left Hand" 
-                  className="relative w-full h-auto drop-shadow-[0_16px_36px_rgba(0,0,0,0.95)]"
-                  style={{ zIndex: 1 }}
-                />
-              </div>
-            </motion.div>
-
-            {/* Right Hand + Green Tinted Queen */}
-            <motion.div 
-              style={{ x: rightHandX, opacity: handsOpacity }}
-              className="absolute right-[-100px] sm:right--2 md:right--4 lg:right--1 top-[35%] -translate-y-1/2 pointer-events-none z-20 flex items-center justify-end"
-            >
-              <div className="relative w-[180px] sm:w-[260px] md:w-[320px] lg:w-[380px]">
-                {/* Queen piece in FRONT (#228B22 green tint with dot matrix positioned right at the fingertip) */}
-                <img 
-                  src={queenGreenImg} 
-                  alt="Green Queen" 
-                  className="absolute top-[50%] left-[4%] -translate-x-1/2 -translate-y-1/2 w-[46px] sm:w-[66px] md:w-[82px] lg:w-[98px] -rotate-[18deg] drop-shadow-[0_12px_24px_rgba(0,0,0,0.9)]"
-                  style={{ zIndex: 10, filter: 'drop-shadow(0 0 1px rgba(34,139,34,0.3))' }}
-                />
-                {/* Right Hand in BACK */}
-                <img 
-                  src={handRightImg} 
-                  alt="Right Hand" 
-                  className="relative w-full h-auto drop-shadow-[0_16px_36px_rgba(0,0,0,0.95)]"
-                  style={{ zIndex: 1 }}
-                />
-              </div>
-            </motion.div>
-
             {/* Center Brand Title */}
             <motion.div
               style={{ 
