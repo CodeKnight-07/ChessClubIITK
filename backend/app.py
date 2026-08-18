@@ -82,7 +82,7 @@ def login():
         cursor = conn.cursor()
         
         cursor.execute(
-            "SELECT id, is_admin, password_hash FROM users WHERE email = %s OR chess_username = %s", 
+            "SELECT id, is_admin, password_hash FROM users WHERE email = %s OR secondary_email = %s", 
             (username, username)
         )
         user = cursor.fetchone()

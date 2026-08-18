@@ -281,8 +281,8 @@ def get_user_profile(email):
     try:
         connection = get_db_connection()
         with connection.cursor(row_factory=dict_row) as cursor:
-            sql = "SELECT name, roll_no AS rollNo, contact, email, chess_username AS chesscom, avatar, secondary_email FROM users WHERE email = %s"
-            cursor.execute(sql, (email,))
+            sql = "SELECT name, roll_no AS rollNo, contact, email, chess_username AS chesscom, avatar, secondary_email FROM users WHERE email = %s OR secondary_email = %s"
+            cursor.execute(sql, (email,email))
             profile = cursor.fetchone()
 
             if not profile:
