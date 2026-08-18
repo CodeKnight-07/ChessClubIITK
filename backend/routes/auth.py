@@ -1,5 +1,6 @@
 import os
 import random
+import re
 import smtplib
 from email.mime.text import MIMEText
 from flask import Blueprint, request, jsonify
@@ -45,11 +46,17 @@ def generate_otp():
     secondary_email = (data.get('secondary_email') or '').strip()
     chess_username = (data.get('chess_username') or '').strip()
 
-    if not primary_email or not primary_email.endswith('@iitk.ac.in'):
+    if not primary_email or not primary_email.lower().endswith('@iitk.ac.in'):
         return jsonify({"error": "You must use a valid @iitk.ac.in email address."}), 400
     
+    if not re.search(r'\d{2}@iitk\.ac\.in$', primary_email, re.IGNORECASE):
+        return jsonify({"error": "IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in)."}), 400
+
     if not secondary_email:
         return jsonify({"error": "Secondary recovery email is required."}), 400
+
+    if secondary_email.lower().endswith('@iitk.ac.in') and not re.search(r'\d{2}@iitk\.ac\.in$', secondary_email, re.IGNORECASE):
+        return jsonify({"error": "Secondary IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in)."}), 400
 
     if primary_email.lower() == secondary_email.lower():
         return jsonify({"error": "Secondary email must be different from your primary IITK email."}), 400
@@ -96,8 +103,8 @@ def generate_otp():
             cursor.execute(sql, (secondary_email, secondary_otp))
             connection.commit()
 
-        email_body_1 = f"Welcome to the Sanctum!\n\nYour verification code is: {primary_otp}\n\nUse this to complete your registration."
-        email_body_2 = f"Welcome to the Sanctum!\n\nYour verification code is: {secondary_otp}\n\nUse this to complete your registration."
+        email_body_1 = f"Welcome to the Community!\n\nYour verification code is: {primary_otp}\n\nUse this to complete your registration."
+        email_body_2 = f"Welcome to the Community!\n\nYour verification code is: {secondary_otp}\n\nUse this to complete your registration."
         primary_sent = send_custom_email(primary_email, 'Chess Club IITK - Verification Code', email_body_1)
         secondary_sent = send_custom_email(secondary_email, 'Chess Club IITK - Verification Code', email_body_2)
         if primary_sent and secondary_sent:
@@ -129,6 +136,10 @@ def verify_and_register():
 
     if not all([email, secondary_email, primary_user_otp, secondary_user_otp, password, chess_username, name, roll_no, contact, gender]):
         return jsonify({"error": "All fields are required."}), 400
+
+    # 0. Validate password strength constraints
+    if len(password) < 8 or not re.search(r'[a-z]', password) or not re.search(r'[A-Z]', password) or not re.search(r'[^A-Za-z0-9]', password):
+        return jsonify({"error": "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one special character."}), 400
 
     # 1. Validate Chess.com Username existence
     headers = {"User-Agent": "ChessClubIITK-Signup-App/1.0 (Contact: your_email@iitk.ac.in)"}
@@ -471,12 +482,16 @@ def handle_alumni_request():
     chess_username = (data.get('chess_username') or data.get('chessUsername') or '').strip()
     contact = (data.get('contact') or '').strip()
     notes = (data.get('notes') or '').strip()
+    gender = (data.get('gender') or 'Male').strip()
 
     if not name or not email:
         return jsonify({"error": "Full name and personal email are required."}), 400
 
     if '@' not in email or '.' not in email.split('@')[-1]:
         return jsonify({"error": "Please provide a valid email address."}), 400
+
+    if email.lower().endswith('@iitk.ac.in') and not re.search(r'\d{2}@iitk\.ac\.in$', email, re.IGNORECASE):
+        return jsonify({"error": "IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in)."}), 400
 
     # Validate Chess.com ID if provided
     if chess_username:
@@ -496,10 +511,10 @@ def handle_alumni_request():
         connection = get_db_connection()
         with connection.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO alumni_requests (name, email, roll_no, graduation_year, chess_username, contact, notes, status)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, 'pending')
+                INSERT INTO alumni_requests (name, email, roll_no, graduation_year, chess_username, contact, notes, gender, status)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'pending')
                 RETURNING id;
-            """, (name, email, roll_no, graduation_year, chess_username, contact, notes))
+            """, (name, email, roll_no, graduation_year, chess_username, contact, notes, gender))
             
             if hasattr(connection, 'commit'):
                 connection.commit()

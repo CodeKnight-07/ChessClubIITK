@@ -37,7 +37,7 @@ const Footer = () => {
           </h5>
           <ul className="space-y-3 text-sm text-on-surface-variant">
             <li>
-              <Link to="/previous-teams" className="cursor-pointer transition-colors hover:text-primary">
+              <Link to="/blog/16" className="cursor-pointer transition-colors hover:text-primary">
                 Our History
               </Link>
             </li>
@@ -49,6 +49,11 @@ const Footer = () => {
             <li>
               <Link to="/previous-teams" className="cursor-pointer transition-colors hover:text-primary">
                 Alumni Network
+              </Link>
+            </li>
+            <li>
+              <Link to="/gallery" className="cursor-pointer transition-colors hover:text-primary">
+                Gallery
               </Link>
             </li>
           </ul>
