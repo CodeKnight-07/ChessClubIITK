@@ -995,6 +995,7 @@ const Gallery = () => {
       </section>
 
       {/* Archives Card Grid (Preserves all other 9 static events in a beautiful cards grid!) */}
+      {/* Archived Exhibitions Section commented out as requested
       <section className="mb-24 max-w-5xl mx-auto">
         <div className="text-center md:text-left mb-10">
           <p className="text-primary font-label text-xs tracking-[0.3em] uppercase mb-2">
@@ -1051,6 +1052,7 @@ const Gallery = () => {
           </div>
         )}
       </section>
+      */}
 
       {/* 3D Diary Book Section (Club Memories & moments from the database) */}
       <AnimatePresence mode="wait">
