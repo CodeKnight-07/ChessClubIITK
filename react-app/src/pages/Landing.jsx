@@ -12,8 +12,8 @@ import tanmayImg from "../assets/exCoordinators/tanmay.jpg";
 import akshatImg from "../assets/exCoordinators/akshat.png";
 import kushagraImg from "../assets/exCoordinators/kushagra.jpg";
 import pulkitImg from "../assets/exCoordinators/pulkit.jpg";
-import { globalCache } from '../utils/cache';
 import { API_BASE_URL } from '../config';
+import FloatingChessPieces from '../components/FloatingChessPieces';
 
 import handLeftImg from '../assets/hero/hand_left.png';
 import handRightImg from '../assets/hero/hand_right.png';
@@ -165,6 +165,9 @@ const Landing = () => {
               backgroundSize: '44px 44px'
             }}
           />
+
+          {/* Dynamic Floating Chess Pieces */}
+          <FloatingChessPieces />
 
           {/* Vignette & Soft Center Glow */}
           <div className="absolute inset-0 bg-radial from-transparent via-[#121212]/50 to-[#121212] pointer-events-none z-0" />

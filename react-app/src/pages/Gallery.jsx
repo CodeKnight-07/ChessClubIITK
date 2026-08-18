@@ -596,31 +596,17 @@ const Gallery = () => {
     setIsAnimating(false);
   };
 
-  const handleNextPhoto = () => {
-    if (lightboxPhotos.length === 0) return;
-    setLightboxIndex(prev => (prev + 1) % lightboxPhotos.length);
-  };
-
-  const handlePrevPhoto = () => {
-    if (lightboxPhotos.length === 0) return;
-    setLightboxIndex(prev => (prev - 1 + lightboxPhotos.length) % lightboxPhotos.length);
-  };
-
   // Lightbox keyboard shortcuts
   useEffect(() => {
     if (!isOpenLightbox) return;
     const handleKeyDown = (e) => {
-      if (e.key === 'ArrowRight') {
-        handleNextPhoto();
-      } else if (e.key === 'ArrowLeft') {
-        handlePrevPhoto();
-      } else if (e.key === 'Escape') {
+      if (e.key === 'Escape') {
         setIsOpenLightbox(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpenLightbox, lightboxPhotos]);
+  }, [isOpenLightbox]);
 
   // Map 3D Book page number to corresponding content safely
   const getBookPageContent = (pageNum) => {
@@ -1169,13 +1155,10 @@ const Gallery = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 md:p-8 outline-none"
+            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col p-4 md:p-8 outline-none overflow-y-auto"
           >
             {/* Header Controls */}
-            <div className="flex justify-between items-center w-full max-w-7xl mx-auto h-12">
-              <div className="text-on-surface/75 text-xs md:text-sm font-label uppercase tracking-widest truncate max-w-[70%]">
-                {lightboxTitle} Capture ({lightboxIndex + 1} / {lightboxPhotos.length})
-              </div>
+            <div className="absolute top-4 right-4 md:top-8 md:right-8 z-[100]">
               <button
                 onClick={() => setIsOpenLightbox(false)}
                 className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary transition-colors text-on-surface hover:text-[#3c2f00] flex items-center justify-center outline-none shadow-lg"
@@ -1184,56 +1167,9 @@ const Gallery = () => {
               </button>
             </div>
 
-            {/* Main Photo Area */}
-            <div className="flex-1 flex items-center justify-center relative max-w-7xl mx-auto w-full my-4">
-              {/* Previous Button */}
-              <button
-                onClick={handlePrevPhoto}
-                className="absolute left-2 md:left-4 z-10 w-12 h-12 rounded-full bg-surface-container-low/80 hover:bg-primary text-on-surface hover:text-[#3c2f00] flex items-center justify-center hover:scale-105 active:scale-95 transition-all outline-none"
-              >
-                <span className="material-symbols-outlined text-2xl">chevron_left</span>
-              </button>
-
-              {/* Active Image */}
-              <div className="relative max-h-[68vh] max-w-[85vw] flex items-center justify-center overflow-hidden rounded-xl shadow-2xl border border-outline-variant/10">
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={lightboxIndex}
-                    src={lightboxPhotos[lightboxIndex]}
-                    alt={`${lightboxTitle} Photo ${lightboxIndex + 1}`}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.25 }}
-                    className="max-h-[68vh] max-w-full object-contain rounded-xl"
-                  />
-                </AnimatePresence>
-              </div>
-
-              {/* Next Button */}
-              <button
-                onClick={handleNextPhoto}
-                className="absolute right-2 md:right-4 z-10 w-12 h-12 rounded-full bg-surface-container-low/80 hover:bg-primary text-on-surface hover:text-[#3c2f00] flex items-center justify-center hover:scale-105 active:scale-95 transition-all outline-none"
-              >
-                <span className="material-symbols-outlined text-2xl">chevron_right</span>
-              </button>
-            </div>
-
-            {/* Thumbnails Footer */}
-            <div className="w-full max-w-7xl mx-auto py-4 overflow-x-auto flex justify-center gap-2 border-t border-outline-variant/10">
-              {lightboxPhotos.map((photo, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setLightboxIndex(idx)}
-                  className={`w-16 h-12 md:w-20 md:h-14 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all ${
-                    idx === lightboxIndex
-                      ? 'border-primary scale-105 shadow-md shadow-primary/20'
-                      : 'border-transparent opacity-50 hover:opacity-100'
-                  }`}
-                >
-                  <img src={photo} alt="" className="w-full h-full object-cover" />
-                </button>
-              ))}
+            {/* Main Photo Area - NOW USING PHOTOBOOK */}
+            <div className="flex-1 w-full flex flex-col items-center justify-center relative mt-8 md:mt-4">
+              <PhotoBook photos={lightboxPhotos} title={lightboxTitle} subtitle="Event Archive" />
             </div>
           </motion.div>
         )}
