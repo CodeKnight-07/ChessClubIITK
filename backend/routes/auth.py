@@ -309,38 +309,124 @@ def get_user_profile(email):
             connection.close()
 
 
+@auth_bp.route('/user/profile/send-secondary-otp', methods=['POST'])
+@jwt_required()
+def send_secondary_otp():
+    data = request.get_json() or {}
+    email = data.get('email')
+    new_secondary_email = (data.get('secondary_email') or '').strip()
+
+    if not email or not new_secondary_email:
+        return jsonify({"error": "Primary and secondary email are required."}), 400
+
+    current_authenticated_user = get_jwt_identity()
+    if current_authenticated_user != email:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    if email.lower() == new_secondary_email.lower():
+        return jsonify({"error": "Secondary email must be different from your primary email."}), 400
+
+    if new_secondary_email.lower().endswith('@iitk.ac.in') and not re.search(r'\d{2}@iitk\.ac\.in$', new_secondary_email, re.IGNORECASE):
+        return jsonify({"error": "Secondary IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in)."}), 400
+
+    otp = str(random.randint(100000, 999999))
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            # Save OTP
+            sql = """
+                INSERT INTO pending_otps (email, otp) VALUES (%s, %s)
+                ON CONFLICT (email) DO UPDATE SET otp = EXCLUDED.otp, created_at = CURRENT_TIMESTAMP
+            """
+            cursor.execute(sql, (new_secondary_email, otp))
+            connection.commit()
+
+        body = f"Use this verification code to confirm your new secondary recovery email: {otp}\n\nIf you didn't request this change, please ignore this email."
+        if send_custom_email(new_secondary_email, "Chess Club IITK - Secondary Email Verification", body):
+            return jsonify({"message": "Verification code sent to your new secondary email!"}), 200
+        else:
+            return jsonify({"error": "Failed to send verification email. Please try again."}), 500
+    except Exception as e:
+        print(f"Send Secondary OTP Failure: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+    finally:
+        if connection:
+            connection.close()
+
+
 @auth_bp.route('/user/profile/update', methods=['PUT'])
 @jwt_required()
-
 def update_user_profile():
-    """Applies modified user identity details to the persistent database layer, explicitly locking email and chess_username"""
+    """Applies modified user identity details to the persistent database layer, verifying secondary email update if modified"""
     data = request.get_json()
     email = data.get('email')
     name = data.get('name')
     roll_no = data.get('rollNo')
     contact = data.get('contact')
     avatar = data.get('avatar')
+    new_secondary_email = data.get('secondary_email')
+    otp = data.get('otp')
 
     # Security check: Email is our tracking identifier; it cannot be missing
     if not email:
         return jsonify({"error": "Tracking identity string is missing."}), 400
 
-    current_authenticated_user=get_jwt_identity()
-    if current_authenticated_user!=email:
+    current_authenticated_user = get_jwt_identity()
+    if current_authenticated_user != email:
         return jsonify({"error": "Unauthorized cross-profile modifications blocked"}), 403
+
     connection = None
     try:
         connection = get_db_connection()
-        with connection.cursor() as cursor:
-            # REMOVED chess_username from the UPDATE statement to lock it down permanently
-            sql = """
-                UPDATE users 
-                SET name = %s, roll_no = %s, contact = %s, avatar = %s 
-                WHERE email = %s
-            """
-            cursor.execute(sql, (name, roll_no, contact, avatar, email))
-            connection.commit()
+        with connection.cursor(row_factory=dict_row) as cursor:
+            # Get current user profile details
+            cursor.execute("SELECT secondary_email FROM users WHERE email = %s", (email,))
+            user_record = cursor.fetchone()
+            if not user_record:
+                return jsonify({"error": "User not found."}), 404
+            
+            current_secondary = user_record.get('secondary_email') or ''
 
+            # If secondary email is being changed
+            if new_secondary_email and new_secondary_email.strip().lower() != current_secondary.lower():
+                cleaned_sec = new_secondary_email.strip()
+                if cleaned_sec.lower() == email.lower():
+                    return jsonify({"error": "Secondary email must be different from your primary email."}), 400
+
+                # Validate IITK email if it is one
+                if cleaned_sec.lower().endswith('@iitk.ac.in') and not re.search(r'\d{2}@iitk\.ac\.in$', cleaned_sec, re.IGNORECASE):
+                    return jsonify({"error": "Secondary IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in)."}), 400
+
+                if not otp:
+                    return jsonify({"error": "OTP_REQUIRED", "message": "Verification code required to update secondary email."}), 400
+
+                # Verify OTP
+                cursor.execute("SELECT otp FROM pending_otps WHERE email = %s", (cleaned_sec,))
+                record = cursor.fetchone()
+                if not record or record['otp'] != otp.strip():
+                    return jsonify({"error": "Invalid or expired OTP."}), 401
+                
+                # Delete OTP
+                cursor.execute("DELETE FROM pending_otps WHERE email = %s", (cleaned_sec,))
+                
+                # Update with secondary email
+                sql = """
+                    UPDATE users 
+                    SET name = %s, roll_no = %s, contact = %s, avatar = %s, secondary_email = %s
+                    WHERE email = %s
+                """
+                cursor.execute(sql, (name, roll_no, contact, avatar, cleaned_sec, email))
+            else:
+                # Update without secondary email
+                sql = """
+                    UPDATE users 
+                    SET name = %s, roll_no = %s, contact = %s, avatar = %s 
+                    WHERE email = %s
+                """
+                cursor.execute(sql, (name, roll_no, contact, avatar, email))
+
+            connection.commit()
             return jsonify({"message": "Profile metrics synced successfully!"}), 200
 
     except Exception as e:

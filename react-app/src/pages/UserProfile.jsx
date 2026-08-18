@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { API_BASE_URL } from '../config'; 
 import { useAuth } from '../context/AuthContext';
 import { globalCache } from '../utils/cache';
@@ -30,6 +31,8 @@ const UserProfile = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [secondaryOtp, setSecondaryOtp] = useState('');
 
   const navigate = useNavigate();
 
@@ -105,8 +108,64 @@ const UserProfile = () => {
   }, [userEmail]);
 
   const handleSave = async () => {
+    setError('');
     const token = localStorage.getItem('chess-club-jwt');
 
+    const originalSecondary = (globalCache.profile?.secondary_email || '').trim().toLowerCase();
+    const currentSecondary = (profile.secondary_email || '').trim().toLowerCase();
+    const hasSecondaryEmailChanged = currentSecondary !== originalSecondary;
+
+    if (hasSecondaryEmailChanged) {
+      if (!profile.secondary_email?.trim()) {
+        setError("Secondary recovery email is required.");
+        return;
+      }
+      if (profile.secondary_email.trim().toLowerCase() === profile.email.toLowerCase()) {
+        setError("Secondary email must be different from your primary email.");
+        return;
+      }
+
+      // Check if it's an IITK email and ends with two digits
+      const isIITK = (m) => m.toLowerCase().endsWith('@iitk.ac.in');
+      const isValidIITK = (m) => /\d{2}@iitk\.ac\.in$/i.test(m.trim());
+      if (isIITK(profile.secondary_email) && !isValidIITK(profile.secondary_email)) {
+        setError("Secondary IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in).");
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const otpRes = await fetch(`${API_BASE_URL}/api/user/profile/send-secondary-otp`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            email: profile.email,
+            secondary_email: profile.secondary_email.trim()
+          })
+        });
+
+        const otpData = await otpRes.json();
+        if (!otpRes.ok) {
+          setError(otpData.error || "Failed to send verification code to your new secondary email.");
+          setIsLoading(false);
+          return;
+        }
+
+        // Show OTP modal
+        setShowOtpModal(true);
+      } catch (err) {
+        console.error("Secondary OTP Error:", err);
+        setError("Unable to connect to the server.");
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+
+    // Normal profile save
     try {
       const response = await fetch(`${API_BASE_URL}/api/user/profile/update`, {
         method: 'PUT',
@@ -123,7 +182,8 @@ const UserProfile = () => {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed saving database modifications");
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed saving database modifications");
       
       const updatedProfile = {
         ...profile,
@@ -137,7 +197,59 @@ const UserProfile = () => {
       setError('');
     } catch (err) {
       console.error(err);
+      setError(err.message || "Unable to save adjustments to server database.");
+    }
+  };
+
+  const handleVerifyAndSave = async (e) => {
+    if (e) e.preventDefault();
+    setError('');
+    setIsLoading(true);
+    const token = localStorage.getItem('chess-club-jwt');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/user/profile/update`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+         },
+        body: JSON.stringify({
+          email: profile.email,
+          name: profile.name,
+          rollNo: profile.rollno,
+          contact: profile.contact,
+          avatar: profile.avatar,
+          secondary_email: profile.secondary_email.trim(),
+          otp: secondaryOtp.trim()
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.error || "Verification failed.");
+        setIsLoading(false);
+        return;
+      }
+      
+      const updatedProfile = {
+        ...profile,
+        name: profile.name,
+        rollno: profile.rollno,
+        contact: profile.contact,
+        avatar: profile.avatar,
+        secondary_email: profile.secondary_email.trim()
+      };
+      globalCache.profile = updatedProfile;
+      setIsEditing(false);
+      setShowOtpModal(false);
+      setSecondaryOtp('');
+      setError('');
+    } catch (err) {
+      console.error("Secondary verification save error:", err);
       setError("Unable to save adjustments to server database.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -284,16 +396,15 @@ const UserProfile = () => {
                     <span className="absolute right-2 bottom-1.5 text-[14px] text-on-surface-variant/30 material-symbols-outlined">lock</span>
                   </div>
 
-                  {/*SECONDARY EMAIL INPUT: Locked down with 'disabled flag'*/}
+                  {/* SECONDARY EMAIL INPUT: Now editable */}
                   <div className="w-full relative">
                     <input 
                       type="email" 
                       value={profile.secondary_email || ''}
-                      disabled
-                      className="text-[11px] font-label uppercase tracking-widest bg-transparent border-b border-outline-variant/10 text-on-surface-variant/40 pb-1 focus:outline-none w-full text-center cursor-not-allowed select-none"
+                      onChange={(e) => setProfile({...profile, secondary_email: e.target.value})}
+                      className="text-[11px] font-label uppercase tracking-widest bg-transparent border-b border-outline-variant/30 text-on-surface pb-1 focus:outline-none focus:border-primary w-full transition-colors text-center"
                       placeholder="Secondary Email ID"
                     />
-                    <span className="absolute right-2 bottom-1.5 text-[14px] text-on-surface-variant/30 material-symbols-outlined">lock</span>
                   </div>
 
                   {/* CHESS.COM INPUT: Locked down with 'disabled' flag */}
@@ -412,6 +523,57 @@ const UserProfile = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {/* --- SECONDARY EMAIL OTP VERIFICATION MODAL --- */}
+      {showOtpModal && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="bg-[#1c1b1b] max-w-sm w-full rounded-2xl p-8 border border-[#4d4635]/20 shadow-2xl space-y-6">
+            <div className="text-center">
+              <span className="material-symbols-outlined text-primary text-5xl mb-2">mark_email_read</span>
+              <h3 className="text-xl font-serif font-bold text-white">Verify Secondary Email</h3>
+              <p className="text-xs text-on-surface-variant/70 mt-2 leading-relaxed">
+                We sent a 6-digit verification code to <strong>{profile.secondary_email}</strong>. Please enter it below to confirm your change.
+              </p>
+            </div>
+
+            <form onSubmit={handleVerifyAndSave} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-bold text-primary uppercase tracking-[0.15em] mb-2 ml-1 text-center">
+                  Verification Code
+                </label>
+                <input
+                  type="text"
+                  required
+                  maxLength="6"
+                  value={secondaryOtp}
+                  onChange={(e) => setSecondaryOtp(e.target.value)}
+                  className="appearance-none block w-full px-4 py-3 border border-[#4d4635]/35 bg-surface-container-lowest text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-center tracking-[0.4em] font-mono font-bold text-lg transition-colors"
+                  placeholder="000000"
+                />
+              </div>
+
+              {error && <div className="text-red-500 text-xs text-center font-semibold">{error}</div>}
+
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <button
+                  type="button"
+                  onClick={() => { setShowOtpModal(false); setSecondaryOtp(''); }}
+                  className="w-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface py-3 rounded-xl font-bold text-xs tracking-widest uppercase transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="w-full bg-primary hover:bg-[#d4af37] text-on-primary py-3 rounded-xl font-bold text-xs tracking-widest uppercase shadow-lg transition-all"
+                >
+                  Verify & Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );
