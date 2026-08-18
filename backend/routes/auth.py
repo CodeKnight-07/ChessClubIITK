@@ -103,8 +103,8 @@ def generate_otp():
             cursor.execute(sql, (secondary_email, secondary_otp))
             connection.commit()
 
-        email_body_1 = f"Welcome to the Sanctum!\n\nYour verification code is: {primary_otp}\n\nUse this to complete your registration."
-        email_body_2 = f"Welcome to the Sanctum!\n\nYour verification code is: {secondary_otp}\n\nUse this to complete your registration."
+        email_body_1 = f"Welcome to the Community!\n\nYour verification code is: {primary_otp}\n\nUse this to complete your registration."
+        email_body_2 = f"Welcome to the Community!\n\nYour verification code is: {secondary_otp}\n\nUse this to complete your registration."
         primary_sent = send_custom_email(primary_email, 'Chess Club IITK - Verification Code', email_body_1)
         secondary_sent = send_custom_email(secondary_email, 'Chess Club IITK - Verification Code', email_body_2)
         if primary_sent and secondary_sent:
