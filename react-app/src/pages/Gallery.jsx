@@ -34,6 +34,18 @@ const STREET_CHESS_PHOTOS = Object.values(STREET_CHESS_GLOB).map(module => modul
 const GRAND_SWISS_GLOB = import.meta.glob('../assets/Grand Swiss/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
 const GRAND_SWISS_PHOTOS = Object.values(GRAND_SWISS_GLOB).map(module => module.default);
 
+// Dynamically import and numerically sort all images in the FIDE 25-26 folder using Vite's glob import
+const FIDE_2526_GLOB = import.meta.glob('../Gallery/fide2526/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
+const FIDE_2526_KEYS = Object.keys(FIDE_2526_GLOB).sort((a, b) => {
+  const matchA = a.match(/\/(\d+)\.\w+$/);
+  const matchB = b.match(/\/(\d+)\.\w+$/);
+  if (matchA && matchB) {
+    return parseInt(matchA[1], 10) - parseInt(matchB[1], 10);
+  }
+  return a.localeCompare(b);
+});
+const FIDE_2526_PHOTOS = FIDE_2526_KEYS.map(key => FIDE_2526_GLOB[key].default);
+
 // Dynamically import other casual photos using Vite's glob import
 const OTHER_IMAGES_GLOB = import.meta.glob('../Gallery/OTHER PHOTOS/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
 const OTHER_PHOTOS = Object.values(OTHER_IMAGES_GLOB).map(module => module.default);
@@ -150,38 +162,16 @@ const CURRENT_YEAR_EVENTS = [
 
 // 3D Diary Book Single Page Component (Club Memories)
 const DiaryPage = ({ photoUrl, pageNumber, isLeftPage, isAdmin, photoIdx, onDelete, onReplace }) => {
-  if (!photoUrl && pageNumber !== 0 && pageNumber !== 999) return null;
-
-  if (pageNumber === 0) {
-    // Front Cover
+  if (!photoUrl) {
     return (
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-900 to-amber-950 flex flex-col justify-between p-6 text-center border-l-4 border-amber-800 shadow-inner rounded-r-xl select-none">
-        <div className="border border-primary/30 rounded-lg p-4 flex-1 flex flex-col justify-center items-center gap-4">
-          <span className="material-symbols-outlined text-primary text-5xl animate-pulse">menu_book</span>
-          <div>
-            <h3 className="font-serif text-2xl text-primary tracking-wide leading-tight mb-2">Club Memories</h3>
-            <p className="font-label text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/80">Chess Club</p>
-          </div>
-          <div className="h-0.5 w-12 bg-primary/30" />
-          <p className="text-[9px] font-label text-on-surface-variant/60 uppercase tracking-widest max-w-[160px]">
-            Visual Archives • Casual Moments
-          </p>
+      <div className={`w-full h-full bg-[#FAF6EE] p-4 sm:p-5 md:p-8 flex flex-col justify-between relative overflow-hidden select-none ${isLeftPage ? 'shadow-[inset_10px_0_20px_rgba(0,0,0,0.05),inset_0_4px_10px_rgba(0,0,0,0.03)] border-r border-black/5' : 'shadow-[inset_-10px_0_20px_rgba(0,0,0,0.05),inset_0_4px_10px_rgba(0,0,0,0.03)]'}`}>
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:12px_12px]" />
+        <div className={`absolute ${isLeftPage ? 'right-0 bg-gradient-to-l' : 'left-0 bg-gradient-to-r'} top-0 h-full w-[25px] from-black/15 via-black/5 to-transparent pointer-events-none z-10`} />
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <span className="material-symbols-outlined text-[#8a7f6e]/20 text-5xl">photo</span>
         </div>
-      </div>
-    );
-  }
-
-  if (pageNumber === 999) {
-    // Back Cover
-    return (
-      <div className="absolute inset-0 bg-gradient-to-bl from-amber-950 to-amber-900 flex flex-col justify-center items-center p-6 text-center border-r-4 border-amber-800 shadow-inner rounded-l-xl select-none">
-        <div className="border border-[#d4af37]/20 rounded-lg p-4 w-full h-full flex flex-col justify-center items-center gap-4">
-          <span className="material-symbols-outlined text-primary text-4xl">emoji_events</span>
-          <h3 className="font-serif text-lg text-[#d4af37] tracking-wider">Chess Club</h3>
-          <p className="text-[9px] font-label text-on-surface-variant/50 max-w-[150px]">
-            Thank you for being part of our chess journey.
-          </p>
-          <div className="h-0.5 w-10 bg-[#d4af37]/20 mt-2" />
+        <div className={`absolute bottom-3 ${isLeftPage ? 'left-6' : 'right-6'} font-handwritten text-xs text-[#8a7f6e]/70 select-none`}>
+          — Page {pageNumber} —
         </div>
       </div>
     );
@@ -316,11 +306,34 @@ const PREVIOUS_YEARS_DATA = {
       description: "Who will challenge the champion?",
       photos: CANDIDATES_2025_PHOTOS,
       image: CANDIDATES_2025_PHOTOS[0]
+    },
+    {
+      id: "event-4",
+      category: "TOURNAMENTS",
+      title: "FIDE Rated Chess Tournament",
+      description: "SBI GIC Ltd. Presents FIDE Rated Open Chess Tournament.",
+      photos: FIDE_2526_PHOTOS,
+      image: FIDE_2526_PHOTOS.length > 0 ? FIDE_2526_PHOTOS[0] : null
     }
   ]
 };
 
+const preloadImages = (urls) => {
+  return Promise.all(
+    urls.map(url => {
+      if (!url) return Promise.resolve();
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = url;
+        img.onload = resolve;
+        img.onerror = resolve;
+      });
+    })
+  );
+};
+
 const Gallery = () => {
+  const [isPreloading, setIsPreloading] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeYear, setActiveYear] = useState(PREVIOUS_YEARS[0]);
   const [isOpenLightbox, setIsOpenLightbox] = useState(false);
@@ -594,22 +607,68 @@ const Gallery = () => {
   };
 
   // Pagination for dynamic memories 3D book
-  const totalSpreads = Math.floor(clubMemoriesPhotos.length / 2) + 2;
+  const totalSpreads = Math.ceil(clubMemoriesPhotos.length / 2) || 1;
 
   const handleNext = () => {
-    if (diaryIsAnimating || totalSpreads <= 1) return;
-    setDiaryAnimDirection('next');
-    setDiaryPrevSpread(diarySpreadIndex);
-    setDiarySpreadIndex(prev => (prev + 1) % totalSpreads);
-    setDiaryIsAnimating(true);
+    if (diaryIsAnimating || isPreloading || totalSpreads <= 1) return;
+    
+    const targetSpread = (diarySpreadIndex + 1) % totalSpreads;
+    const targetUrls = [];
+    const idxLeft = targetSpread * 2;
+    const idxRight = targetSpread * 2 + 1;
+    if (idxLeft >= 0 && idxLeft < clubMemoriesPhotos.length) {
+      targetUrls.push(clubMemoriesPhotos[idxLeft]);
+    }
+    if (idxRight >= 0 && idxRight < clubMemoriesPhotos.length) {
+      targetUrls.push(clubMemoriesPhotos[idxRight]);
+    }
+
+    if (targetUrls.length > 0) {
+      setIsPreloading(true);
+      preloadImages(targetUrls).then(() => {
+        setIsPreloading(false);
+        setDiaryAnimDirection('next');
+        setDiaryPrevSpread(diarySpreadIndex);
+        setDiarySpreadIndex(targetSpread);
+        setDiaryIsAnimating(true);
+      });
+    } else {
+      setDiaryAnimDirection('next');
+      setDiaryPrevSpread(diarySpreadIndex);
+      setDiarySpreadIndex(targetSpread);
+      setDiaryIsAnimating(true);
+    }
   };
 
   const handlePrev = () => {
-    if (isAnimating || totalSpreads <= 1) return;
-    setDiaryAnimDirection('prev');
-    setDiaryPrevSpread(diarySpreadIndex);
-    setDiarySpreadIndex(prev => (prev - 1 + totalSpreads) % totalSpreads);
-    setDiaryIsAnimating(true);
+    if (diaryIsAnimating || isPreloading || totalSpreads <= 1) return;
+    
+    const targetSpread = (diarySpreadIndex - 1 + totalSpreads) % totalSpreads;
+    const targetUrls = [];
+    const idxLeft = targetSpread * 2;
+    const idxRight = targetSpread * 2 + 1;
+    if (idxLeft >= 0 && idxLeft < clubMemoriesPhotos.length) {
+      targetUrls.push(clubMemoriesPhotos[idxLeft]);
+    }
+    if (idxRight >= 0 && idxRight < clubMemoriesPhotos.length) {
+      targetUrls.push(clubMemoriesPhotos[idxRight]);
+    }
+
+    if (targetUrls.length > 0) {
+      setIsPreloading(true);
+      preloadImages(targetUrls).then(() => {
+        setIsPreloading(false);
+        setDiaryAnimDirection('prev');
+        setDiaryPrevSpread(diarySpreadIndex);
+        setDiarySpreadIndex(targetSpread);
+        setDiaryIsAnimating(true);
+      });
+    } else {
+      setDiaryAnimDirection('prev');
+      setDiaryPrevSpread(diarySpreadIndex);
+      setDiarySpreadIndex(targetSpread);
+      setDiaryIsAnimating(true);
+    }
   };
 
   const handleAnimationComplete = () => {
@@ -644,17 +703,17 @@ const Gallery = () => {
 
   // Map 3D Book page number to corresponding content safely
   const getBookPageContent = (pageNum) => {
-    if (pageNum < 0 || pageNum > clubMemoriesPhotos.length + 1) return null;
-
-    if (pageNum === 0) {
-      return <DiaryPage pageNumber={0} isLeftPage={false} />;
-    }
-
-    if (pageNum === clubMemoriesPhotos.length + 1) {
-      return <DiaryPage pageNumber={999} isLeftPage={true} />;
-    }
-
     const photoIdx = pageNum - 1;
+    if (photoIdx < 0 || photoIdx >= clubMemoriesPhotos.length) {
+      return (
+        <DiaryPage
+          photoUrl={null}
+          pageNumber={pageNum}
+          isLeftPage={pageNum % 2 !== 0}
+        />
+      );
+    }
+
     const photoUrl = clubMemoriesPhotos[photoIdx];
     return (
       <DiaryPage
@@ -1050,8 +1109,8 @@ const Gallery = () => {
                       <div className="w-1/2 h-full">
                         {getBookPageContent(
                           diaryIsAnimating
-                            ? (diaryAnimDirection === 'next' ? diaryPrevSpread * 2 - 1 : diarySpreadIndex * 2 - 1)
-                            : diarySpreadIndex * 2 - 1
+                            ? (diaryAnimDirection === 'next' ? diaryPrevSpread * 2 + 1 : diarySpreadIndex * 2 + 1)
+                            : diarySpreadIndex * 2 + 1
                         )}
                       </div>
 
@@ -1059,8 +1118,8 @@ const Gallery = () => {
                       <div className="w-1/2 h-full">
                         {getBookPageContent(
                           diaryIsAnimating
-                            ? (diaryAnimDirection === 'next' ? diarySpreadIndex * 2 : diaryPrevSpread * 2)
-                            : diarySpreadIndex * 2
+                            ? (diaryAnimDirection === 'next' ? diarySpreadIndex * 2 + 2 : diaryPrevSpread * 2 + 2)
+                            : diarySpreadIndex * 2 + 2
                         )}
                       </div>
 
@@ -1100,7 +1159,7 @@ const Gallery = () => {
                               }}
                             >
                               {getBookPageContent(
-                                diaryAnimDirection === 'next' ? diaryPrevSpread * 2 : diarySpreadIndex * 2
+                                diaryAnimDirection === 'next' ? diaryPrevSpread * 2 + 2 : diarySpreadIndex * 2 + 2
                               )}
                             </div>
 
@@ -1118,7 +1177,7 @@ const Gallery = () => {
                               }}
                             >
                               {getBookPageContent(
-                                diaryAnimDirection === 'next' ? diarySpreadIndex * 2 - 1 : diaryPrevSpread * 2 - 1
+                                diaryAnimDirection === 'next' ? diarySpreadIndex * 2 + 1 : diaryPrevSpread * 2 + 1
                               )}
                             </div>
                           </motion.div>
@@ -1210,30 +1269,82 @@ const Gallery = () => {
             {/* Main 3D Book Container */}
             <div className="flex-1 flex flex-col items-center justify-center relative max-w-5xl mx-auto w-full my-auto py-4">
               {(() => {
-                const totalSpreads = Math.floor(diaryPhotos.length / 2) + 2;
+                const totalSpreads = Math.ceil(diaryPhotos.length / 2) || 1;
 
                 const handleDiaryNext = () => {
-                  if (diaryIsAnimating || totalSpreads <= 1) return;
-                  setDiaryAnimDirection('next');
-                  setDiaryPrevSpread(diarySpreadIndex);
-                  setDiarySpreadIndex(prev => (prev + 1) % totalSpreads);
-                  setDiaryIsAnimating(true);
+                  if (diaryIsAnimating || isPreloading || totalSpreads <= 1) return;
+                  
+                  const targetSpread = (diarySpreadIndex + 1) % totalSpreads;
+                  const targetUrls = [];
+                  const idxLeft = targetSpread * 2;
+                  const idxRight = targetSpread * 2 + 1;
+                  if (idxLeft >= 0 && idxLeft < diaryPhotos.length) {
+                    targetUrls.push(diaryPhotos[idxLeft]);
+                  }
+                  if (idxRight >= 0 && idxRight < diaryPhotos.length) {
+                    targetUrls.push(diaryPhotos[idxRight]);
+                  }
+
+                  if (targetUrls.length > 0) {
+                    setIsPreloading(true);
+                    preloadImages(targetUrls).then(() => {
+                      setIsPreloading(false);
+                      setDiaryAnimDirection('next');
+                      setDiaryPrevSpread(diarySpreadIndex);
+                      setDiarySpreadIndex(targetSpread);
+                      setDiaryIsAnimating(true);
+                    });
+                  } else {
+                    setDiaryAnimDirection('next');
+                    setDiaryPrevSpread(diarySpreadIndex);
+                    setDiarySpreadIndex(targetSpread);
+                    setDiaryIsAnimating(true);
+                  }
                 };
 
                 const handleDiaryPrev = () => {
-                  if (diaryIsAnimating || totalSpreads <= 1) return;
-                  setDiaryAnimDirection('prev');
-                  setDiaryPrevSpread(diarySpreadIndex);
-                  setDiarySpreadIndex(prev => (prev - 1 + totalSpreads) % totalSpreads);
-                  setDiaryIsAnimating(true);
+                  if (diaryIsAnimating || isPreloading || totalSpreads <= 1) return;
+                  
+                  const targetSpread = (diarySpreadIndex - 1 + totalSpreads) % totalSpreads;
+                  const targetUrls = [];
+                  const idxLeft = targetSpread * 2;
+                  const idxRight = targetSpread * 2 + 1;
+                  if (idxLeft >= 0 && idxLeft < diaryPhotos.length) {
+                    targetUrls.push(diaryPhotos[idxLeft]);
+                  }
+                  if (idxRight >= 0 && idxRight < diaryPhotos.length) {
+                    targetUrls.push(diaryPhotos[idxRight]);
+                  }
+
+                  if (targetUrls.length > 0) {
+                    setIsPreloading(true);
+                    preloadImages(targetUrls).then(() => {
+                      setIsPreloading(false);
+                      setDiaryAnimDirection('prev');
+                      setDiaryPrevSpread(diarySpreadIndex);
+                      setDiarySpreadIndex(targetSpread);
+                      setDiaryIsAnimating(true);
+                    });
+                  } else {
+                    setDiaryAnimDirection('prev');
+                    setDiaryPrevSpread(diarySpreadIndex);
+                    setDiarySpreadIndex(targetSpread);
+                    setDiaryIsAnimating(true);
+                  }
                 };
 
                 const getModalPageContent = (pageNum) => {
-                  if (pageNum < 0 || pageNum > diaryPhotos.length + 1) return null;
-                  if (pageNum === 0) return <DiaryPage pageNumber={0} isLeftPage={false} />;
-                  if (pageNum === diaryPhotos.length + 1) return <DiaryPage pageNumber={999} isLeftPage={true} />;
-
                   const photoIdx = pageNum - 1;
+                  if (photoIdx < 0 || photoIdx >= diaryPhotos.length) {
+                    return (
+                      <DiaryPage
+                        photoUrl={null}
+                        pageNumber={pageNum}
+                        isLeftPage={pageNum % 2 !== 0}
+                      />
+                    );
+                  }
+
                   const photoUrl = diaryPhotos[photoIdx];
                   return (
                     <DiaryPage
@@ -1262,15 +1373,15 @@ const Gallery = () => {
                         <div className="w-1/2 h-full">
                           {getModalPageContent(
                             diaryIsAnimating
-                              ? (diaryAnimDirection === 'next' ? diaryPrevSpread * 2 - 1 : diarySpreadIndex * 2 - 1)
-                              : diarySpreadIndex * 2 - 1
+                              ? (diaryAnimDirection === 'next' ? diaryPrevSpread * 2 + 1 : diarySpreadIndex * 2 + 1)
+                              : diarySpreadIndex * 2 + 1
                           )}
                         </div>
                         <div className="w-1/2 h-full">
                           {getModalPageContent(
                             diaryIsAnimating
-                              ? (diaryAnimDirection === 'next' ? diarySpreadIndex * 2 : diaryPrevSpread * 2)
-                              : diarySpreadIndex * 2
+                              ? (diaryAnimDirection === 'next' ? diarySpreadIndex * 2 + 2 : diaryPrevSpread * 2 + 2)
+                              : diarySpreadIndex * 2 + 2
                           )}
                         </div>
 
@@ -1297,10 +1408,10 @@ const Gallery = () => {
                               }}
                             >
                               <div style={{ position: "absolute", inset: 0, width: "100%", height: "100%", backfaceVisibility: "hidden", transform: "rotateY(0deg)" }}>
-                                {getModalPageContent(diaryAnimDirection === 'next' ? diaryPrevSpread * 2 : diarySpreadIndex * 2)}
+                                {getModalPageContent(diaryAnimDirection === 'next' ? diaryPrevSpread * 2 + 2 : diarySpreadIndex * 2 + 2)}
                               </div>
                               <div style={{ position: "absolute", inset: 0, width: "100%", height: "100%", backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>
-                                {getModalPageContent(diaryAnimDirection === 'next' ? diarySpreadIndex * 2 - 1 : diaryPrevSpread * 2 - 1)}
+                                {getModalPageContent(diaryAnimDirection === 'next' ? diarySpreadIndex * 2 + 1 : diaryPrevSpread * 2 + 1)}
                               </div>
                             </motion.div>
                           )}
