@@ -108,6 +108,7 @@ def login():
         return jsonify({'error': 'Invalid username or password.'}), 401
         
     except Exception as e:
+        print(f"CRITICAL LOGIN EXCEPTION: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 @app.route("/health")
