@@ -141,7 +141,8 @@ const Signup = () => {
           graduation_year: alumniGradYear.trim(),
           chess_username: chessUsername.trim(),
           contact: contact.trim(),
-          notes: alumniNotes.trim()
+          notes: alumniNotes.trim(),
+          gender: gender
         }),
       });
 
@@ -287,6 +288,21 @@ const Signup = () => {
                     className="appearance-none relative block w-full px-4 py-2.5 border border-outline-variant/20 bg-surface-container-lowest placeholder-on-surface-variant/30 text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm transition-colors"
                     placeholder="alumnus@gmail.com"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-1.5 ml-1" htmlFor="alumni-gender">Gender</label>
+                  <select
+                    id="alumni-gender"
+                    required
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    className="relative block w-full px-4 py-2.5 border border-outline-variant/20 bg-surface-container-lowest text-on-surface rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm transition-colors cursor-pointer"
+                  >
+                    <option value="Male" className="bg-[#121212] text-on-surface">Male</option>
+                    <option value="Female" className="bg-[#121212] text-on-surface">Female</option>
+                    <option value="Prefer not to say" className="bg-[#121212] text-on-surface">Prefer not to say</option>
+                  </select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">

@@ -22,18 +22,6 @@ import img8 from '../Gallery/8.png';
 import img9 from '../Gallery/9.png';
 import img10 from '../Gallery/SCHOOL VISIT.png';
 
-// Dynamically import all images in the FIDE RATED folder using Vite's glob import
-const FIDE_IMAGES_GLOB = import.meta.glob('../Gallery/FIDE RATED/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
-const FIDE_RATED_PHOTOS = Object.values(FIDE_IMAGES_GLOB).map(module => module.default);
-
-// Dynamically import all images in the Street Chess folder using Vite's glob import
-const STREET_CHESS_GLOB = import.meta.glob('../assets/Street Chess/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
-const STREET_CHESS_PHOTOS = Object.values(STREET_CHESS_GLOB).map(module => module.default);
-
-// Dynamically import all images in the Grand Swiss folder using Vite's glob import
-const GRAND_SWISS_GLOB = import.meta.glob('../assets/Grand Swiss/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
-const GRAND_SWISS_PHOTOS = Object.values(GRAND_SWISS_GLOB).map(module => module.default);
-
 // Dynamically import and numerically sort all images in the FIDE 25-26 folder using Vite's glob import
 const FIDE_2526_GLOB = import.meta.glob('../Gallery/fide2526/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
 const FIDE_2526_KEYS = Object.keys(FIDE_2526_GLOB).sort((a, b) => {
@@ -45,6 +33,17 @@ const FIDE_2526_KEYS = Object.keys(FIDE_2526_GLOB).sort((a, b) => {
   return a.localeCompare(b);
 });
 const FIDE_2526_PHOTOS = FIDE_2526_KEYS.map(key => FIDE_2526_GLOB[key].default);
+
+// FIDE RATED PHOTOS is now FIDE_2526_PHOTOS for the featured spotlight at the top
+const FIDE_RATED_PHOTOS = FIDE_2526_PHOTOS;
+
+// Dynamically import all images in the Street Chess folder using Vite's glob import
+const STREET_CHESS_GLOB = import.meta.glob('../assets/Street Chess/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
+const STREET_CHESS_PHOTOS = Object.values(STREET_CHESS_GLOB).map(module => module.default);
+
+// Dynamically import all images in the Grand Swiss folder using Vite's glob import
+const GRAND_SWISS_GLOB = import.meta.glob('../assets/Grand Swiss/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
+const GRAND_SWISS_PHOTOS = Object.values(GRAND_SWISS_GLOB).map(module => module.default);
 
 // Dynamically import other casual photos using Vite's glob import
 const OTHER_IMAGES_GLOB = import.meta.glob('../Gallery/OTHER PHOTOS/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
@@ -306,14 +305,6 @@ const PREVIOUS_YEARS_DATA = {
       description: "Who will challenge the champion?",
       photos: CANDIDATES_2025_PHOTOS,
       image: CANDIDATES_2025_PHOTOS[0]
-    },
-    {
-      id: "event-4",
-      category: "TOURNAMENTS",
-      title: "FIDE Rated Chess Tournament",
-      description: "SBI GIC Ltd. Presents FIDE Rated Open Chess Tournament.",
-      photos: FIDE_2526_PHOTOS,
-      image: FIDE_2526_PHOTOS.length > 0 ? FIDE_2526_PHOTOS[0] : null
     }
   ]
 };

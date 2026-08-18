@@ -471,6 +471,7 @@ def handle_alumni_request():
     chess_username = (data.get('chess_username') or data.get('chessUsername') or '').strip()
     contact = (data.get('contact') or '').strip()
     notes = (data.get('notes') or '').strip()
+    gender = (data.get('gender') or 'Male').strip()
 
     if not name or not email:
         return jsonify({"error": "Full name and personal email are required."}), 400
@@ -496,10 +497,10 @@ def handle_alumni_request():
         connection = get_db_connection()
         with connection.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO alumni_requests (name, email, roll_no, graduation_year, chess_username, contact, notes, status)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, 'pending')
+                INSERT INTO alumni_requests (name, email, roll_no, graduation_year, chess_username, contact, notes, gender, status)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'pending')
                 RETURNING id;
-            """, (name, email, roll_no, graduation_year, chess_username, contact, notes))
+            """, (name, email, roll_no, graduation_year, chess_username, contact, notes, gender))
             
             if hasattr(connection, 'commit'):
                 connection.commit()

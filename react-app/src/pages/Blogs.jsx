@@ -486,8 +486,8 @@ const Blogs = () => {
                       </div>
                     )}
                     <Link to={`/blog/${post.id}`} className={`flex bg-surface-container-low border border-outline-variant/10 rounded-2xl overflow-hidden hover:border-outline-variant/30 hover:shadow-xl transition-all duration-300 h-full ${viewMode === 'grid' ? 'flex-col' : 'flex-col md:flex-row'}`}>
-                      <div className={`overflow-hidden relative ${viewMode === 'grid' ? 'h-52 w-full' : 'h-full w-48 flex-shrink-0'}`}>
-                        <img alt={post.title} className="w-full h-full object-fill group-hover:scale-105 transition-transform duration-500" src={getImageUrl(post.cover_image || post.image)} onError={(e) => { e.currentTarget.src = defaultBlogHero; }} />
+                      <div className={`overflow-hidden relative ${viewMode === 'grid' ? 'aspect-[3/4] w-full' : 'aspect-[3/4] w-40 flex-shrink-0'}`}>
+                        <img alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src={getImageUrl(post.cover_image || post.image)} onError={(e) => { e.currentTarget.src = defaultBlogHero; }} />
                         <div className="absolute top-3 left-3">
                           <span className="bg-surface/90 backdrop-blur-md px-3 py-1 text-[9px] font-label tracking-widest uppercase text-primary font-bold rounded-md shadow-sm">{getBlogTag(post)}</span>
                         </div>

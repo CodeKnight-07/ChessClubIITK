@@ -373,7 +373,7 @@ const BlogPost = () => {
           <div className="w-full h-[320px] sm:h-[450px] rounded-xl overflow-hidden mb-16 relative shadow-2xl shadow-black/50 bg-black/20">
             <img 
               alt={dbPost.title} 
-              className="w-full h-full object-fill" 
+              className="w-full h-full object-cover" 
               src={getImageUrl(dbPost.cover_image)}
               onError={(e) => { e.currentTarget.src = defaultBlogHero; }}
             />
