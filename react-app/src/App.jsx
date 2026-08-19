@@ -19,7 +19,6 @@ import logoImg from './assets/chessclubiitklogo.jpeg';
 const Landing = React.lazy(() => import('./pages/Landing'));
 const Calendar = React.lazy(() => import('./pages/Calendar'));
 const Events = React.lazy(() => import('./pages/Events'));
-const EventRegistration = React.lazy(() => import('./pages/EventRegistration'));
 const Blogs = React.lazy(() => import('./pages/Blogs'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 const UserProfile = React.lazy(() => import('./pages/UserProfile'));
@@ -140,7 +139,6 @@ function App() {
                 <Route path="/calendar" element={<PageTransition><Calendar /></PageTransition>} />
                 <Route path="/events" element={<PageTransition><Events /></PageTransition>} />
                 <Route path="/events/results/:id" element={<PageTransition><Results /></PageTransition>} />
-                <Route path="/events/register/:id" element={<PageTransition><EventRegistration /></PageTransition>} />
                 <Route path="/blogs" element={<PageTransition><Blogs /></PageTransition>} />
                 <Route path="/blog/:id" element={<PageTransition><BlogPost /></PageTransition>} />
                 <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />

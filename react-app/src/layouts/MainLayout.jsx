@@ -12,6 +12,7 @@ const MainLayout = ({ children }) => {
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRegisteredForLol, setIsRegisteredForLol] = useState(false);
+  const [isRegisteredForFcl, setIsRegisteredForFcl] = useState(false);
   const [nextEvent, setNextEvent] = useState(null);
 
   useEffect(() => {
@@ -57,6 +58,7 @@ const MainLayout = ({ children }) => {
   }, []);
 
   const isLolEvent = nextEvent?.title?.toLowerCase().includes("league of legends");
+  const isFclEvent = nextEvent?.title?.toLowerCase().includes("fresher");
 
   useEffect(() => {
     if (isLoggedIn && token && nextEvent && isLolEvent) {
@@ -80,6 +82,29 @@ const MainLayout = ({ children }) => {
       setIsRegisteredForLol(false);
     }
   }, [isLoggedIn, token, nextEvent, isLolEvent]);
+
+  useEffect(() => {
+    if (isLoggedIn && token && nextEvent && isFclEvent) {
+      const checkFclStatus = async () => {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/register-fcl/status`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setIsRegisteredForFcl(data.is_registered);
+          }
+        } catch (e) {
+          console.error("Error checking fcl registration status in layout:", e);
+        }
+      };
+      checkFclStatus();
+    } else {
+      setIsRegisteredForFcl(false);
+    }
+  }, [isLoggedIn, token, nextEvent, isFclEvent]);
 
   useEffect(() => {
     const handleOpenModal = () => setIsModalOpen(true);
@@ -291,7 +316,7 @@ const MainLayout = ({ children }) => {
                   Close
                 </button>
                 {isLoggedIn ? (
-                  isRegisteredForLol && isLolEvent ? (
+                  ((isLolEvent && isRegisteredForLol) || (isFclEvent && isRegisteredForFcl)) ? (
                     <button
                       disabled
                       className="px-6 py-2.5 rounded-xl bg-gray-800 text-gray-500 text-xs font-bold uppercase tracking-wider border border-gray-700 cursor-not-allowed"
@@ -300,8 +325,8 @@ const MainLayout = ({ children }) => {
                     </button>
                   ) : (
                     <Link
-                      to={isLolEvent ? "/events" : `/events/register/${nextEvent.id}`}
-                      state={isLolEvent ? { openRegisterLol: true } : undefined}
+                      to={(isLolEvent || isFclEvent) ? "/events" : `/events/register/${nextEvent.id}`}
+                      state={isLolEvent ? { openRegisterLol: true } : (isFclEvent ? { openRegisterFcl: true } : undefined)}
                       onClick={() => setIsModalOpen(false)}
                       className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#f2ca50] to-[#d4af37] text-xs font-bold uppercase tracking-wider text-[#3c2f00] shadow-lg transition-transform hover:scale-[1.02]"
                     >

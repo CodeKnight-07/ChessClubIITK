@@ -29,10 +29,13 @@ const formatBlogDate = (raw) => {
 
 const getBlogTag = (post) => {
   if (!post) return "Tournament News";
+  if (post.tag === "None" || post.tag === "") return "";
   if (post.tag) return post.tag;
   const standardTags = ["Tournament News", "Event Recap", "Puzzle Analytics"];
-  if (post.subtitle && standardTags.includes(post.subtitle.trim())) {
-    return post.subtitle.trim();
+  if (post.subtitle) {
+    const trimmed = post.subtitle.trim();
+    if (trimmed === "None" || trimmed === "") return "";
+    if (standardTags.includes(trimmed)) return trimmed;
   }
   return "Tournament News";
 };
@@ -40,7 +43,7 @@ const getBlogTag = (post) => {
 const getBlogExcerpt = (post, maxLength = 180) => {
   if (!post) return "";
   if (post.excerpt) return post.excerpt;
-  const standardTags = ["Tournament News", "Event Recap", "Puzzle Analytics"];
+  const standardTags = ["Tournament News", "Event Recap", "Puzzle Analytics", "None"];
   if (post.subtitle && !standardTags.includes(post.subtitle.trim())) {
     return post.subtitle;
   }
@@ -256,8 +259,14 @@ const Blogs = () => {
   const handleStartEdit = (post) => {
     setEditingPostId(post.id);
     setNewTitle(post.title || "");
-    setNewSubtitle(post.subtitle || "");
-    setNewTag(getBlogTag(post));
+    const standardTags = ["Tournament News", "Event Recap", "Puzzle Analytics", "None"];
+    if (post.subtitle && standardTags.includes(post.subtitle.trim())) {
+      setNewSubtitle("");
+    } else {
+      setNewSubtitle(post.subtitle || "");
+    }
+    const currentTag = getBlogTag(post);
+    setNewTag(currentTag === "" ? "None" : currentTag);
     setNewCover(post.cover_image || post.image || "");
     setNewAuthorName(post.author_name || post.author || "");
     setNewAuthorPosition(post.author_position || post.authorRole || "");
@@ -401,6 +410,7 @@ const Blogs = () => {
                   <option value="Tournament News">Tournament News</option>
                   <option value="Event Recap">Event Recap</option>
                   <option value="Puzzle Analytics">Puzzle Analytics</option>
+                  <option value="None">None (Show Nothing)</option>
                 </select>
                 <div className="flex items-center gap-2 bg-surface-container-lowest border border-outline-variant/20 px-3 py-1.5 rounded-xl">
                   <input type="text" placeholder="Banner Graphic URL" value={newCover} onChange={(e) => setNewCover(e.target.value)} className="flex-grow bg-transparent text-sm text-on-surface focus:outline-none py-1.5" />
@@ -488,9 +498,11 @@ const Blogs = () => {
                     <Link to={`/blog/${post.id}`} className={`flex bg-surface-container-low border border-outline-variant/10 rounded-2xl overflow-hidden hover:border-outline-variant/30 hover:shadow-xl transition-all duration-300 h-full ${viewMode === 'grid' ? 'flex-col' : 'flex-col md:flex-row'}`}>
                       <div className={`overflow-hidden relative ${viewMode === 'grid' ? 'aspect-[3/4] w-full' : 'aspect-[3/4] w-40 flex-shrink-0'}`}>
                         <img alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src={getImageUrl(post.cover_image || post.image)} onError={(e) => { e.currentTarget.src = defaultBlogHero; }} />
-                        <div className="absolute top-3 left-3">
-                          <span className="bg-surface/90 backdrop-blur-md px-3 py-1 text-[9px] font-label tracking-widest uppercase text-primary font-bold rounded-md shadow-sm">{getBlogTag(post)}</span>
-                        </div>
+                        {getBlogTag(post) && (
+                          <div className="absolute top-3 left-3">
+                            <span className="bg-surface/90 backdrop-blur-md px-3 py-1 text-[9px] font-label tracking-widest uppercase text-primary font-bold rounded-md shadow-sm">{getBlogTag(post)}</span>
+                          </div>
+                        )}
                       </div>
                       <div className="flex flex-col flex-grow p-5 sm:p-6">
                         <span className="text-[10px] font-label text-on-surface-variant/70 uppercase mb-2">

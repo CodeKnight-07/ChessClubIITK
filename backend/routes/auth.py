@@ -557,6 +557,79 @@ def register_lol_status():
         if connection:
             connection.close()
 
+# --- FRESHERS' CHESS LEAGUE EVENT REGISTRATION ---
+
+@auth_bp.route('/register-fcl', methods=['POST'])
+@jwt_required()
+def register_fcl():
+    data = request.get_json()
+    email = data.get('email')
+    name = data.get('name')
+    roll_no = data.get('roll_no')
+    chess_username = data.get('chess_username')
+    contact = data.get('contact')
+    secondary_email = data.get('secondary_email')
+
+    if not all([email, name, roll_no, chess_username, contact]):
+        return jsonify({"error": "All fields are required."}), 400
+
+    current_user_email = get_jwt_identity()
+    if current_user_email != email:
+        return jsonify({"error": "Unauthorized registration identity mismatch."}), 403
+
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            # 1. Prevent registration if the event date has already passed
+            cursor.execute("SELECT event_date, event_end_date FROM events WHERE title ILIKE '%fresher%' ORDER BY event_date DESC LIMIT 1;")
+            row = cursor.fetchone()
+            if row:
+                from datetime import date
+                event_date = row[0]
+                event_end_date = row[1]
+                compare_date = event_end_date if event_end_date else event_date
+                if compare_date and compare_date < date.today():
+                    return jsonify({"error": "Registration is closed. This event has already ended."}), 400
+
+            # Check if user is already registered
+            cursor.execute('SELECT id FROM "fclEntries" WHERE email = %s', (email,))
+            if cursor.fetchone():
+                return jsonify({"error": "You are already registered for this event."}), 409
+
+            # Insert registration record
+            cursor.execute(
+                'INSERT INTO "fclEntries" (email, name, roll_no, chess_username, contact, secondary_email) VALUES (%s, %s, %s, %s, %s, %s)',
+                (email, name, roll_no, chess_username, contact, secondary_email or '')
+            )
+            connection.commit()
+            return jsonify({"message": "Successfully registered for Freshers' Chess League!"}), 201
+
+    except Exception as e:
+        print(f"FCL Registration Error: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+    finally:
+        if connection:
+            connection.close()
+
+@auth_bp.route('/register-fcl/status', methods=['GET'])
+@jwt_required()
+def register_fcl_status():
+    email = get_jwt_identity()
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT id FROM "fclEntries" WHERE email = %s', (email,))
+            is_registered = cursor.fetchone() is not None
+            return jsonify({"is_registered": is_registered}), 200
+    except Exception as e:
+        print(f"FCL Registration Status Error: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+    finally:
+        if connection:
+            connection.close()
+
 
 @auth_bp.route('/alumni-request', methods=['POST'])
 def handle_alumni_request():

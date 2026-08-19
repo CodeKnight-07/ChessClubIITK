@@ -39,14 +39,24 @@ class ConnectionProxy:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self._conn.__exit__(exc_type, exc_val, exc_tb)
+        try:
+            if self._conn:
+                self._conn.__exit__(exc_type, exc_val, exc_tb)
+        finally:
+            self.close()
 
     def close(self):
         # Return connection back to the pool instead of closing the physical connection
         if self._conn and self._pool:
-            self._pool.putconn(self._conn)
+            try:
+                self._pool.putconn(self._conn)
+            except Exception:
+                pass
             self._conn = None
             self._pool = None
+
+    def __del__(self):
+        self.close()
 
 def get_db_connection():
     pool = get_pool()
