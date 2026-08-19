@@ -604,7 +604,7 @@ const Events = () => {
     .sort((a, b) => new Date(b.endDate || b.date) - new Date(a.endDate || a.date));
 
   const renderEventCard = (event) => {
-    const isLolEvent = event.title.toLowerCase().includes("league of legends");
+    const isLolEvent = event.title?.toLowerCase()?.includes("league of legends") || false;
     const eventStartDate = new Date(event.date);
     const eventEndDate = event.endDate ? new Date(event.endDate) : null;
     

@@ -57,8 +57,8 @@ const MainLayout = ({ children }) => {
     fetchNextEvent();
   }, []);
 
-  const isLolEvent = nextEvent?.title?.toLowerCase().includes("league of legends");
-  const isFclEvent = nextEvent?.title?.toLowerCase().includes("fresher");
+  const isLolEvent = nextEvent?.title?.toLowerCase()?.includes("league of legends") || false;
+  const isFclEvent = nextEvent?.title?.toLowerCase()?.includes("fresher") || false;
 
   useEffect(() => {
     if (isLoggedIn && token && nextEvent && isLolEvent) {
