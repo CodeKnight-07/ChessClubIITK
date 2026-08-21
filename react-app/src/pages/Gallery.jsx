@@ -666,31 +666,17 @@ const Gallery = () => {
     setDiaryIsAnimating(false);
   };
 
-  const handleNextPhoto = () => {
-    if (lightboxPhotos.length === 0) return;
-    setLightboxIndex(prev => (prev + 1) % lightboxPhotos.length);
-  };
-
-  const handlePrevPhoto = () => {
-    if (lightboxPhotos.length === 0) return;
-    setLightboxIndex(prev => (prev - 1 + lightboxPhotos.length) % lightboxPhotos.length);
-  };
-
   // Lightbox keyboard shortcuts
   useEffect(() => {
     if (!isOpenLightbox) return;
     const handleKeyDown = (e) => {
-      if (e.key === 'ArrowRight') {
-        handleNextPhoto();
-      } else if (e.key === 'ArrowLeft') {
-        handlePrevPhoto();
-      } else if (e.key === 'Escape') {
+      if (e.key === 'Escape') {
         setIsOpenLightbox(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpenLightbox, lightboxPhotos]);
+  }, [isOpenLightbox]);
 
   // Map 3D Book page number to corresponding content safely
   const getBookPageContent = (pageNum) => {
