@@ -15,10 +15,62 @@ import pulkitImg from "../assets/exCoordinators/pulkit.jpg";
 import { API_BASE_URL } from '../config';
 import FloatingChessPieces from '../components/FloatingChessPieces';
 
+const AnimatedCounter = ({ value, duration = 1200, trigger }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!trigger) {
+      setCount(0);
+      return;
+    }
+
+    const match = value.match(/^(.*?)([0-9,.]+)(.*?)$/);
+    if (!match) {
+      setCount(value);
+      return;
+    }
+
+    const targetNum = parseFloat(match[2].replace(/,/g, ''));
+    let start = 0;
+    const end = targetNum;
+    if (start === end) return;
+
+    let startTimestamp = null;
+    let animFrame = null;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      
+      // Calculate current count using quadratic ease-out for a nicer rapid-scrolling effect
+      const easeOutQuad = 1 - (1 - progress) * (1 - progress);
+      const currentVal = Math.floor(easeOutQuad * (end - start) + start);
+      setCount(currentVal);
+
+      if (progress < 1) {
+        animFrame = window.requestAnimationFrame(step);
+      } else {
+        setCount(end);
+      }
+    };
+
+    animFrame = window.requestAnimationFrame(step);
+    return () => {
+      if (animFrame) window.cancelAnimationFrame(animFrame);
+    };
+  }, [value, duration, trigger]);
+
+  const match = value.match(/^(.*?)([0-9,.]+)(.*?)$/);
+  if (!match) return <span>{value}</span>;
+  const prefix = match[1];
+  const suffix = match[3];
+  return <span>{prefix}{count.toLocaleString()}{suffix}</span>;
+};
+
 const Landing = () => {
   const { isLoggedIn } = useAuth();
   const [nextEvent, setNextEvent] = useState(null);
   const heroRef = useRef(null);
+  const [triggerStats, setTriggerStats] = useState(false);
 
   // Scroll tracking across the pinned container (520vh for 4 smooth in-place stages with generous pacing)
   const { scrollYProgress } = useScroll({
@@ -56,6 +108,16 @@ const Landing = () => {
       document.title = "Chess Club";
     };
   }, []);
+
+  useEffect(() => {
+    return scrollYProgress.on("change", (latest) => {
+      if (latest >= 0.42 && latest <= 0.70) {
+        setTriggerStats(true);
+      } else {
+        setTriggerStats(false);
+      }
+    });
+  }, [scrollYProgress]);
 
   useEffect(() => {
     // Delay preloading by 2 seconds to prioritize main landing page resources
@@ -317,16 +379,8 @@ const Landing = () => {
                   
                   <div className="relative z-20 flex flex-col h-full justify-between">
                     <div>
-                      <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 rounded-xl bg-primary/10 group-hover:bg-[#131313]/10 flex items-center justify-center text-primary group-hover:text-[#131313] transition-colors duration-500">
-                          <span className="material-symbols-outlined text-2xl">
-                            {stat.icon}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#f2ca50] group-hover:text-[#131313] tracking-tight leading-none transition-colors duration-500 mb-2">
-                        {stat.value}
+                      <div className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#f2ca50] group-hover:text-[#131313] tracking-tight leading-none transition-colors duration-500 mb-2 mt-2">
+                        <AnimatedCounter value={stat.value} trigger={triggerStats} />
                       </div>
 
                       <h3 className="text-sm sm:text-base font-serif font-bold text-on-surface group-hover:text-[#131313] uppercase tracking-wider transition-colors duration-500 mb-2">

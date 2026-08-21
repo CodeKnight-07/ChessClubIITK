@@ -39,11 +39,13 @@ const FIDE_RATED_PHOTOS = FIDE_2526_PHOTOS;
 
 // Dynamically import all images in the Street Chess folder using Vite's glob import
 const STREET_CHESS_GLOB = import.meta.glob('../assets/Street Chess/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
-const STREET_CHESS_PHOTOS = Object.values(STREET_CHESS_GLOB).map(module => module.default);
+const STREET_CHESS_KEYS = Object.keys(STREET_CHESS_GLOB).sort((a, b) => a.localeCompare(b));
+const STREET_CHESS_PHOTOS = STREET_CHESS_KEYS.map(key => STREET_CHESS_GLOB[key].default).filter((_, idx) => idx !== 5);
 
 // Dynamically import all images in the Grand Swiss folder using Vite's glob import
 const GRAND_SWISS_GLOB = import.meta.glob('../assets/Grand Swiss/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
-const GRAND_SWISS_PHOTOS = Object.values(GRAND_SWISS_GLOB).map(module => module.default);
+const GRAND_SWISS_KEYS = Object.keys(GRAND_SWISS_GLOB).sort((a, b) => a.localeCompare(b));
+const GRAND_SWISS_PHOTOS = GRAND_SWISS_KEYS.map(key => GRAND_SWISS_GLOB[key].default).filter((_, idx) => idx !== 9);
 
 // Dynamically import other casual photos using Vite's glob import
 const OTHER_IMAGES_GLOB = import.meta.glob('../Gallery/OTHER PHOTOS/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
@@ -276,8 +278,8 @@ import cd10 from '../Gallery/CANDIDATES 2025/10.JPG';
 import cd11 from '../Gallery/CANDIDATES 2025/11.JPG';
 
 const FCL_PHOTOS = [fcl1, fcl2, fcl3, fcl4, fcl5, fcl6, fcl7, fcl9, fcl10, fcl11, fcl12, fcl13];
-const IITK_GRAND_SWISS_PHOTOS = [gs1, gs2, gs3, gs4, gs5, gs6, gs7, gs8, gs9, gs10, gs11];
-const CANDIDATES_2025_PHOTOS = [cd1, cd2, cd3, cd4, cd5, cd6, cd7, cd8, cd9, cd10, cd11];
+const IITK_GRAND_SWISS_PHOTOS = [gs1, gs2, gs3, gs4, gs5, gs6, gs7, gs8, gs9, gs11];
+const CANDIDATES_2025_PHOTOS = [cd1, cd2, cd3, cd4, cd5, cd7, cd8, cd9, cd10, cd11];
 
 const PREVIOUS_YEARS = ['25-26 Tenure'];
 const PREVIOUS_YEARS_DATA = {
@@ -981,6 +983,7 @@ const Gallery = () => {
       </section>
 
       {/* Archives Card Grid (Preserves all other 9 static events in a beautiful cards grid!) */}
+      {/* Archived Exhibitions Section commented out as requested
       <section className="mb-24 max-w-5xl mx-auto">
         <div className="text-center md:text-left mb-10">
           <p className="text-primary font-label text-xs tracking-[0.3em] uppercase mb-2">
@@ -1037,6 +1040,7 @@ const Gallery = () => {
           </div>
         )}
       </section>
+      */}
 
       {/* 3D Diary Book Section (Club Memories & moments from the database) */}
       <AnimatePresence mode="wait">

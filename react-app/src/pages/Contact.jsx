@@ -288,8 +288,8 @@ const SECRETARIES = [
     funnyDescription: `"I enjoy playing chess, chess enjoys playing with my emotions."`,
     image: pratikImg,
     email: "pratikd24@iitk.ac.in",
-    instagram: "https://www.instagram.com/pratik_dhanuka/",
-    linkedin: "https://www.linkedin.com/in/pratik-dhanuka/"
+    instagram: "https://www.instagram.com/prattsss__/",
+    linkedin: "https://www.linkedin.com/in/pratik-dhanuka-7789023b5/"
   },
   {
     id: "sec-23",
