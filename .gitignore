@@ -3,3 +3,6 @@
 **/__pycache__/ 
 backend/venv/
 .vscode/
+backend/static/uploads/
+react-app/src/assets/Chess Hour/
+react-app/src/assets/Street Chess 2/

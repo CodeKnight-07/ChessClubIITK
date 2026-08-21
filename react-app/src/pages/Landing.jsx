@@ -77,6 +77,150 @@ const Landing = () => {
   const heroRef = useRef(null);
   const [triggerStats, setTriggerStats] = useState(false);
 
+  const [currentStage, setCurrentStage] = useState(0);
+  const isScrollingRef = useRef(false);
+
+  // 1. Scroll snapping controller
+  useEffect(() => {
+    const handleWheel = (e) => {
+      if (document.body.style.overflow === 'hidden') return;
+      e.preventDefault();
+
+      if (isScrollingRef.current) return;
+
+      const direction = e.deltaY > 0 ? 1 : -1;
+      let nextStage = currentStage + direction;
+
+      if (nextStage < 0) nextStage = 0;
+      if (nextStage > 4) nextStage = 4;
+
+      if (nextStage === currentStage) return;
+
+      isScrollingRef.current = true;
+      setCurrentStage(nextStage);
+
+      if (heroRef.current) {
+        const scrollHeight = heroRef.current.scrollHeight;
+        const windowHeight = window.innerHeight;
+        const maxScroll = scrollHeight - windowHeight;
+        const stageProgress = [0.00, 0.30, 0.56, 0.88, 1.00];
+        
+        let targetScrollY = 0;
+        if (nextStage === 4) {
+          targetScrollY = document.documentElement.scrollHeight - windowHeight;
+        } else {
+          targetScrollY = heroRef.current.offsetTop + (maxScroll * stageProgress[nextStage]);
+        }
+
+        window.scrollTo({
+          top: targetScrollY,
+          behavior: 'smooth'
+        });
+      }
+
+      setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 950);
+    };
+
+    const handleKeyDown = (e) => {
+      if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Space'].includes(e.key)) {
+        e.preventDefault();
+        if (isScrollingRef.current) return;
+
+        let direction = 0;
+        if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'Space') {
+          direction = 1;
+        } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+          direction = -1;
+        }
+
+        if (direction === 0) return;
+
+        let nextStage = currentStage + direction;
+        if (nextStage < 0) nextStage = 0;
+        if (nextStage > 4) nextStage = 4;
+
+        if (nextStage === currentStage) return;
+
+        isScrollingRef.current = true;
+        setCurrentStage(nextStage);
+
+        if (heroRef.current) {
+          const scrollHeight = heroRef.current.scrollHeight;
+          const windowHeight = window.innerHeight;
+          const maxScroll = scrollHeight - windowHeight;
+          const stageProgress = [0.00, 0.30, 0.56, 0.88, 1.00];
+          
+          let targetScrollY = 0;
+          if (nextStage === 4) {
+            targetScrollY = document.documentElement.scrollHeight - windowHeight;
+          } else {
+            targetScrollY = heroRef.current.offsetTop + (maxScroll * stageProgress[nextStage]);
+          }
+
+          window.scrollTo({
+            top: targetScrollY,
+            behavior: 'smooth'
+          });
+        }
+
+        setTimeout(() => {
+          isScrollingRef.current = false;
+        }, 950);
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [currentStage]);
+
+  // 2. Scroll position sync to keep state aligned
+  useEffect(() => {
+    const handleScrollSync = () => {
+      if (isScrollingRef.current || !heroRef.current) return;
+
+      const scrollHeight = heroRef.current.scrollHeight;
+      const windowHeight = window.innerHeight;
+      const maxScroll = scrollHeight - windowHeight;
+      const currentScrollY = window.scrollY - heroRef.current.offsetTop;
+
+      // Force stage 4 if close to absolute bottom of page
+      const docScrollHeight = document.documentElement.scrollHeight;
+      if (window.scrollY + windowHeight >= docScrollHeight - 20) {
+        if (currentStage !== 4) {
+          setCurrentStage(4);
+        }
+        return;
+      }
+
+      const progress = maxScroll > 0 ? currentScrollY / maxScroll : 0;
+
+      const stageProgress = [0.00, 0.30, 0.56, 0.88, 1.00];
+      let closestStage = 0;
+      let minDiff = Infinity;
+
+      stageProgress.forEach((p, idx) => {
+        const diff = Math.abs(progress - p);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestStage = idx;
+        }
+      });
+
+      if (closestStage !== currentStage) {
+        setCurrentStage(closestStage);
+      }
+    };
+
+    window.addEventListener('scroll', handleScrollSync);
+    return () => window.removeEventListener('scroll', handleScrollSync);
+  }, [currentStage]);
+
   // Scroll tracking across the pinned container (520vh for 4 smooth in-place stages with generous pacing)
   const { scrollYProgress } = useScroll({
     target: heroRef,

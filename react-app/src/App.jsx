@@ -15,6 +15,8 @@ import chessboardImg from './assets/chessclubiitklogo.jpeg';
 import homePgBg from './pages/home-pg-bg.png';
 import logoImg from './assets/chessclubiitklogo.jpeg';
 
+import AdminRoute from './components/AdminRoute';
+
 // Lazy loaded page components for optimal production bundle code-splitting
 const Landing = React.lazy(() => import('./pages/Landing'));
 const Calendar = React.lazy(() => import('./pages/Calendar'));
@@ -29,6 +31,7 @@ const Signup = React.lazy(() => import('./pages/Signup'));
 const Login = React.lazy(() => import('./pages/Login'));
 const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword'));
 const Results = React.lazy(() => import('./pages/Results'));
+const AdminPortal = React.lazy(() => import('./pages/AdminPortal'));
 
 // Premium, brand-aligned loading spinner fallback
 const PageLoader = () => (
@@ -148,6 +151,7 @@ function App() {
                 <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
                 <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
                 <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
+                <Route path="/admin" element={<AdminRoute><PageTransition><AdminPortal /></PageTransition></AdminRoute>} />
                 <Route path="/500" element={<PageTransition><ServerError500 /></PageTransition>} />
               </Routes>
             </Suspense>
