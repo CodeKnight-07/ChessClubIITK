@@ -1,19 +1,20 @@
 import psycopg
 from psycopg.rows import dict_row
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt
 from config.db import get_db_connection
 
 blogs_bp = Blueprint('blogs', __name__)
 
 # --- UTILITY: Admin Authorization Middleware Check ---
-def verify_admin_privileges(cursor, email):
-    cursor.execute("SELECT is_admin FROM users WHERE email = %s", (email,))
-    user = cursor.fetchone()
-    return user and bool(user.get('is_admin'))
+def verify_admin_privileges():
+    claims = get_jwt()
+    return bool(claims.get('is_admin'))
 
 
 # --- CREATE: Add a New Blog (Admin Only) ---
 @blogs_bp.route('/blogs', methods=['POST'])
+@jwt_required()
 def create_blog():
     data = request.get_json()
     email = data.get('author_email')
@@ -33,7 +34,7 @@ def create_blog():
     try:
         connection = get_db_connection()
         with connection.cursor(row_factory=dict_row) as cursor:
-            if not verify_admin_privileges(cursor, email):
+            if not verify_admin_privileges():
                 return jsonify({"error": "Access Denied: Admin privileges required."}), 403
 
             sql = """
@@ -108,6 +109,7 @@ def get_single_blog(blog_id):
 
 # --- DELETE: Remove a Blog (Admin Only) ---
 @blogs_bp.route('/blogs/<int:blog_id>', methods=['DELETE'])
+@jwt_required()
 def delete_blog(blog_id):
     data = request.get_json() or {}
     email = data.get('email') # Check who is making the delete request
@@ -119,7 +121,7 @@ def delete_blog(blog_id):
     try:
         connection = get_db_connection()
         with connection.cursor(row_factory=dict_row) as cursor:
-            if not verify_admin_privileges(cursor, email):
+            if not verify_admin_privileges():
                 return jsonify({"error": "Access Denied: Admin privileges required."}), 403
 
             cursor.execute("DELETE FROM blogs WHERE id = %s", (blog_id,))
@@ -134,6 +136,7 @@ def delete_blog(blog_id):
 
 # --- UPDATE: Modify an Existing Blog (Admin Only) ---
 @blogs_bp.route('/blogs/<int:blog_id>', methods=['PUT'])
+@jwt_required()
 def update_blog(blog_id):
     data = request.get_json()
     email = data.get('author_email')
@@ -152,7 +155,7 @@ def update_blog(blog_id):
     try:
         connection = get_db_connection()
         with connection.cursor(row_factory=dict_row) as cursor:
-            if not verify_admin_privileges(cursor, email):
+            if not verify_admin_privileges():
                 return jsonify({"error": "Access Denied: Admin privileges required."}), 403
 
             if 'created_at' in data:

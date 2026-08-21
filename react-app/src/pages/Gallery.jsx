@@ -47,6 +47,30 @@ const GRAND_SWISS_GLOB = import.meta.glob('../assets/Grand Swiss/*.{png,jpg,jpeg
 const GRAND_SWISS_KEYS = Object.keys(GRAND_SWISS_GLOB).sort((a, b) => a.localeCompare(b));
 const GRAND_SWISS_PHOTOS = GRAND_SWISS_KEYS.map(key => GRAND_SWISS_GLOB[key].default).filter((_, idx) => idx !== 9);
 
+// Dynamically import all images in the Chess Hour folder using Vite's glob import
+const CHESS_HOUR_GLOB = import.meta.glob('../assets/Chess Hour/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
+const CHESS_HOUR_KEYS = Object.keys(CHESS_HOUR_GLOB).sort((a, b) => {
+  const matchA = a.match(/\/(\d+)\.\w+$/);
+  const matchB = b.match(/\/(\d+)\.\w+$/);
+  if (matchA && matchB) {
+    return parseInt(matchA[1], 10) - parseInt(matchB[1], 10);
+  }
+  return a.localeCompare(b);
+});
+const CHESS_HOUR_PHOTOS = CHESS_HOUR_KEYS.map(key => CHESS_HOUR_GLOB[key].default);
+
+// Dynamically import all images in the Street Chess 2 folder using Vite's glob import
+const STREET_CHESS_2_GLOB = import.meta.glob('../assets/Street Chess 2/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
+const STREET_CHESS_2_KEYS = Object.keys(STREET_CHESS_2_GLOB).sort((a, b) => {
+  const matchA = a.match(/\/(\d+)\.\w+$/);
+  const matchB = b.match(/\/(\d+)\.\w+$/);
+  if (matchA && matchB) {
+    return parseInt(matchA[1], 10) - parseInt(matchB[1], 10);
+  }
+  return a.localeCompare(b);
+});
+const STREET_CHESS_2_PHOTOS = STREET_CHESS_2_KEYS.map(key => STREET_CHESS_2_GLOB[key].default);
+
 // Dynamically import other casual photos using Vite's glob import
 const OTHER_IMAGES_GLOB = import.meta.glob('../Gallery/OTHER PHOTOS/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
 const OTHER_PHOTOS = Object.values(OTHER_IMAGES_GLOB).map(module => module.default);
@@ -154,7 +178,7 @@ const CURRENT_YEAR_EVENTS = [
     id: 'current-street-chess',
     title: 'Street Chess 2026',
     tag: 'Street Showcase',
-    date: 'Nov 12, 2026',
+    date: 'June 10, 2026',
     coverImage: STREET_CHESS_PHOTOS.length > 0 ? STREET_CHESS_PHOTOS[0] : workshopImg,
     photos: STREET_CHESS_PHOTOS,
     description: 'Bringing the game of chess to the campus streets! Casual, blitz, and speed matchplays on public tables open for all passersby.'
@@ -307,6 +331,23 @@ const PREVIOUS_YEARS_DATA = {
       description: "Who will challenge the champion?",
       photos: CANDIDATES_2025_PHOTOS,
       image: CANDIDATES_2025_PHOTOS[0]
+    },
+    {
+      id: "event-4",
+      category: "SOCIALS",
+      title: "Chess Hour",
+      description: "Weekly casual over-the-board meetups, blitz sessions, and friendly sparring.",
+      photos: CHESS_HOUR_PHOTOS,
+      image: CHESS_HOUR_PHOTOS[0],
+      date: "Aug 8, 2026"
+    },
+    {
+      id: "event-5",
+      category: "SOCIALS",
+      title: "Street Chess 2",
+      description: "Taking over the streets once again! Friendly matchplays, lightning blitz tables, and casual chess out in the open campus air.",
+      photos: STREET_CHESS_2_PHOTOS,
+      image: STREET_CHESS_2_PHOTOS[0]
     }
   ]
 };
@@ -962,6 +1003,11 @@ const Gallery = () => {
 
                   <div className="p-6 flex-1 flex flex-col justify-between">
                     <div>
+                      {event.date && (
+                        <span className="text-[10px] font-label text-on-surface-variant/60 tracking-wider block mb-2 font-semibold">
+                          {event.date}
+                        </span>
+                      )}
                       <h3 className="text-lg font-serif font-bold text-on-surface mb-3 group-hover:text-primary transition-colors leading-tight">
                         {event.title}
                       </h3>
