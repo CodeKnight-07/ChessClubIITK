@@ -13,6 +13,7 @@ import akshatImg from "../assets/exCoordinators/akshat.png";
 import kushagraImg from "../assets/exCoordinators/kushagra.jpg";
 import pulkitImg from "../assets/exCoordinators/pulkit.jpg";
 import { API_BASE_URL } from '../config';
+import { globalCache } from '../utils/cache';
 import FloatingChessPieces from '../components/FloatingChessPieces';
 
 const AnimatedCounter = ({ value, duration = 1200, trigger }) => {
@@ -649,10 +650,8 @@ const Landing = () => {
                 to="/events"
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-primary/30 bg-primary/10 text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary hover:text-surface transition-all duration-300 shadow-lg shadow-primary/10"
               >
-                <Link to="/events" className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-sm">event_note</span>
-                  View All Tournaments
-                </Link>
+                <span className="material-symbols-outlined text-sm">event_note</span>
+                View All Tournaments
               </Link>
             </div>
           </motion.div>
