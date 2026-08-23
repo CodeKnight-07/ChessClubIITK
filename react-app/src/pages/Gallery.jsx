@@ -71,6 +71,17 @@ const STREET_CHESS_2_KEYS = Object.keys(STREET_CHESS_2_GLOB).sort((a, b) => {
 });
 const STREET_CHESS_2_PHOTOS = STREET_CHESS_2_KEYS.map(key => STREET_CHESS_2_GLOB[key].default);
 
+const CHAMPIONSHIP_2026_GLOB = import.meta.glob('../Gallery/Championship 2026/*.{png,jpg,jpeg,heic,PNG,JPG,JPEG,HEIC}', { eager: true });
+const CHAMPIONSHIP_2026_KEYS = Object.keys(CHAMPIONSHIP_2026_GLOB).sort((a, b) => {
+  const matchA = a.match(/\/(\d+)\.\w+$/);
+  const matchB = b.match(/\/(\d+)\.\w+$/);
+  if (matchA && matchB) {
+    return parseInt(matchA[1], 10) - parseInt(matchB[1], 10);
+  }
+  return a.localeCompare(b);
+});
+const CHAMPIONSHIP_2026_PHOTOS = CHAMPIONSHIP_2026_KEYS.map(key => CHAMPIONSHIP_2026_GLOB[key].default);
+
 // Dynamically import other casual photos using Vite's glob import
 const OTHER_IMAGES_GLOB = import.meta.glob('../Gallery/OTHER PHOTOS/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
 const OTHER_PHOTOS = Object.values(OTHER_IMAGES_GLOB).map(module => module.default);
@@ -348,6 +359,14 @@ const PREVIOUS_YEARS_DATA = {
       description: "Taking over the streets once again! Friendly matchplays, lightning blitz tables, and casual chess out in the open campus air.",
       photos: STREET_CHESS_2_PHOTOS,
       image: STREET_CHESS_2_PHOTOS[0]
+    },
+    {
+      id: "event-6",
+      category: "TOURNAMENTS",
+      title: "IITK Championship 2026",
+      description: "The final showdown to decide who is the IITK Chess Champion",
+      photos: CHAMPIONSHIP_2026_PHOTOS,
+      image: CHAMPIONSHIP_2026_PHOTOS[0]
     }
   ]
 };
