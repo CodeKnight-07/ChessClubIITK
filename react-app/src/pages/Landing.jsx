@@ -302,7 +302,10 @@ const Landing = () => {
           location: evt.location,
           format: evt.format
         })).filter(evt => {
-          const compareDate = new Date(evt.endDate || evt.date);
+          const dateStr = evt.endDate && evt.endDate !== 'null' && evt.endDate !== 'None' ? evt.endDate : evt.date;
+          if (!dateStr) return false;
+          const compareDate = new Date(dateStr);
+          if (isNaN(compareDate.getTime())) return false;
           compareDate.setHours(0,0,0,0);
           return compareDate >= today;
         });
@@ -542,21 +545,21 @@ const Landing = () => {
           </motion.div>
 
           {/* STAGE 4: UPCOMING EVENT (Materializes in-place in the center of the screen!) */}
-          {nextEvent && (
-            <motion.div
-              style={{
-                opacity: eventOpacity,
-                scale: eventScale,
-                pointerEvents: eventPointerEvents,
-                display: eventVisibility
-              }}
-              className="absolute inset-0 z-30 w-full max-w-5xl mx-auto px-6 md:px-12 flex flex-col items-center justify-center py-6 overflow-y-auto"
-            >
-              <div className="text-center mb-6">
-                <span className="text-primary font-label text-xs tracking-[0.3em] uppercase">Featured Arena</span>
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-on-surface mt-1">Upcoming Event</h2>
-              </div>
+          <motion.div
+            style={{
+              opacity: eventOpacity,
+              scale: eventScale,
+              pointerEvents: eventPointerEvents,
+              display: eventVisibility
+            }}
+            className="absolute inset-0 z-30 w-full max-w-5xl mx-auto px-6 md:px-12 flex flex-col items-center justify-center py-6 overflow-y-auto"
+          >
+            <div className="text-center mb-6">
+              <span className="text-primary font-label text-xs tracking-[0.3em] uppercase">Featured Arena</span>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-on-surface mt-1">Upcoming Event</h2>
+            </div>
 
+            {nextEvent ? (
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent('open-event-details-modal'))}
                 className="w-full text-left rounded-3xl border border-[#4d4635]/30 bg-gradient-to-br from-surface-container-high/90 to-surface-container/60 backdrop-blur-xl hover:border-primary/50 hover:shadow-[0_0_50px_rgba(242,202,80,0.2)] transition-all duration-700 flex flex-col md:flex-row overflow-hidden group cursor-pointer relative shadow-2xl shadow-black/80"
@@ -630,19 +633,29 @@ const Landing = () => {
                   </div>
                 </div>
               </button>
+            ) : (
+              <div className="w-full text-center p-12 rounded-3xl border border-[#4d4635]/20 bg-gradient-to-br from-surface-container-high/60 to-surface-container/30 backdrop-blur-xl flex flex-col items-center justify-center relative shadow-xl">
+                <span className="material-symbols-outlined text-5xl text-primary/40 mb-4">sports_esports</span>
+                <h3 className="text-xl font-serif text-on-surface font-semibold">Stay Tuned!</h3>
+                <p className="text-xs sm:text-sm text-on-surface-variant/75 mt-2 max-w-md mx-auto font-body leading-relaxed">
+                  We are currently preparing our next offline auctions and competitive arenas. Check back shortly or view our calendar for the full schedule!
+                </p>
+              </div>
+            )}
 
-              {/* Other Events CTA Button */}
-              <div className="flex justify-center mt-6">
-                <Link
-                  to="/events"
-                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-primary/30 bg-primary/10 text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary hover:text-surface transition-all duration-300 shadow-lg shadow-primary/10"
-                >
+            {/* Other Events CTA Button */}
+            <div className="flex justify-center mt-6">
+              <Link
+                to="/events"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-primary/30 bg-primary/10 text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary hover:text-surface transition-all duration-300 shadow-lg shadow-primary/10"
+              >
+                <Link to="/events" className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-sm">event_note</span>
                   View All Tournaments
                 </Link>
-              </div>
-            </motion.div>
-          )}
+              </Link>
+            </div>
+          </motion.div>
 
         </div>
       </div>
