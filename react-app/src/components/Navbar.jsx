@@ -1,21 +1,28 @@
 import { useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import logo from '../assets/chessclubiitklogo.jpeg';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, user } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleAuthClick = () => {
     if (isLoggedIn) {
-      logout();
-      navigate('/');
+      setShowLogoutModal(true);
     } else {
       navigate('/login');
     }
+  };
+
+  const confirmLogout = () => {
+    logout();
+    setShowLogoutModal(false);
+    navigate('/');
   };
 
   const navLinks = [
@@ -27,6 +34,13 @@ const Navbar = () => {
     { name: 'Contact Us', path: '/contact' },
     { name: 'Previous Teams', path: '/previous-teams' },
   ];
+
+  if (isLoggedIn && user?.is_admin) {
+    navLinks.push({ name: 'Admin', path: '/admin' });
+  }
+
+  const location = useLocation();
+  const isHomepage = location.pathname === '/';
 
   return (
     <motion.nav
@@ -43,12 +57,14 @@ const Navbar = () => {
       >
         <Link to="/" className="flex items-center gap-3 sm:gap-4 group">
           <img
-            alt="Chess Club IITK Seal"
+            alt="Chess Club Seal"
             className="w-10 h-10 rounded-full border border-primary-container/20 group-hover:border-primary transition-all duration-300 shadow-md object-cover"
             src={logo}
           />
           <div className="flex flex-col">
-            <span className="text-lg sm:text-xl font-headline text-primary leading-none">Chess Club IITK</span>
+            <span className="text-lg sm:text-xl font-headline text-primary leading-none">
+              Chess Club
+            </span>
             <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/60 font-bold">IIT Kanpur</span>
           </div>
         </Link>
@@ -132,6 +148,48 @@ const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Logout Confirmation Modal */}
+      {createPortal(
+        <AnimatePresence>
+          {showLogoutModal && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                className="bg-surface-container-low p-6 sm:p-8 rounded-3xl border border-outline-variant/15 shadow-2xl max-w-sm w-full mx-4 text-center space-y-6 relative"
+              >
+                <div className="mx-auto w-12 h-12 flex items-center justify-center rounded-full bg-red-500/10 border border-red-500/20 text-red-500">
+                  <span className="material-symbols-outlined text-2xl">logout</span>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-serif font-bold text-on-surface">Confirm Log Out</h3>
+                  <p className="text-xs text-on-surface-variant leading-relaxed">Are you sure you want to end your active session?</p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowLogoutModal(false)}
+                    className="flex-1 py-3 px-4 border border-outline-variant/20 hover:border-outline-variant text-on-surface-variant hover:text-on-surface text-xs font-bold font-label uppercase tracking-widest rounded-xl transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={confirmLogout}
+                    className="flex-1 py-3 px-4 bg-red-600 hover:bg-red-700 text-white text-xs font-bold font-label uppercase tracking-widest rounded-xl shadow-lg hover:shadow-red-500/20 transition-all cursor-pointer"
+                  >
+                    Log Out
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </motion.nav>
   );
 };

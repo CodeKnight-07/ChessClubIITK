@@ -20,6 +20,7 @@ load_dotenv()
 from routes.auth import auth_bp
 from routes.blogs import blogs_bp
 from routes.events import events_bp
+from routes.admin import admin_bp
 
 app = Flask(__name__)
 app.config["JWT_TOKEN_LOCATION"] = ["headers"]
@@ -41,6 +42,7 @@ CORS(
     app,
     origins=[
         "http://localhost:5173",
+        "http://127.0.0.1:5173",
         "https://chess-club-iitk-myfork.vercel.app",
         "https://chess-club-iitk-w7u5.vercel.app"
     ]
@@ -49,6 +51,7 @@ CORS(
 app.register_blueprint(auth_bp, url_prefix='/api')
 app.register_blueprint(blogs_bp, url_prefix='/api')
 app.register_blueprint(events_bp)
+app.register_blueprint(admin_bp)
 
 # <--- MUST BE AT THE TOP OF app.py
 #test, comment out before deploying or pushing into master repo
@@ -82,7 +85,7 @@ def login():
         cursor = conn.cursor()
         
         cursor.execute(
-            "SELECT id, is_admin, password_hash FROM users WHERE email = %s OR chess_username = %s", 
+            "SELECT id, is_admin, password_hash FROM users WHERE email = %s OR secondary_email = %s", 
             (username, username)
         )
         user = cursor.fetchone()
@@ -108,6 +111,7 @@ def login():
         return jsonify({'error': 'Invalid username or password.'}), 401
         
     except Exception as e:
+        print(f"CRITICAL LOGIN EXCEPTION: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 @app.route("/health")

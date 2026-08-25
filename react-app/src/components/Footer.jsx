@@ -17,7 +17,7 @@ const Footer = () => {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0 }}
           className="col-span-1 lg:col-span-4" 
         >
-          <h4 className="mb-4 text-xl font-serif text-primary">Chess Club IITK</h4>
+          <h4 className="mb-4 text-xl font-serif text-primary">Chess Club</h4>
           <p className="mb-6 max-w-sm text-on-surface-variant">
             The official digital portal for the IIT Kanpur Chess Club. Archiving brilliance since 2007.
           </p>
@@ -37,18 +37,23 @@ const Footer = () => {
           </h5>
           <ul className="space-y-3 text-sm text-on-surface-variant">
             <li>
-              <Link to="/previous-teams" className="cursor-pointer transition-colors hover:text-primary">
+              <Link to="/blog/16" className="cursor-pointer transition-colors hover:text-primary">
                 Our History
               </Link>
             </li>
             <li>
               <Link to="/contact" className="cursor-pointer transition-colors hover:text-primary">
-                Core Committee
+                Core Team
               </Link>
             </li>
             <li>
               <Link to="/previous-teams" className="cursor-pointer transition-colors hover:text-primary">
                 Alumni Network
+              </Link>
+            </li>
+            <li>
+              <Link to="/gallery" className="cursor-pointer transition-colors hover:text-primary">
+                Gallery
               </Link>
             </li>
           </ul>

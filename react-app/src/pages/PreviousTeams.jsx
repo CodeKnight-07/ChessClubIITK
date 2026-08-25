@@ -12,6 +12,11 @@ import premImg from "../assets/exCoordinators/Prem.png";
 import parvImg from "../assets/exCoordinators/parv.jpg";
 import navankurImg from "../assets/exCoordinators/navankur.jpg";
 import abhijeetImg from "../assets/exCoordinators/abhijeet.jpg";
+import ayushImg from "../assets/exCoordinators/ayush.jpg";
+import tejasImg from "../assets/exCoordinators/tejas.jpg";
+import vaibhavImg from "../assets/exCoordinators/vaibhav.jpg";
+import himanshuImg from "../assets/exCoordinators/himanshu.jpg";
+import pranshuImg from "../assets/exCoordinators/pranshu.jpg";
 
 // 25-26 Secretaries imports
 import secArjit from '../assets/secretaries_25_26/arjit.jpg';
@@ -44,15 +49,15 @@ const TEAMS_DATA = {
   ],
   '23-24 Team': [
     { name: "Abhijeet Verma", email: "abhiteet21@iitk.ac.in", image: abhijeetImg, funnyDescription: "Placeholder description for 23-24 team." },
-    { name: "Ayush Yadav", email: "ayushy21@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 23-24 team." },
+    { name: "Ayush Yadav", email: "ayushy21@iitk.ac.in", image: ayushImg, funnyDescription: "Placeholder description for 23-24 team." },
     { name: "Navankur Shrotriya", email: "navankurs21@iitk.ac.in", image: navankurImg, funnyDescription: "Placeholder description for 23-24 team." },
-    { name: "Tejas Goyal", email: "tejasg21@iitk.ac.in", image: profileImg, funnyDescription: "Placeholder description for 23-24 team." }
+    { name: "Tejas Goyal", email: "tejasg21@iitk.ac.in", image: tejasImg, funnyDescription: "Placeholder description for 23-24 team." }
   ],
   '22-23 Team': [
-    { name: "Himanshu Beniwal", email: "‎ ", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." },
-    { name: "Pranshu Gaur", email: "‎ ", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." },
+    { name: "Himanshu Beniwal", email: "‎ ", image: himanshuImg, funnyDescription: "Placeholder description for 22-23 team." },
+    { name: "Pranshu Gaur", email: "‎ ", image: pranshuImg, funnyDescription: "Placeholder description for 22-23 team." },
     { name: "Prem Milind Gujrathi", email: "‎ ", image: premImg, funnyDescription: "Placeholder description for 22-23 team." },
-    { name: "Vaibhav Waghmare", email: "‎ ", image: profileImg, funnyDescription: "Placeholder description for 22-23 team." }
+    { name: "Vaibhav Waghmare", email: "‎ ", image: vaibhavImg, funnyDescription: "Placeholder description for 22-23 team." }
   ]
 };
 
@@ -70,7 +75,7 @@ const SECRETARIES_DATA = {
     { name: "Prakhar", role: "Secretary", image: secPrakhar },
     { name: "Prithvijeet", role: "Secretary", image: secPrithvijeet },
     { name: "Rishi", role: "Secretary", image: secRishi },
-    { name: "Roz Anandan", role: "Secretary", image: secRozAnandan },
+    { name: "Anandan", role: "Secretary", image: secRozAnandan },
     { name: "Rudra", role: "Secretary", image: secRudra },
     { name: "Shaurya", role: "Secretary", image: secShaurya }
   ]
@@ -90,9 +95,6 @@ const MemberCard = ({ person }) => (
       
       <div className="absolute bottom-0 left-0 w-full p-4 translate-y-2 group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
         <h5 className="text-xl font-serif font-bold text-on-surface mb-1 drop-shadow-md group-hover:text-primary transition-colors duration-300">{person.name}</h5>
-        {person.email && (
-          <a href={`mailto:${person.email}`} className="text-[10px] font-mono text-primary hover:text-primary/70 transition-colors tracking-wider block opacity-0 group-hover:opacity-100 duration-500 delay-100 ease-out">{person.email}</a>
-        )}
       </div>
     </div>
   </div>
@@ -105,9 +107,12 @@ const PreviousTeams = () => {
     <div>
       <div className="px-4 sm:px-6 md:px-12 pb-20 max-w-7xl mx-auto min-h-[70vh]">
         <section className="mb-20 mt-12">
-          <div className="flex flex-col items-center mb-12 text-center">
-            <h3 className="text-xs font-label uppercase tracking-[0.2em] text-primary mb-2">Our Legacy</h3>
-            <h2 className="text-5xl font-serif font-bold tracking-tighter text-on-surface">Previous Teams</h2>
+          <div className="flex flex-col items-center mb-10 text-center max-w-3xl mx-auto">
+            <p className="text-xs font-label uppercase tracking-[0.3em] text-primary mb-3">Our Legacy</p>
+            <h1 className="text-4xl font-serif leading-tight text-on-surface sm:text-5xl">Previous Teams</h1>
+            <p className="mt-3 text-sm font-light leading-relaxed text-on-surface-variant/80 sm:text-base">
+              Honoring the coordinators and team members who built and shaped the IITK Chess Community.
+            </p>
           </div>
 
           <div className="flex flex-col md:flex-row gap-12 mt-8">

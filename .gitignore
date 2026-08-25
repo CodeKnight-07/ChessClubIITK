@@ -3,3 +3,7 @@
 **/__pycache__/ 
 backend/venv/
 .vscode/
+backend/static/uploads/temp_gdrive/
+backend/static/uploads/temp_download/
+backend/static/uploads/test.jpg
+*.log

@@ -22,17 +22,65 @@ import img8 from '../Gallery/8.png';
 import img9 from '../Gallery/9.png';
 import img10 from '../Gallery/SCHOOL VISIT.png';
 
-// Dynamically import all images in the FIDE RATED folder using Vite's glob import
-const FIDE_IMAGES_GLOB = import.meta.glob('../Gallery/FIDE RATED/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
-const FIDE_RATED_PHOTOS = Object.values(FIDE_IMAGES_GLOB).map(module => module.default);
+// Dynamically import and numerically sort all images in the FIDE 25-26 folder using Vite's glob import
+const FIDE_2526_GLOB = import.meta.glob('../Gallery/fide2526/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
+const FIDE_2526_KEYS = Object.keys(FIDE_2526_GLOB).sort((a, b) => {
+  const matchA = a.match(/\/(\d+)\.\w+$/);
+  const matchB = b.match(/\/(\d+)\.\w+$/);
+  if (matchA && matchB) {
+    return parseInt(matchA[1], 10) - parseInt(matchB[1], 10);
+  }
+  return a.localeCompare(b);
+});
+const FIDE_2526_PHOTOS = FIDE_2526_KEYS.map(key => FIDE_2526_GLOB[key].default);
+
+// FIDE RATED PHOTOS is now FIDE_2526_PHOTOS for the featured spotlight at the top
+const FIDE_RATED_PHOTOS = FIDE_2526_PHOTOS;
 
 // Dynamically import all images in the Street Chess folder using Vite's glob import
 const STREET_CHESS_GLOB = import.meta.glob('../assets/Street Chess/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
-const STREET_CHESS_PHOTOS = Object.values(STREET_CHESS_GLOB).map(module => module.default);
+const STREET_CHESS_KEYS = Object.keys(STREET_CHESS_GLOB).sort((a, b) => a.localeCompare(b));
+const STREET_CHESS_PHOTOS = STREET_CHESS_KEYS.map(key => STREET_CHESS_GLOB[key].default).filter((_, idx) => idx !== 5);
 
 // Dynamically import all images in the Grand Swiss folder using Vite's glob import
 const GRAND_SWISS_GLOB = import.meta.glob('../assets/Grand Swiss/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
-const GRAND_SWISS_PHOTOS = Object.values(GRAND_SWISS_GLOB).map(module => module.default);
+const GRAND_SWISS_KEYS = Object.keys(GRAND_SWISS_GLOB).sort((a, b) => a.localeCompare(b));
+const GRAND_SWISS_PHOTOS = GRAND_SWISS_KEYS.map(key => GRAND_SWISS_GLOB[key].default).filter((_, idx) => idx !== 9);
+
+// Dynamically import all images in the Chess Hour folder using Vite's glob import
+const CHESS_HOUR_GLOB = import.meta.glob('../assets/Chess Hour/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
+const CHESS_HOUR_KEYS = Object.keys(CHESS_HOUR_GLOB).sort((a, b) => {
+  const matchA = a.match(/\/(\d+)\.\w+$/);
+  const matchB = b.match(/\/(\d+)\.\w+$/);
+  if (matchA && matchB) {
+    return parseInt(matchA[1], 10) - parseInt(matchB[1], 10);
+  }
+  return a.localeCompare(b);
+});
+const CHESS_HOUR_PHOTOS = CHESS_HOUR_KEYS.map(key => CHESS_HOUR_GLOB[key].default);
+
+// Dynamically import all images in the Street Chess 2 folder using Vite's glob import
+const STREET_CHESS_2_GLOB = import.meta.glob('../assets/Street Chess 2/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
+const STREET_CHESS_2_KEYS = Object.keys(STREET_CHESS_2_GLOB).sort((a, b) => {
+  const matchA = a.match(/\/(\d+)\.\w+$/);
+  const matchB = b.match(/\/(\d+)\.\w+$/);
+  if (matchA && matchB) {
+    return parseInt(matchA[1], 10) - parseInt(matchB[1], 10);
+  }
+  return a.localeCompare(b);
+});
+const STREET_CHESS_2_PHOTOS = STREET_CHESS_2_KEYS.map(key => STREET_CHESS_2_GLOB[key].default);
+
+const CHAMPIONSHIP_2026_GLOB = import.meta.glob('../Gallery/Championship 2026/*.{png,jpg,jpeg,heic,PNG,JPG,JPEG,HEIC}', { eager: true });
+const CHAMPIONSHIP_2026_KEYS = Object.keys(CHAMPIONSHIP_2026_GLOB).sort((a, b) => {
+  const matchA = a.match(/\/(\d+)\.\w+$/);
+  const matchB = b.match(/\/(\d+)\.\w+$/);
+  if (matchA && matchB) {
+    return parseInt(matchA[1], 10) - parseInt(matchB[1], 10);
+  }
+  return a.localeCompare(b);
+});
+const CHAMPIONSHIP_2026_PHOTOS = CHAMPIONSHIP_2026_KEYS.map(key => CHAMPIONSHIP_2026_GLOB[key].default);
 
 // Dynamically import other casual photos using Vite's glob import
 const OTHER_IMAGES_GLOB = import.meta.glob('../Gallery/OTHER PHOTOS/*.{png,jpg,jpeg,PNG,JPG,JPEG}', { eager: true });
@@ -141,7 +189,7 @@ const CURRENT_YEAR_EVENTS = [
     id: 'current-street-chess',
     title: 'Street Chess 2026',
     tag: 'Street Showcase',
-    date: 'Nov 12, 2026',
+    date: 'June 10, 2026',
     coverImage: STREET_CHESS_PHOTOS.length > 0 ? STREET_CHESS_PHOTOS[0] : workshopImg,
     photos: STREET_CHESS_PHOTOS,
     description: 'Bringing the game of chess to the campus streets! Casual, blitz, and speed matchplays on public tables open for all passersby.'
@@ -150,38 +198,16 @@ const CURRENT_YEAR_EVENTS = [
 
 // 3D Diary Book Single Page Component (Club Memories)
 const DiaryPage = ({ photoUrl, pageNumber, isLeftPage, isAdmin, photoIdx, onDelete, onReplace }) => {
-  if (!photoUrl && pageNumber !== 0 && pageNumber !== 999) return null;
-
-  if (pageNumber === 0) {
-    // Front Cover
+  if (!photoUrl) {
     return (
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-900 to-amber-950 flex flex-col justify-between p-6 text-center border-l-4 border-amber-800 shadow-inner rounded-r-xl select-none">
-        <div className="border border-primary/30 rounded-lg p-4 flex-1 flex flex-col justify-center items-center gap-4">
-          <span className="material-symbols-outlined text-primary text-5xl animate-pulse">menu_book</span>
-          <div>
-            <h3 className="font-serif text-2xl text-primary tracking-wide leading-tight mb-2">Club Memories</h3>
-            <p className="font-label text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/80">Chess Club IITK</p>
-          </div>
-          <div className="h-0.5 w-12 bg-primary/30" />
-          <p className="text-[9px] font-label text-on-surface-variant/60 uppercase tracking-widest max-w-[160px]">
-            Visual Archives • Casual Moments
-          </p>
+      <div className={`w-full h-full bg-[#FAF6EE] p-4 sm:p-5 md:p-8 flex flex-col justify-between relative overflow-hidden select-none ${isLeftPage ? 'shadow-[inset_10px_0_20px_rgba(0,0,0,0.05),inset_0_4px_10px_rgba(0,0,0,0.03)] border-r border-black/5' : 'shadow-[inset_-10px_0_20px_rgba(0,0,0,0.05),inset_0_4px_10px_rgba(0,0,0,0.03)]'}`}>
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:12px_12px]" />
+        <div className={`absolute ${isLeftPage ? 'right-0 bg-gradient-to-l' : 'left-0 bg-gradient-to-r'} top-0 h-full w-[25px] from-black/15 via-black/5 to-transparent pointer-events-none z-10`} />
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <span className="material-symbols-outlined text-[#8a7f6e]/20 text-5xl">photo</span>
         </div>
-      </div>
-    );
-  }
-
-  if (pageNumber === 999) {
-    // Back Cover
-    return (
-      <div className="absolute inset-0 bg-gradient-to-bl from-amber-950 to-amber-900 flex flex-col justify-center items-center p-6 text-center border-r-4 border-amber-800 shadow-inner rounded-l-xl select-none">
-        <div className="border border-[#d4af37]/20 rounded-lg p-4 w-full h-full flex flex-col justify-center items-center gap-4">
-          <span className="material-symbols-outlined text-primary text-4xl">emoji_events</span>
-          <h3 className="font-serif text-lg text-[#d4af37] tracking-wider">Chess Club IITK</h3>
-          <p className="text-[9px] font-label text-on-surface-variant/50 max-w-[150px]">
-            Thank you for being part of our chess journey.
-          </p>
-          <div className="h-0.5 w-10 bg-[#d4af37]/20 mt-2" />
+        <div className={`absolute bottom-3 ${isLeftPage ? 'left-6' : 'right-6'} font-handwritten text-xs text-[#8a7f6e]/70 select-none`}>
+          — Page {pageNumber} —
         </div>
       </div>
     );
@@ -274,12 +300,25 @@ import gs9 from '../Gallery/grand swiss/9.jpg';
 import gs10 from '../Gallery/grand swiss/10.jpg';
 import gs11 from '../Gallery/grand swiss/11.jpg';
 
-const FCL_PHOTOS = [fcl1, fcl2, fcl3, fcl4, fcl5, fcl6, fcl7, fcl9, fcl10, fcl11, fcl12, fcl13];
-const IITK_GRAND_SWISS_PHOTOS = [gs1, gs2, gs3, gs4, gs5, gs6, gs7, gs8, gs9, gs10, gs11];
+import cd1 from '../Gallery/CANDIDATES 2025/1.JPG';
+import cd2 from '../Gallery/CANDIDATES 2025/2.JPG';
+import cd3 from '../Gallery/CANDIDATES 2025/3.JPG';
+import cd4 from '../Gallery/CANDIDATES 2025/4.JPG';
+import cd5 from '../Gallery/CANDIDATES 2025/5.JPG';
+import cd6 from '../Gallery/CANDIDATES 2025/6.JPG';
+import cd7 from '../Gallery/CANDIDATES 2025/7.JPG';
+import cd8 from '../Gallery/CANDIDATES 2025/8.JPG';
+import cd9 from '../Gallery/CANDIDATES 2025/9.JPG';
+import cd10 from '../Gallery/CANDIDATES 2025/10.JPG';
+import cd11 from '../Gallery/CANDIDATES 2025/11.JPG';
 
-const PREVIOUS_YEARS = ['25-26'];
+const FCL_PHOTOS = [fcl1, fcl2, fcl3, fcl4, fcl5, fcl6, fcl7, fcl9, fcl10, fcl11, fcl12, fcl13];
+const IITK_GRAND_SWISS_PHOTOS = [gs1, gs2, gs3, gs4, gs5, gs6, gs7, gs8, gs9, gs11];
+const CANDIDATES_2025_PHOTOS = [cd1, cd2, cd3, cd4, cd5, cd7, cd8, cd9, cd10, cd11];
+
+const PREVIOUS_YEARS = ['25-26 Tenure'];
 const PREVIOUS_YEARS_DATA = {
-  '25-26': [
+  '25-26 Tenure': [
     {
       id: "event-1",
       category: "TOURNAMENTS",
@@ -295,11 +334,59 @@ const PREVIOUS_YEARS_DATA = {
       description: "The grandest chess tournament of the year.",
       photos: IITK_GRAND_SWISS_PHOTOS,
       image: IITK_GRAND_SWISS_PHOTOS[0]
+    },
+    {
+      id: "event-3",
+      category: "TOURNAMENTS",
+      title: "IITK Candidates 2025",
+      description: "Who will challenge the champion?",
+      photos: CANDIDATES_2025_PHOTOS,
+      image: CANDIDATES_2025_PHOTOS[0]
+    },
+    {
+      id: "event-4",
+      category: "SOCIALS",
+      title: "Chess Hour",
+      description: "Weekly casual over-the-board meetups, blitz sessions, and friendly sparring.",
+      photos: CHESS_HOUR_PHOTOS,
+      image: CHESS_HOUR_PHOTOS[0],
+      date: "Aug 8, 2026"
+    },
+    {
+      id: "event-5",
+      category: "SOCIALS",
+      title: "Street Chess 2",
+      description: "Taking over the streets once again! Friendly matchplays, lightning blitz tables, and casual chess out in the open campus air.",
+      photos: STREET_CHESS_2_PHOTOS,
+      image: STREET_CHESS_2_PHOTOS[0]
+    },
+    {
+      id: "event-6",
+      category: "TOURNAMENTS",
+      title: "IITK Championship 2026",
+      description: "The final showdown to decide who is the IITK Chess Champion",
+      photos: CHAMPIONSHIP_2026_PHOTOS,
+      image: CHAMPIONSHIP_2026_PHOTOS[0]
     }
   ]
 };
 
+const preloadImages = (urls) => {
+  return Promise.all(
+    urls.map(url => {
+      if (!url) return Promise.resolve();
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = url;
+        img.onload = resolve;
+        img.onerror = resolve;
+      });
+    })
+  );
+};
+
 const Gallery = () => {
+  const [isPreloading, setIsPreloading] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeYear, setActiveYear] = useState(PREVIOUS_YEARS[0]);
   const [isOpenLightbox, setIsOpenLightbox] = useState(false);
@@ -307,14 +394,18 @@ const Gallery = () => {
   const [slideshowIndex, setSlideshowIndex] = useState(0);
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  // Replace lightbox states with Diary Modal states
+  const [isOpenDiaryModal, setIsOpenDiaryModal] = useState(false);
+  const [diaryPhotos, setDiaryPhotos] = useState([]);
+  const [diaryTitle, setDiaryTitle] = useState('');
   const [lightboxPhotos, setLightboxPhotos] = useState([]);
   const [lightboxTitle, setLightboxTitle] = useState('');
-
-  // 3D Book spread state variables
-  const [spreadIndex, setSpreadIndex] = useState(0);
-  const [previousSpread, setPreviousSpread] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [animDirection, setAnimDirection] = useState('next');
+  
+  // Keep/reset 3D book spread index when opening a new diary
+  const [diarySpreadIndex, setDiarySpreadIndex] = useState(0);
+  const [diaryPrevSpread, setDiaryPrevSpread] = useState(0);
+  const [diaryIsAnimating, setDiaryIsAnimating] = useState(false);
+  const [diaryAnimDirection, setDiaryAnimDirection] = useState('next');
 
   // Pull login / admin auth status
   const { isLoggedIn, token } = useAuth();
@@ -452,7 +543,7 @@ const Gallery = () => {
       });
       if (response.ok) {
         setClubMemoriesPhotos(prev => prev.filter((_, i) => i !== index));
-        setSpreadIndex(0);
+        setDiarySpreadIndex(0);
       } else {
         alert("Failed to delete photo.");
       }
@@ -538,20 +629,15 @@ const Gallery = () => {
 
   const handleSpotlightClick = () => {
     if (SLIDESHOW_PHOTOS.length === 0) return;
-    const currentPhoto = SLIDESHOW_PHOTOS[slideshowIndex];
-    const mainIndex = FIDE_RATED_PHOTOS.indexOf(currentPhoto);
-    setLightboxPhotos(FIDE_RATED_PHOTOS);
-    setLightboxTitle('SBI GIC Ltd. Presents FIDE Rated Open Rapid Chess Tournament 2026');
-    setLightboxIndex(mainIndex !== -1 ? mainIndex : 0);
-    setIsOpenLightbox(true);
+    openExhibition(FIDE_RATED_PHOTOS, 'SBI GIC Ltd. Presents FIDE Rated Open Rapid Chess Tournament 2026');
   };
 
-  const openExhibition = (photos, title, startIdx = 0) => {
+  const openExhibition = (photos, title) => {
     if (!photos || photos.length === 0) return;
-    setLightboxPhotos(photos);
-    setLightboxTitle(title);
-    setLightboxIndex(startIdx);
-    setIsOpenLightbox(true);
+    setDiaryPhotos(photos);
+    setDiaryTitle(title);
+    setDiarySpreadIndex(0);
+    setIsOpenDiaryModal(true);
   };
 
   // Measure container width
@@ -569,31 +655,77 @@ const Gallery = () => {
 
   const handleCategoryChange = (cat) => {
     setActiveCategory(cat);
-    setSpreadIndex(0);
-    setIsAnimating(false);
+    setDiarySpreadIndex(0);
+    setDiaryIsAnimating(false);
   };
 
   // Pagination for dynamic memories 3D book
-  const totalSpreads = Math.floor(clubMemoriesPhotos.length / 2) + 2;
+  const totalSpreads = Math.ceil(clubMemoriesPhotos.length / 2) || 1;
 
   const handleNext = () => {
-    if (isAnimating || totalSpreads <= 1) return;
-    setAnimDirection('next');
-    setPreviousSpread(spreadIndex);
-    setSpreadIndex(prev => (prev + 1) % totalSpreads);
-    setIsAnimating(true);
+    if (diaryIsAnimating || isPreloading || totalSpreads <= 1) return;
+    
+    const targetSpread = (diarySpreadIndex + 1) % totalSpreads;
+    const targetUrls = [];
+    const idxLeft = targetSpread * 2;
+    const idxRight = targetSpread * 2 + 1;
+    if (idxLeft >= 0 && idxLeft < clubMemoriesPhotos.length) {
+      targetUrls.push(clubMemoriesPhotos[idxLeft]);
+    }
+    if (idxRight >= 0 && idxRight < clubMemoriesPhotos.length) {
+      targetUrls.push(clubMemoriesPhotos[idxRight]);
+    }
+
+    if (targetUrls.length > 0) {
+      setIsPreloading(true);
+      preloadImages(targetUrls).then(() => {
+        setIsPreloading(false);
+        setDiaryAnimDirection('next');
+        setDiaryPrevSpread(diarySpreadIndex);
+        setDiarySpreadIndex(targetSpread);
+        setDiaryIsAnimating(true);
+      });
+    } else {
+      setDiaryAnimDirection('next');
+      setDiaryPrevSpread(diarySpreadIndex);
+      setDiarySpreadIndex(targetSpread);
+      setDiaryIsAnimating(true);
+    }
   };
 
   const handlePrev = () => {
-    if (isAnimating || totalSpreads <= 1) return;
-    setAnimDirection('prev');
-    setPreviousSpread(spreadIndex);
-    setSpreadIndex(prev => (prev - 1 + totalSpreads) % totalSpreads);
-    setIsAnimating(true);
+    if (diaryIsAnimating || isPreloading || totalSpreads <= 1) return;
+    
+    const targetSpread = (diarySpreadIndex - 1 + totalSpreads) % totalSpreads;
+    const targetUrls = [];
+    const idxLeft = targetSpread * 2;
+    const idxRight = targetSpread * 2 + 1;
+    if (idxLeft >= 0 && idxLeft < clubMemoriesPhotos.length) {
+      targetUrls.push(clubMemoriesPhotos[idxLeft]);
+    }
+    if (idxRight >= 0 && idxRight < clubMemoriesPhotos.length) {
+      targetUrls.push(clubMemoriesPhotos[idxRight]);
+    }
+
+    if (targetUrls.length > 0) {
+      setIsPreloading(true);
+      preloadImages(targetUrls).then(() => {
+        setIsPreloading(false);
+        setDiaryAnimDirection('prev');
+        setDiaryPrevSpread(diarySpreadIndex);
+        setDiarySpreadIndex(targetSpread);
+        setDiaryIsAnimating(true);
+      });
+    } else {
+      setDiaryAnimDirection('prev');
+      setDiaryPrevSpread(diarySpreadIndex);
+      setDiarySpreadIndex(targetSpread);
+      setDiaryIsAnimating(true);
+    }
   };
 
   const handleAnimationComplete = () => {
-    setIsAnimating(false);
+    setDiaryIsAnimating(false);
   };
 
   // Lightbox keyboard shortcuts
@@ -610,17 +742,17 @@ const Gallery = () => {
 
   // Map 3D Book page number to corresponding content safely
   const getBookPageContent = (pageNum) => {
-    if (pageNum < 0 || pageNum > clubMemoriesPhotos.length + 1) return null;
-
-    if (pageNum === 0) {
-      return <DiaryPage pageNumber={0} isLeftPage={false} />;
-    }
-
-    if (pageNum === clubMemoriesPhotos.length + 1) {
-      return <DiaryPage pageNumber={999} isLeftPage={true} />;
-    }
-
     const photoIdx = pageNum - 1;
+    if (photoIdx < 0 || photoIdx >= clubMemoriesPhotos.length) {
+      return (
+        <DiaryPage
+          photoUrl={null}
+          pageNumber={pageNum}
+          isLeftPage={pageNum % 2 !== 0}
+        />
+      );
+    }
+
     const photoUrl = clubMemoriesPhotos[photoIdx];
     return (
       <DiaryPage
@@ -648,13 +780,16 @@ const Gallery = () => {
   return (
     <>
       <div className="px-6 md:px-12 pb-20 max-w-7xl mx-auto min-h-screen text-on-surface">
-      <header className="py-16 text-center">
-        <p className="text-primary font-label text-xs tracking-[0.4em] uppercase mb-4">
+      <header className="py-10 text-center max-w-3xl mx-auto">
+        <p className="text-primary font-label text-xs tracking-[0.3em] uppercase mb-3">
           Visual Archive
         </p>
         <h1 className="text-5xl sm:text-6xl font-serif mb-8">
           The Gallery of <span className="text-primary">Kings</span>
         </h1>
+        <p className="text-sm font-light leading-relaxed text-on-surface-variant/80 sm:text-base mb-6">
+          Moments of triumph, intense calculations, and community memories captured through the lens.
+        </p>
       </header>
 
 
@@ -887,6 +1022,11 @@ const Gallery = () => {
 
                   <div className="p-6 flex-1 flex flex-col justify-between">
                     <div>
+                      {event.date && (
+                        <span className="text-[10px] font-label text-on-surface-variant/60 tracking-wider block mb-2 font-semibold">
+                          {event.date}
+                        </span>
+                      )}
                       <h3 className="text-lg font-serif font-bold text-on-surface mb-3 group-hover:text-primary transition-colors leading-tight">
                         {event.title}
                       </h3>
@@ -908,6 +1048,7 @@ const Gallery = () => {
       </section>
 
       {/* Archives Card Grid (Preserves all other 9 static events in a beautiful cards grid!) */}
+      {/* Archived Exhibitions Section commented out as requested
       <section className="mb-24 max-w-5xl mx-auto">
         <div className="text-center md:text-left mb-10">
           <p className="text-primary font-label text-xs tracking-[0.3em] uppercase mb-2">
@@ -964,6 +1105,7 @@ const Gallery = () => {
           </div>
         )}
       </section>
+      */}
 
       {/* 3D Diary Book Section (Club Memories & moments from the database) */}
       <AnimatePresence mode="wait">
@@ -1012,29 +1154,29 @@ const Gallery = () => {
                       {/* Left Side Static Page */}
                       <div className="w-1/2 h-full">
                         {getBookPageContent(
-                          isAnimating
-                            ? (animDirection === 'next' ? previousSpread * 2 - 1 : spreadIndex * 2 - 1)
-                            : spreadIndex * 2 - 1
+                          diaryIsAnimating
+                            ? (diaryAnimDirection === 'next' ? diaryPrevSpread * 2 + 1 : diarySpreadIndex * 2 + 1)
+                            : diarySpreadIndex * 2 + 1
                         )}
                       </div>
 
                       {/* Right Side Static Page */}
                       <div className="w-1/2 h-full">
                         {getBookPageContent(
-                          isAnimating
-                            ? (animDirection === 'next' ? spreadIndex * 2 : previousSpread * 2)
-                            : spreadIndex * 2
+                          diaryIsAnimating
+                            ? (diaryAnimDirection === 'next' ? diarySpreadIndex * 2 + 2 : diaryPrevSpread * 2 + 2)
+                            : diarySpreadIndex * 2 + 2
                         )}
                       </div>
 
                       {/* Turning Page Overlay */}
                       <AnimatePresence mode="wait">
-                        {isAnimating && (
+                        {diaryIsAnimating && (
                           <motion.div
-                            key={`${spreadIndex}-${animDirection}`}
-                            initial={{ rotateY: animDirection === 'next' ? 0 : -180 }}
-                            animate={{ rotateY: animDirection === 'next' ? -180 : 0 }}
-                            exit={{ rotateY: animDirection === 'next' ? -180 : 0 }}
+                            key={`${diarySpreadIndex}-${diaryAnimDirection}`}
+                            initial={{ rotateY: diaryAnimDirection === 'next' ? 0 : -180 }}
+                            animate={{ rotateY: diaryAnimDirection === 'next' ? -180 : 0 }}
+                            exit={{ rotateY: diaryAnimDirection === 'next' ? -180 : 0 }}
                             transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
                             onAnimationComplete={handleAnimationComplete}
                             style={{
@@ -1063,7 +1205,7 @@ const Gallery = () => {
                               }}
                             >
                               {getBookPageContent(
-                                animDirection === 'next' ? previousSpread * 2 : spreadIndex * 2
+                                diaryAnimDirection === 'next' ? diaryPrevSpread * 2 + 2 : diarySpreadIndex * 2 + 2
                               )}
                             </div>
 
@@ -1081,7 +1223,7 @@ const Gallery = () => {
                               }}
                             >
                               {getBookPageContent(
-                                animDirection === 'next' ? spreadIndex * 2 - 1 : previousSpread * 2 - 1
+                                diaryAnimDirection === 'next' ? diarySpreadIndex * 2 + 1 : diaryPrevSpread * 2 + 1
                               )}
                             </div>
                           </motion.div>
@@ -1093,7 +1235,7 @@ const Gallery = () => {
                       <div className="absolute left-1/2 -translate-x-1/2 top-0 h-full w-[1px] bg-black/30 pointer-events-none z-30" />
 
                       {/* Clicking targets */}
-                      {!isAnimating && totalSpreads > 1 && (
+                      {!diaryIsAnimating && totalSpreads > 1 && (
                         <>
                           <div
                             onClick={handlePrev}
@@ -1114,14 +1256,14 @@ const Gallery = () => {
                       <>
                         <button
                           onClick={handlePrev}
-                          disabled={isAnimating}
+                          disabled={diaryIsAnimating}
                           className="absolute left-[-20px] sm:left-[-35px] md:left-[-56px] top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-low/95 border border-outline-variant/20 hover:border-primary/50 text-on-surface flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-40 disabled:scale-100 disabled:pointer-events-none transition-all shadow-xl outline-none"
                         >
                           <span className="material-symbols-outlined text-xl sm:text-2xl">chevron_left</span>
                         </button>
                         <button
                           onClick={handleNext}
-                          disabled={isAnimating}
+                          disabled={diaryIsAnimating}
                           className="absolute right-[-20px] sm:right-[-35px] md:right-[-56px] top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-low/95 border border-outline-variant/20 hover:border-primary/50 text-on-surface flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-40 disabled:scale-100 disabled:pointer-events-none transition-all shadow-xl outline-none"
                         >
                           <span className="material-symbols-outlined text-xl sm:text-2xl">chevron_right</span>
@@ -1134,7 +1276,7 @@ const Gallery = () => {
                   {totalSpreads > 1 && (
                     <div className="mt-6 text-xs font-label uppercase tracking-widest text-on-surface-variant/60 flex items-center gap-2 select-none">
                       <span className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                      <span>Spread {spreadIndex + 1} of {totalSpreads} • Memories ({clubMemoriesPhotos.length} photos)</span>
+                      <span>Spread {diarySpreadIndex + 1} of {totalSpreads} • Memories ({clubMemoriesPhotos.length} photos)</span>
                     </div>
                   )}
                 </div>
@@ -1148,28 +1290,219 @@ const Gallery = () => {
         )}
       </AnimatePresence>
 
-      {/* Full-Screen Image Lightbox Modal */}
+      {/* Full-Screen 3D Diary Book Modal */}
       <AnimatePresence>
-        {isOpenLightbox && lightboxPhotos.length > 0 && (
+        {isOpenDiaryModal && diaryPhotos.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col p-4 md:p-8 outline-none overflow-y-auto"
+            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 md:p-8 outline-none overflow-y-auto"
           >
             {/* Header Controls */}
-            <div className="absolute top-4 right-4 md:top-8 md:right-8 z-[100]">
+            <div className="flex justify-between items-center w-full max-w-5xl mx-auto h-12 flex-shrink-0">
+              <div className="text-primary text-xs md:text-sm font-label uppercase tracking-widest truncate max-w-[80%]">
+                {diaryTitle} • Scrapbook Archives ({diaryPhotos.length} Photos)
+              </div>
               <button
-                onClick={() => setIsOpenLightbox(false)}
-                className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary transition-colors text-on-surface hover:text-[#3c2f00] flex items-center justify-center outline-none shadow-lg"
+                onClick={() => setIsOpenDiaryModal(false)}
+                className="w-10 h-10 rounded-full bg-surface-container hover:bg-primary transition-colors text-on-surface hover:text-[#3c2f00] flex items-center justify-center outline-none shadow-lg cursor-pointer"
               >
                 <span className="material-symbols-outlined text-xl">close</span>
               </button>
             </div>
 
-            {/* Main Photo Area - NOW USING PHOTOBOOK */}
-            <div className="flex-1 w-full flex flex-col items-center justify-center relative mt-8 md:mt-4">
-              <PhotoBook photos={lightboxPhotos} title={lightboxTitle} subtitle="Event Archive" />
+            {/* Main 3D Book Container */}
+            <div className="flex-1 flex flex-col items-center justify-center relative max-w-5xl mx-auto w-full my-auto py-4">
+              {(() => {
+                const totalSpreads = Math.ceil(diaryPhotos.length / 2) || 1;
+
+                const handleDiaryNext = () => {
+                  if (diaryIsAnimating || isPreloading || totalSpreads <= 1) return;
+                  
+                  const targetSpread = (diarySpreadIndex + 1) % totalSpreads;
+                  const targetUrls = [];
+                  const idxLeft = targetSpread * 2;
+                  const idxRight = targetSpread * 2 + 1;
+                  if (idxLeft >= 0 && idxLeft < diaryPhotos.length) {
+                    targetUrls.push(diaryPhotos[idxLeft]);
+                  }
+                  if (idxRight >= 0 && idxRight < diaryPhotos.length) {
+                    targetUrls.push(diaryPhotos[idxRight]);
+                  }
+
+                  if (targetUrls.length > 0) {
+                    setIsPreloading(true);
+                    preloadImages(targetUrls).then(() => {
+                      setIsPreloading(false);
+                      setDiaryAnimDirection('next');
+                      setDiaryPrevSpread(diarySpreadIndex);
+                      setDiarySpreadIndex(targetSpread);
+                      setDiaryIsAnimating(true);
+                    });
+                  } else {
+                    setDiaryAnimDirection('next');
+                    setDiaryPrevSpread(diarySpreadIndex);
+                    setDiarySpreadIndex(targetSpread);
+                    setDiaryIsAnimating(true);
+                  }
+                };
+
+                const handleDiaryPrev = () => {
+                  if (diaryIsAnimating || isPreloading || totalSpreads <= 1) return;
+                  
+                  const targetSpread = (diarySpreadIndex - 1 + totalSpreads) % totalSpreads;
+                  const targetUrls = [];
+                  const idxLeft = targetSpread * 2;
+                  const idxRight = targetSpread * 2 + 1;
+                  if (idxLeft >= 0 && idxLeft < diaryPhotos.length) {
+                    targetUrls.push(diaryPhotos[idxLeft]);
+                  }
+                  if (idxRight >= 0 && idxRight < diaryPhotos.length) {
+                    targetUrls.push(diaryPhotos[idxRight]);
+                  }
+
+                  if (targetUrls.length > 0) {
+                    setIsPreloading(true);
+                    preloadImages(targetUrls).then(() => {
+                      setIsPreloading(false);
+                      setDiaryAnimDirection('prev');
+                      setDiaryPrevSpread(diarySpreadIndex);
+                      setDiarySpreadIndex(targetSpread);
+                      setDiaryIsAnimating(true);
+                    });
+                  } else {
+                    setDiaryAnimDirection('prev');
+                    setDiaryPrevSpread(diarySpreadIndex);
+                    setDiarySpreadIndex(targetSpread);
+                    setDiaryIsAnimating(true);
+                  }
+                };
+
+                const getModalPageContent = (pageNum) => {
+                  const photoIdx = pageNum - 1;
+                  if (photoIdx < 0 || photoIdx >= diaryPhotos.length) {
+                    return (
+                      <DiaryPage
+                        photoUrl={null}
+                        pageNumber={pageNum}
+                        isLeftPage={pageNum % 2 !== 0}
+                      />
+                    );
+                  }
+
+                  const photoUrl = diaryPhotos[photoIdx];
+                  return (
+                    <DiaryPage
+                      photoUrl={photoUrl}
+                      pageNumber={pageNum}
+                      isLeftPage={pageNum % 2 !== 0}
+                      isAdmin={false} // Turn off admin destructive edit controls inside modals if preferred, or pass `isAdmin`
+                    />
+                  );
+                };
+
+                return (
+                  <div className="w-full flex flex-col items-center">
+                    <div
+                      className="w-full max-w-[900px] aspect-[16/10] sm:aspect-[16/9.5] relative rounded-2xl bg-[#2d1f10] border-4 border-[#3e2c17] shadow-[0_25px_60px_rgba(0,0,0,0.8),inset_0_0_30px_rgba(0,0,0,0.8)] p-2 sm:p-3"
+                      style={{ perspective: '2000px', transformStyle: 'preserve-3d' }}
+                    >
+                      {/* Book Corners */}
+                      <div className="absolute top-1 left-1 w-6 h-6 border-t-2 border-l-2 border-[#d4af37]/80 rounded-tl-lg pointer-events-none z-30" />
+                      <div className="absolute top-1 right-1 w-6 h-6 border-t-2 border-r-2 border-[#d4af37]/80 rounded-tr-lg pointer-events-none z-30" />
+                      <div className="absolute bottom-1 left-1 w-6 h-6 border-b-2 border-l-2 border-[#d4af37]/80 rounded-bl-lg pointer-events-none z-30" />
+                      <div className="absolute bottom-1 right-1 w-6 h-6 border-b-2 border-r-2 border-[#d4af37]/80 rounded-br-lg pointer-events-none z-30" />
+
+                      {/* Pages Wrapper */}
+                      <div className="w-full h-full relative rounded-lg overflow-hidden flex shadow-inner" style={{ transformStyle: 'preserve-3d' }}>
+                        <div className="w-1/2 h-full">
+                          {getModalPageContent(
+                            diaryIsAnimating
+                              ? (diaryAnimDirection === 'next' ? diaryPrevSpread * 2 + 1 : diarySpreadIndex * 2 + 1)
+                              : diarySpreadIndex * 2 + 1
+                          )}
+                        </div>
+                        <div className="w-1/2 h-full">
+                          {getModalPageContent(
+                            diaryIsAnimating
+                              ? (diaryAnimDirection === 'next' ? diarySpreadIndex * 2 + 2 : diaryPrevSpread * 2 + 2)
+                              : diarySpreadIndex * 2 + 2
+                          )}
+                        </div>
+
+                        {/* Animation Page Turnover */}
+                        <AnimatePresence mode="wait">
+                          {diaryIsAnimating && (
+                            <motion.div
+                              key={`${diarySpreadIndex}-${diaryAnimDirection}`}
+                              initial={{ rotateY: diaryAnimDirection === 'next' ? 0 : -180 }}
+                              animate={{ rotateY: diaryAnimDirection === 'next' ? -180 : 0 }}
+                              exit={{ rotateY: diaryAnimDirection === 'next' ? -180 : 0 }}
+                              transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
+                              onAnimationComplete={() => setDiaryIsAnimating(false)}
+                              style={{
+                                position: "absolute",
+                                top: 0,
+                                right: 0,
+                                width: "50%",
+                                height: "100%",
+                                transformOrigin: "left center",
+                                transformStyle: "preserve-3d",
+                                zIndex: 25,
+                                pointerEvents: "none"
+                              }}
+                            >
+                              <div style={{ position: "absolute", inset: 0, width: "100%", height: "100%", backfaceVisibility: "hidden", transform: "rotateY(0deg)" }}>
+                                {getModalPageContent(diaryAnimDirection === 'next' ? diaryPrevSpread * 2 + 2 : diarySpreadIndex * 2 + 2)}
+                              </div>
+                              <div style={{ position: "absolute", inset: 0, width: "100%", height: "100%", backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>
+                                {getModalPageContent(diaryAnimDirection === 'next' ? diarySpreadIndex * 2 + 1 : diaryPrevSpread * 2 + 1)}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        {/* Spine overlay */}
+                        <div className="absolute left-1/2 -translate-x-1/2 top-0 h-full w-[30px] pointer-events-none z-30 bg-gradient-to-r from-black/0 via-black/35 to-black/0" />
+                        
+                        {/* Click zones */}
+                        {!diaryIsAnimating && totalSpreads > 1 && (
+                          <>
+                            <div onClick={handleDiaryPrev} className="absolute left-0 top-0 w-1/2 h-full z-20 cursor-w-resize" title="Previous Page" />
+                            <div onClick={handleDiaryNext} className="absolute right-0 top-0 w-1/2 h-full z-20 cursor-e-resize" title="Next Page" />
+                          </>
+                        )}
+                      </div>
+
+                      {/* Book navigation arrows */}
+                      {totalSpreads > 1 && (
+                        <>
+                          <button
+                            onClick={handleDiaryPrev}
+                            disabled={diaryIsAnimating}
+                            className="absolute left-[-20px] sm:left-[-45px] top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-low/95 border border-outline-variant/20 hover:border-primary/50 text-on-surface flex items-center justify-center transition-all shadow-xl cursor-pointer"
+                          >
+                            <span className="material-symbols-outlined text-2xl">chevron_left</span>
+                          </button>
+                          <button
+                            onClick={handleDiaryNext}
+                            disabled={diaryIsAnimating}
+                            className="absolute right-[-20px] sm:right-[-45px] top-1/2 -translate-y-1/2 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-low/95 border border-outline-variant/20 hover:border-primary/50 text-on-surface flex items-center justify-center transition-all shadow-xl cursor-pointer"
+                          >
+                            <span className="material-symbols-outlined text-2xl">chevron_right</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
+
+                    <div className="mt-6 text-xs font-label uppercase tracking-widest text-on-surface-variant/70 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      <span>Spread {diarySpreadIndex + 1} of {totalSpreads} • Click edges to flip pages</span>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </motion.div>
         )}

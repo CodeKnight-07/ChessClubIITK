@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_cors import CORS
+from flask_jwt_extended import jwt_required, get_jwt, verify_jwt_in_request
 from config.db import get_db_connection  # <--- 1. Add your custom import here
 
 
@@ -8,6 +9,11 @@ CORS(events_bp)
 
 @events_bp.route('/api/events', methods=['POST'])
 def create_event():
+    verify_jwt_in_request()
+    claims = get_jwt()
+    if not claims.get('is_admin'):
+        return jsonify({"error": "Access Denied: Admin privileges required."}), 403
+
     data = request.get_json()
     
     title = data.get('title')
@@ -74,6 +80,11 @@ def get_events():
 def modify_event(event_id):
     if request.method == 'OPTIONS':
         return jsonify({"message": "CORS preflight successful"}), 200
+
+    verify_jwt_in_request()
+    claims = get_jwt()
+    if not claims.get('is_admin'):
+        return jsonify({"error": "Access Denied: Admin privileges required."}), 403
 
     conn = get_db_connection()
     cur = conn.cursor()

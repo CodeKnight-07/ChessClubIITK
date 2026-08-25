@@ -6,7 +6,7 @@ import { globalCache } from '../utils/cache';
 import tournamentImg from '../assets/fide.png';
 import fresherImg from '../assets/fcl.png';
 import winnerImg from '../assets/anuj_shivratri.png';
-import defaultBlogHero from '../assets/chessboard.jpg';
+import defaultBlogHero from '../assets/chessclubiitklogo.jpeg';
 
 // Helper to fix and format injected HTML or plain-text paragraph content
 const formatInjectedContent = (rawContent) => {
@@ -25,11 +25,26 @@ const formatInjectedContent = (rawContent) => {
     content = paragraphs
       .map((p, idx) => {
         if (idx === 0) {
-          return `<p class="text-xl sm:text-2xl font-serif text-on-surface leading-relaxed mb-8 first-letter:float-left first-letter:text-6xl sm:first-letter:text-7xl first-letter:pr-4 first-letter:font-serif first-letter:text-primary">${p.replace(/\n/g, '<br />')}</p>`;
+          return `<p class="leading-relaxed mb-6 text-on-surface-variant text-base sm:text-lg first-letter:float-left first-letter:text-6xl sm:first-letter:text-7xl first-letter:pr-4 first-letter:font-serif first-letter:text-primary">${p.replace(/\n/g, '<br />')}</p>`;
         }
         return `<p class="leading-relaxed mb-6 text-on-surface-variant text-base sm:text-lg">${p.replace(/\n/g, '<br />')}</p>`;
       })
       .join('\n');
+  } else {
+    // If it already has HTML paragraph tags, let's find the first <p> tag and inject dropcap classes into it:
+    if (/<p/i.test(content)) {
+      if (/<p[^>]+class=/i.test(content)) {
+        content = content.replace(/<p([^>]*class=["'])([^"']*)(["'])/i, (m, before, classes, after) => {
+          if (!classes.includes('first-letter:float-left')) {
+            const newClasses = `${classes} first-letter:float-left first-letter:text-6xl sm:first-letter:text-7xl first-letter:pr-4 first-letter:font-serif first-letter:text-primary`.trim();
+            return `<p${before}${newClasses}${after}`;
+          }
+          return m;
+        });
+      } else {
+        content = content.replace(/<p>/i, `<p class="first-letter:float-left first-letter:text-6xl sm:first-letter:text-7xl first-letter:pr-4 first-letter:font-serif first-letter:text-primary">`);
+      }
+    }
   }
 
   // Regex to match raw base64 images without data prefix
@@ -44,38 +59,7 @@ const formatInjectedContent = (rawContent) => {
   );
 };
 
-const LEGACY_POSTS_MAP = {
-  'legacy-fcl': {
-    id: 'legacy-fcl',
-    title: "Fresher's Chess League 2025: An Absolute Thriller!",
-    created_at: "August 25, 2025",
-    tag: "Event Recap",
-    author_name: "Tanmay Sahare",
-    author_position: "Tournament Coordinator",
-    cover_image: fresherImg,
-    content: `<p class="text-2xl text-on-surface font-serif leading-relaxed mb-10 first-letter:float-left first-letter:text-7xl first-letter:pr-4 first-letter:font-serif first-letter:text-primary">Recapping the absolute hype surrounding the offline auctions in the Senate Hall, analyzing the intense Round Robin pool matches at the OAT, and spotlighting the brilliant knockout blunders that ultimately led the underdogs to gold memberships.</p><p>The Fresher's Chess League this year was nothing short of a spectacle! Over 60 incoming freshers registered for the 8-player team slots. The offline auction was a chaotic flurry of bids, calculations, and pure adrenaline as captains scrambled to build the ultimate 8-person squads within their limited budgets.</p>`
-  },
-  'legacy-anuj': {
-    id: 'legacy-anuj',
-    title: "Anuj Shrivatri emerges victorious at SBI GIC Fide Rated Rapid Tournament 2026 at IITK",
-    created_at: "February 15, 2026",
-    tag: "Tournament News",
-    author_name: "Laksh Dhir",
-    author_position: "Coordinator, Chess Club IITK",
-    cover_image: winnerImg,
-    content: `<p class="text-2xl text-on-surface font-serif leading-relaxed mb-10 first-letter:float-left first-letter:text-7xl first-letter:pr-4 first-letter:font-serif first-letter:text-primary">Top seed Anuj Shrivatri wins SBI GIC Fide Rated Rapid Tournament 2026 at IIT Kanpur. Anuj scored 8/9 points to secure the victory. He was leading the event with 8/8 points going into the 9th round, Anuj lost to Arnav Agrawal, a young talent from the host state Uttar Pradesh. This important win helped Arnav to secure second place with 8/9 points. India's latest GM Aaryav Varshney and IM Aaditya Dhingra also scored 8/9 points to secure 3rd and 4th positions, respectively, on tiebreaks. This one-day rapid-rated event was organized in the IIT Kanpur campus on 7th February with a total cash prize of ₹2,00,000.</p><h2 class="text-3xl font-serif font-bold text-on-surface mt-16 mb-6 border-b border-outline-variant/15 pb-2">Anuj's 4th-Rated Tournament victory this year!!</h2><p>IM Anuj Shrivatri is on an unstoppable winning run right now. This is Anuj's 4th rated tournament victory, and the year just started.</p>`
-  },
-  'legacy-fide': {
-    id: 'legacy-fide',
-    title: "IIT Kanpur's First FIDE-Rated Rapid Tournament: A New Chapter",
-    created_at: "January 26, 2026",
-    tag: "Tournament News",
-    author_name: "Laksh Dhir",
-    author_position: "Coordinator, Chess Club IITK",
-    cover_image: tournamentImg,
-    content: `<p class="text-2xl text-on-surface font-serif leading-relaxed mb-10 first-letter:float-left first-letter:text-7xl first-letter:pr-4 first-letter:font-serif first-letter:text-primary">IIT Kanpur steps onto the rated chess map with its first FIDE-rated rapid tournament, a 9-round Swiss event carrying a prize pool of INR 2,00,000.</p>`
-  }
-};
+const LEGACY_POSTS_MAP = {};
 
 const BlogPost = () => {
   const { id } = useParams();
@@ -161,7 +145,7 @@ const BlogPost = () => {
             setEditContent(matchingNode.content || "");
             setEditCover(matchingNode.cover_image || "");
             setEditAuthorName(matchingNode.author_name || "Chess Club Team");    
-            setEditAuthorPosition(matchingNode.author_position || "Coordinator, Chess Club IITK");
+            setEditAuthorPosition(matchingNode.author_position || "Coordinator, Chess Club");
             if (matchingNode.created_at) {
               const d = new Date(matchingNode.created_at);
               if (!isNaN(d.getTime())) {
@@ -192,7 +176,7 @@ const BlogPost = () => {
             setEditContent(matchingNode.content || "");
             setEditCover(matchingNode.cover_image || "");
             setEditAuthorName(matchingNode.author_name || "Chess Club Team");    
-            setEditAuthorPosition(matchingNode.author_position || "Coordinator, Chess Club IITK");
+            setEditAuthorPosition(matchingNode.author_position || "Coordinator, Chess Club");
             if (matchingNode.created_at) {
               const d = new Date(matchingNode.created_at);
               if (!isNaN(d.getTime())) {
@@ -372,7 +356,7 @@ const BlogPost = () => {
                   {dbPost.author_name || "Chess Club Team"}
                 </p>
                 <p className="text-[10px] text-on-surface-variant font-label uppercase tracking-widest !m-0 !leading-none !mt-1">
-                  {dbPost.author_position || "Coordinator, Chess Club IITK"}
+                  {dbPost.author_position || "Coordinator, Chess Club"}
                 </p>
               </div>
             </div>

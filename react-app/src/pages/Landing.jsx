@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import fresherImg from '../assets/fresher_league_recap_1775765383248.png';
 import grandSwissImg from '../assets/grand_swiss_recap_1775765397656.png';
 import fideImg from '../assets/fide.png';
-import featuredEventImg from '../assets/featured_event.png';
+import logoImg from '../assets/chessclubiitklogo.jpeg';
 import lolImg from "../assets/lol_poster.png";
 import { useAuth } from '../context/AuthContext';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -13,12 +13,209 @@ import akshatImg from "../assets/exCoordinators/akshat.png";
 import kushagraImg from "../assets/exCoordinators/kushagra.jpg";
 import pulkitImg from "../assets/exCoordinators/pulkit.jpg";
 import { API_BASE_URL } from '../config';
+import { globalCache } from '../utils/cache';
 import FloatingChessPieces from '../components/FloatingChessPieces';
+
+const AnimatedCounter = ({ value, duration = 1200, trigger }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!trigger) {
+      setCount(0);
+      return;
+    }
+
+    const match = value.match(/^(.*?)([0-9,.]+)(.*?)$/);
+    if (!match) {
+      setCount(value);
+      return;
+    }
+
+    const targetNum = parseFloat(match[2].replace(/,/g, ''));
+    let start = 0;
+    const end = targetNum;
+    if (start === end) return;
+
+    let startTimestamp = null;
+    let animFrame = null;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      
+      // Calculate current count using quadratic ease-out for a nicer rapid-scrolling effect
+      const easeOutQuad = 1 - (1 - progress) * (1 - progress);
+      const currentVal = Math.floor(easeOutQuad * (end - start) + start);
+      setCount(currentVal);
+
+      if (progress < 1) {
+        animFrame = window.requestAnimationFrame(step);
+      } else {
+        setCount(end);
+      }
+    };
+
+    animFrame = window.requestAnimationFrame(step);
+    return () => {
+      if (animFrame) window.cancelAnimationFrame(animFrame);
+    };
+  }, [value, duration, trigger]);
+
+  const match = value.match(/^(.*?)([0-9,.]+)(.*?)$/);
+  if (!match) return <span>{value}</span>;
+  const prefix = match[1];
+  const suffix = match[3];
+  return <span>{prefix}{count.toLocaleString()}{suffix}</span>;
+};
 
 const Landing = () => {
   const { isLoggedIn } = useAuth();
   const [nextEvent, setNextEvent] = useState(null);
   const heroRef = useRef(null);
+  const [triggerStats, setTriggerStats] = useState(false);
+
+  const [currentStage, setCurrentStage] = useState(0);
+  const isScrollingRef = useRef(false);
+
+  // 1. Scroll snapping controller
+  useEffect(() => {
+    const handleWheel = (e) => {
+      if (document.body.style.overflow === 'hidden') return;
+      e.preventDefault();
+
+      if (isScrollingRef.current) return;
+
+      const direction = e.deltaY > 0 ? 1 : -1;
+      let nextStage = currentStage + direction;
+
+      if (nextStage < 0) nextStage = 0;
+      if (nextStage > 4) nextStage = 4;
+
+      if (nextStage === currentStage) return;
+
+      isScrollingRef.current = true;
+      setCurrentStage(nextStage);
+
+      if (heroRef.current) {
+        const scrollHeight = heroRef.current.scrollHeight;
+        const windowHeight = window.innerHeight;
+        const maxScroll = scrollHeight - windowHeight;
+        const stageProgress = [0.00, 0.30, 0.56, 0.88, 1.00];
+        
+        let targetScrollY = 0;
+        if (nextStage === 4) {
+          targetScrollY = document.documentElement.scrollHeight - windowHeight;
+        } else {
+          targetScrollY = heroRef.current.offsetTop + (maxScroll * stageProgress[nextStage]);
+        }
+
+        window.scrollTo({
+          top: targetScrollY,
+          behavior: 'smooth'
+        });
+      }
+
+      setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 950);
+    };
+
+    const handleKeyDown = (e) => {
+      if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Space'].includes(e.key)) {
+        e.preventDefault();
+        if (isScrollingRef.current) return;
+
+        let direction = 0;
+        if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'Space') {
+          direction = 1;
+        } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+          direction = -1;
+        }
+
+        if (direction === 0) return;
+
+        let nextStage = currentStage + direction;
+        if (nextStage < 0) nextStage = 0;
+        if (nextStage > 4) nextStage = 4;
+
+        if (nextStage === currentStage) return;
+
+        isScrollingRef.current = true;
+        setCurrentStage(nextStage);
+
+        if (heroRef.current) {
+          const scrollHeight = heroRef.current.scrollHeight;
+          const windowHeight = window.innerHeight;
+          const maxScroll = scrollHeight - windowHeight;
+          const stageProgress = [0.00, 0.30, 0.56, 0.88, 1.00];
+          
+          let targetScrollY = 0;
+          if (nextStage === 4) {
+            targetScrollY = document.documentElement.scrollHeight - windowHeight;
+          } else {
+            targetScrollY = heroRef.current.offsetTop + (maxScroll * stageProgress[nextStage]);
+          }
+
+          window.scrollTo({
+            top: targetScrollY,
+            behavior: 'smooth'
+          });
+        }
+
+        setTimeout(() => {
+          isScrollingRef.current = false;
+        }, 950);
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [currentStage]);
+
+  // 2. Scroll position sync to keep state aligned
+  useEffect(() => {
+    const handleScrollSync = () => {
+      if (isScrollingRef.current || !heroRef.current) return;
+
+      const scrollHeight = heroRef.current.scrollHeight;
+      const windowHeight = window.innerHeight;
+      const maxScroll = scrollHeight - windowHeight;
+      const currentScrollY = window.scrollY - heroRef.current.offsetTop;
+
+      // Force stage 4 if close to absolute bottom of page
+      const docScrollHeight = document.documentElement.scrollHeight;
+      if (window.scrollY + windowHeight >= docScrollHeight - 20) {
+        if (currentStage !== 4) {
+          setCurrentStage(4);
+        }
+        return;
+      }
+
+      const progress = maxScroll > 0 ? currentScrollY / maxScroll : 0;
+
+      const stageProgress = [0.00, 0.30, 0.56, 0.88, 1.00];
+      let closestStage = 0;
+      let minDiff = Infinity;
+
+      stageProgress.forEach((p, idx) => {
+        const diff = Math.abs(progress - p);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestStage = idx;
+        }
+      });
+
+      if (closestStage !== currentStage) {
+        setCurrentStage(closestStage);
+      }
+    };
+
+    window.addEventListener('scroll', handleScrollSync);
+    return () => window.removeEventListener('scroll', handleScrollSync);
+  }, [currentStage]);
 
   // Scroll tracking across the pinned container (520vh for 4 smooth in-place stages with generous pacing)
   const { scrollYProgress } = useScroll({
@@ -49,6 +246,23 @@ const Landing = () => {
   const eventScale = useTransform(scrollYProgress, [0.68, 0.76], [0.92, 1]);
   const eventPointerEvents = useTransform(scrollYProgress, v => (v >= 0.72 ? 'auto' : 'none'));
   const eventVisibility = useTransform(scrollYProgress, v => (v < 0.66 ? 'none' : 'flex'));
+
+  useEffect(() => {
+    document.title = "Chess Club";
+    return () => {
+      document.title = "Chess Club";
+    };
+  }, []);
+
+  useEffect(() => {
+    return scrollYProgress.on("change", (latest) => {
+      if (latest >= 0.42 && latest <= 0.70) {
+        setTriggerStats(true);
+      } else {
+        setTriggerStats(false);
+      }
+    });
+  }, [scrollYProgress]);
 
   useEffect(() => {
     // Delay preloading by 2 seconds to prioritize main landing page resources
@@ -89,7 +303,10 @@ const Landing = () => {
           location: evt.location,
           format: evt.format
         })).filter(evt => {
-          const compareDate = new Date(evt.endDate || evt.date);
+          const dateStr = evt.endDate && evt.endDate !== 'null' && evt.endDate !== 'None' ? evt.endDate : evt.date;
+          if (!dateStr) return false;
+          const compareDate = new Date(dateStr);
+          if (isNaN(compareDate.getTime())) return false;
           compareDate.setHours(0,0,0,0);
           return compareDate >= today;
         });
@@ -106,13 +323,7 @@ const Landing = () => {
 
   // Helper to map event to image
   const getEventImage = (event) => {
-    if (!event) return featuredEventImg;
-    const t = String(event.title).toLowerCase();
-    if (t.includes('league of legends')) return lolImg;
-    if (t.includes("fresher's chess") || t.includes("freshers chess")) return fresherImg;
-    if (t.includes('grand swiss')) return grandSwissImg;
-    if (t.includes('fide rated') || t.includes('fide open')) return fideImg;
-    return featuredEventImg;
+    return logoImg;
   };
 
   return (
@@ -290,7 +501,7 @@ const Landing = () => {
                 },
                 {
                   icon: "emoji_events",
-                  value: "₹2.5L+",
+                  value: "₹15L+",
                   label: "Prize Pool Awarded",
                   desc: "Cash prizes and trophies distributed across official championships."
                 },
@@ -302,7 +513,7 @@ const Landing = () => {
                 },
                 {
                   icon: "event_available",
-                  value: "60+",
+                  value: "200+",
                   label: "Events Conducted",
                   desc: "FIDE Opens, CMPL, Blitz Arenas, and international guest talk shows."
                 }
@@ -316,16 +527,8 @@ const Landing = () => {
                   
                   <div className="relative z-20 flex flex-col h-full justify-between">
                     <div>
-                      <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 rounded-xl bg-primary/10 group-hover:bg-[#131313]/10 flex items-center justify-center text-primary group-hover:text-[#131313] transition-colors duration-500">
-                          <span className="material-symbols-outlined text-2xl">
-                            {stat.icon}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#f2ca50] group-hover:text-[#131313] tracking-tight leading-none transition-colors duration-500 mb-2">
-                        {stat.value}
+                      <div className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#f2ca50] group-hover:text-[#131313] tracking-tight leading-none transition-colors duration-500 mb-2 mt-2">
+                        <AnimatedCounter value={stat.value} trigger={triggerStats} />
                       </div>
 
                       <h3 className="text-sm sm:text-base font-serif font-bold text-on-surface group-hover:text-[#131313] uppercase tracking-wider transition-colors duration-500 mb-2">
@@ -343,21 +546,21 @@ const Landing = () => {
           </motion.div>
 
           {/* STAGE 4: UPCOMING EVENT (Materializes in-place in the center of the screen!) */}
-          {nextEvent && (
-            <motion.div
-              style={{
-                opacity: eventOpacity,
-                scale: eventScale,
-                pointerEvents: eventPointerEvents,
-                display: eventVisibility
-              }}
-              className="absolute inset-0 z-30 w-full max-w-5xl mx-auto px-6 md:px-12 flex flex-col items-center justify-center py-6 overflow-y-auto"
-            >
-              <div className="text-center mb-6">
-                <span className="text-primary font-label text-xs tracking-[0.3em] uppercase">Featured Arena</span>
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-on-surface mt-1">Upcoming Event</h2>
-              </div>
+          <motion.div
+            style={{
+              opacity: eventOpacity,
+              scale: eventScale,
+              pointerEvents: eventPointerEvents,
+              display: eventVisibility
+            }}
+            className="absolute inset-0 z-30 w-full max-w-5xl mx-auto px-6 md:px-12 flex flex-col items-center justify-center py-6 overflow-y-auto"
+          >
+            <div className="text-center mb-6">
+              <span className="text-primary font-label text-xs tracking-[0.3em] uppercase">Featured Arena</span>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-on-surface mt-1">Upcoming Event</h2>
+            </div>
 
+            {nextEvent ? (
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent('open-event-details-modal'))}
                 className="w-full text-left rounded-3xl border border-[#4d4635]/30 bg-gradient-to-br from-surface-container-high/90 to-surface-container/60 backdrop-blur-xl hover:border-primary/50 hover:shadow-[0_0_50px_rgba(242,202,80,0.2)] transition-all duration-700 flex flex-col md:flex-row overflow-hidden group cursor-pointer relative shadow-2xl shadow-black/80"
@@ -431,19 +634,27 @@ const Landing = () => {
                   </div>
                 </div>
               </button>
-
-              {/* Other Events CTA Button */}
-              <div className="flex justify-center mt-6">
-                <Link
-                  to="/events"
-                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-primary/30 bg-primary/10 text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary hover:text-surface transition-all duration-300 shadow-lg shadow-primary/10"
-                >
-                  <span className="material-symbols-outlined text-sm">event_note</span>
-                  View All Tournaments
-                </Link>
+            ) : (
+              <div className="w-full text-center p-12 rounded-3xl border border-[#4d4635]/20 bg-gradient-to-br from-surface-container-high/60 to-surface-container/30 backdrop-blur-xl flex flex-col items-center justify-center relative shadow-xl">
+                <span className="material-symbols-outlined text-5xl text-primary/40 mb-4">sports_esports</span>
+                <h3 className="text-xl font-serif text-on-surface font-semibold">Stay Tuned!</h3>
+                <p className="text-xs sm:text-sm text-on-surface-variant/75 mt-2 max-w-md mx-auto font-body leading-relaxed">
+                  We are currently preparing our next offline auctions and competitive arenas. Check back shortly or view our calendar for the full schedule!
+                </p>
               </div>
-            </motion.div>
-          )}
+            )}
+
+            {/* Other Events CTA Button */}
+            <div className="flex justify-center mt-6">
+              <Link
+                to="/events"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-primary/30 bg-primary/10 text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary hover:text-surface transition-all duration-300 shadow-lg shadow-primary/10"
+              >
+                <span className="material-symbols-outlined text-sm">event_note</span>
+                View All Tournaments
+              </Link>
+            </div>
+          </motion.div>
 
         </div>
       </div>

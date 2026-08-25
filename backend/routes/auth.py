@@ -1,5 +1,6 @@
 import os
 import random
+import re
 import smtplib
 from email.mime.text import MIMEText
 from flask import Blueprint, request, jsonify
@@ -45,11 +46,17 @@ def generate_otp():
     secondary_email = (data.get('secondary_email') or '').strip()
     chess_username = (data.get('chess_username') or '').strip()
 
-    if not primary_email or not primary_email.endswith('@iitk.ac.in'):
+    if not primary_email or not primary_email.lower().endswith('@iitk.ac.in'):
         return jsonify({"error": "You must use a valid @iitk.ac.in email address."}), 400
     
+    if not re.search(r'\d{2}@iitk\.ac\.in$', primary_email, re.IGNORECASE):
+        return jsonify({"error": "IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in)."}), 400
+
     if not secondary_email:
         return jsonify({"error": "Secondary recovery email is required."}), 400
+
+    if secondary_email.lower().endswith('@iitk.ac.in') and not re.search(r'\d{2}@iitk\.ac\.in$', secondary_email, re.IGNORECASE):
+        return jsonify({"error": "Secondary IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in)."}), 400
 
     if primary_email.lower() == secondary_email.lower():
         return jsonify({"error": "Secondary email must be different from your primary IITK email."}), 400
@@ -96,8 +103,8 @@ def generate_otp():
             cursor.execute(sql, (secondary_email, secondary_otp))
             connection.commit()
 
-        email_body_1 = f"Welcome to the Sanctum!\n\nYour verification code is: {primary_otp}\n\nUse this to complete your registration."
-        email_body_2 = f"Welcome to the Sanctum!\n\nYour verification code is: {secondary_otp}\n\nUse this to complete your registration."
+        email_body_1 = f"Welcome to the Community!\n\nYour verification code is: {primary_otp}\n\nUse this to complete your registration."
+        email_body_2 = f"Welcome to the Community!\n\nYour verification code is: {secondary_otp}\n\nUse this to complete your registration."
         primary_sent = send_custom_email(primary_email, 'Chess Club IITK - Verification Code', email_body_1)
         secondary_sent = send_custom_email(secondary_email, 'Chess Club IITK - Verification Code', email_body_2)
         if primary_sent and secondary_sent:
@@ -125,9 +132,14 @@ def verify_and_register():
     name = data.get('name')
     roll_no = data.get('rollNo')
     contact = data.get('contact')
+    gender = data.get('gender')
 
-    if not all([email, secondary_email, primary_user_otp, secondary_user_otp, password, chess_username, name, roll_no, contact]):
+    if not all([email, secondary_email, primary_user_otp, secondary_user_otp, password, chess_username, name, roll_no, contact, gender]):
         return jsonify({"error": "All fields are required."}), 400
+
+    # 0. Validate password strength constraints
+    if len(password) < 8 or not re.search(r'[a-z]', password) or not re.search(r'[A-Z]', password) or not re.search(r'[^A-Za-z0-9]', password):
+        return jsonify({"error": "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one special character."}), 400
 
     # 1. Validate Chess.com Username existence
     headers = {"User-Agent": "ChessClubIITK-Signup-App/1.0 (Contact: your_email@iitk.ac.in)"}
@@ -164,8 +176,8 @@ def verify_and_register():
             password_hash = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
             
             cursor.execute(
-                "INSERT INTO users (email, chess_username, password_hash, name, roll_no, contact, secondary_email) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                (email, chess_username, password_hash, name, roll_no, contact, secondary_email)
+                "INSERT INTO users (email, chess_username, password_hash, name, roll_no, contact, secondary_email, gender) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                (email, chess_username, password_hash, name, roll_no, contact, secondary_email, gender)
             )
             
             # 4. Clean up transient database entries
@@ -280,8 +292,8 @@ def get_user_profile(email):
     try:
         connection = get_db_connection()
         with connection.cursor(row_factory=dict_row) as cursor:
-            sql = "SELECT name, roll_no AS rollNo, contact, email, chess_username AS chesscom, avatar, secondary_email FROM users WHERE email = %s"
-            cursor.execute(sql, (email,))
+            sql = "SELECT name, roll_no AS rollNo, contact, email, chess_username AS chesscom, avatar, secondary_email FROM users WHERE email = %s OR secondary_email = %s"
+            cursor.execute(sql, (email,email))
             profile = cursor.fetchone()
 
             if not profile:
@@ -297,38 +309,124 @@ def get_user_profile(email):
             connection.close()
 
 
+@auth_bp.route('/user/profile/send-secondary-otp', methods=['POST'])
+@jwt_required()
+def send_secondary_otp():
+    data = request.get_json() or {}
+    email = data.get('email')
+    new_secondary_email = (data.get('secondary_email') or '').strip()
+
+    if not email or not new_secondary_email:
+        return jsonify({"error": "Primary and secondary email are required."}), 400
+
+    current_authenticated_user = get_jwt_identity()
+    if current_authenticated_user != email:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    if email.lower() == new_secondary_email.lower():
+        return jsonify({"error": "Secondary email must be different from your primary email."}), 400
+
+    if new_secondary_email.lower().endswith('@iitk.ac.in') and not re.search(r'\d{2}@iitk\.ac\.in$', new_secondary_email, re.IGNORECASE):
+        return jsonify({"error": "Secondary IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in)."}), 400
+
+    otp = str(random.randint(100000, 999999))
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            # Save OTP
+            sql = """
+                INSERT INTO pending_otps (email, otp) VALUES (%s, %s)
+                ON CONFLICT (email) DO UPDATE SET otp = EXCLUDED.otp, created_at = CURRENT_TIMESTAMP
+            """
+            cursor.execute(sql, (new_secondary_email, otp))
+            connection.commit()
+
+        body = f"Use this verification code to confirm your new secondary recovery email: {otp}\n\nIf you didn't request this change, please ignore this email."
+        if send_custom_email(new_secondary_email, "Chess Club IITK - Secondary Email Verification", body):
+            return jsonify({"message": "Verification code sent to your new secondary email!"}), 200
+        else:
+            return jsonify({"error": "Failed to send verification email. Please try again."}), 500
+    except Exception as e:
+        print(f"Send Secondary OTP Failure: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+    finally:
+        if connection:
+            connection.close()
+
+
 @auth_bp.route('/user/profile/update', methods=['PUT'])
 @jwt_required()
-
 def update_user_profile():
-    """Applies modified user identity details to the persistent database layer, explicitly locking email and chess_username"""
+    """Applies modified user identity details to the persistent database layer, verifying secondary email update if modified"""
     data = request.get_json()
     email = data.get('email')
     name = data.get('name')
     roll_no = data.get('rollNo')
     contact = data.get('contact')
     avatar = data.get('avatar')
+    new_secondary_email = data.get('secondary_email')
+    otp = data.get('otp')
 
     # Security check: Email is our tracking identifier; it cannot be missing
     if not email:
         return jsonify({"error": "Tracking identity string is missing."}), 400
 
-    current_authenticated_user=get_jwt_identity()
-    if current_authenticated_user!=email:
+    current_authenticated_user = get_jwt_identity()
+    if current_authenticated_user != email:
         return jsonify({"error": "Unauthorized cross-profile modifications blocked"}), 403
+
     connection = None
     try:
         connection = get_db_connection()
-        with connection.cursor() as cursor:
-            # REMOVED chess_username from the UPDATE statement to lock it down permanently
-            sql = """
-                UPDATE users 
-                SET name = %s, roll_no = %s, contact = %s, avatar = %s 
-                WHERE email = %s
-            """
-            cursor.execute(sql, (name, roll_no, contact, avatar, email))
-            connection.commit()
+        with connection.cursor(row_factory=dict_row) as cursor:
+            # Get current user profile details
+            cursor.execute("SELECT secondary_email FROM users WHERE email = %s", (email,))
+            user_record = cursor.fetchone()
+            if not user_record:
+                return jsonify({"error": "User not found."}), 404
+            
+            current_secondary = user_record.get('secondary_email') or ''
 
+            # If secondary email is being changed
+            if new_secondary_email and new_secondary_email.strip().lower() != current_secondary.lower():
+                cleaned_sec = new_secondary_email.strip()
+                if cleaned_sec.lower() == email.lower():
+                    return jsonify({"error": "Secondary email must be different from your primary email."}), 400
+
+                # Validate IITK email if it is one
+                if cleaned_sec.lower().endswith('@iitk.ac.in') and not re.search(r'\d{2}@iitk\.ac\.in$', cleaned_sec, re.IGNORECASE):
+                    return jsonify({"error": "Secondary IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in)."}), 400
+
+                if not otp:
+                    return jsonify({"error": "OTP_REQUIRED", "message": "Verification code required to update secondary email."}), 400
+
+                # Verify OTP
+                cursor.execute("SELECT otp FROM pending_otps WHERE email = %s", (cleaned_sec,))
+                record = cursor.fetchone()
+                if not record or record['otp'] != otp.strip():
+                    return jsonify({"error": "Invalid or expired OTP."}), 401
+                
+                # Delete OTP
+                cursor.execute("DELETE FROM pending_otps WHERE email = %s", (cleaned_sec,))
+                
+                # Update with secondary email
+                sql = """
+                    UPDATE users 
+                    SET name = %s, roll_no = %s, contact = %s, avatar = %s, secondary_email = %s
+                    WHERE email = %s
+                """
+                cursor.execute(sql, (name, roll_no, contact, avatar, cleaned_sec, email))
+            else:
+                # Update without secondary email
+                sql = """
+                    UPDATE users 
+                    SET name = %s, roll_no = %s, contact = %s, avatar = %s 
+                    WHERE email = %s
+                """
+                cursor.execute(sql, (name, roll_no, contact, avatar, email))
+
+            connection.commit()
             return jsonify({"message": "Profile metrics synced successfully!"}), 200
 
     except Exception as e:
@@ -410,6 +508,17 @@ def register_lol():
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:
+            # 1. Prevent registration if the event date has already passed
+            cursor.execute("SELECT event_date, event_end_date FROM events WHERE title ILIKE '%league of legends%' ORDER BY event_date DESC LIMIT 1;")
+            row = cursor.fetchone()
+            if row:
+                from datetime import date
+                event_date = row[0]
+                event_end_date = row[1]
+                compare_date = event_end_date if event_end_date else event_date
+                if compare_date and compare_date < date.today():
+                    return jsonify({"error": "Registration is closed. This event has already ended."}), 400
+
             # Check if user is already registered
             cursor.execute('SELECT id FROM "lolEntries" WHERE email = %s', (email,))
             if cursor.fetchone():
@@ -447,3 +556,135 @@ def register_lol_status():
     finally:
         if connection:
             connection.close()
+
+# --- FRESHERS' CHESS LEAGUE EVENT REGISTRATION ---
+
+@auth_bp.route('/register-fcl', methods=['POST'])
+@jwt_required()
+def register_fcl():
+    data = request.get_json()
+    email = data.get('email')
+    name = data.get('name')
+    roll_no = data.get('roll_no')
+    chess_username = data.get('chess_username')
+    contact = data.get('contact')
+    secondary_email = data.get('secondary_email')
+
+    if not all([email, name, roll_no, chess_username, contact]):
+        return jsonify({"error": "All fields are required."}), 400
+
+    current_user_email = get_jwt_identity()
+    if current_user_email != email:
+        return jsonify({"error": "Unauthorized registration identity mismatch."}), 403
+
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            # 1. Prevent registration if the event date has already passed
+            cursor.execute("SELECT event_date, event_end_date FROM events WHERE title ILIKE '%fresher%' ORDER BY event_date DESC LIMIT 1;")
+            row = cursor.fetchone()
+            if row:
+                from datetime import date
+                event_date = row[0]
+                event_end_date = row[1]
+                compare_date = event_end_date if event_end_date else event_date
+                if compare_date and compare_date < date.today():
+                    return jsonify({"error": "Registration is closed. This event has already ended."}), 400
+
+            # Check if user is already registered
+            cursor.execute('SELECT id FROM "fclEntries" WHERE email = %s', (email,))
+            if cursor.fetchone():
+                return jsonify({"error": "You are already registered for this event."}), 409
+
+            # Insert registration record
+            cursor.execute(
+                'INSERT INTO "fclEntries" (email, name, roll_no, chess_username, contact, secondary_email) VALUES (%s, %s, %s, %s, %s, %s)',
+                (email, name, roll_no, chess_username, contact, secondary_email or '')
+            )
+            connection.commit()
+            return jsonify({"message": "Successfully registered for Freshers' Chess League!"}), 201
+
+    except Exception as e:
+        print(f"FCL Registration Error: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+    finally:
+        if connection:
+            connection.close()
+
+@auth_bp.route('/register-fcl/status', methods=['GET'])
+@jwt_required()
+def register_fcl_status():
+    email = get_jwt_identity()
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT id FROM "fclEntries" WHERE email = %s', (email,))
+            is_registered = cursor.fetchone() is not None
+            return jsonify({"is_registered": is_registered}), 200
+    except Exception as e:
+        print(f"FCL Registration Status Error: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+    finally:
+        if connection:
+            connection.close()
+
+
+@auth_bp.route('/alumni-request', methods=['POST'])
+def handle_alumni_request():
+    data = request.get_json() or {}
+    name = (data.get('name') or '').strip()
+    email = (data.get('email') or '').strip()
+    roll_no = (data.get('roll_no') or data.get('rollNo') or '').strip()
+    graduation_year = (data.get('graduation_year') or data.get('graduationYear') or '').strip()
+    chess_username = (data.get('chess_username') or data.get('chessUsername') or '').strip()
+    contact = (data.get('contact') or '').strip()
+    notes = (data.get('notes') or '').strip()
+    gender = (data.get('gender') or 'Male').strip()
+
+    if not name or not email:
+        return jsonify({"error": "Full name and personal email are required."}), 400
+
+    if '@' not in email or '.' not in email.split('@')[-1]:
+        return jsonify({"error": "Please provide a valid email address."}), 400
+
+    if email.lower().endswith('@iitk.ac.in') and not re.search(r'\d{2}@iitk\.ac\.in$', email, re.IGNORECASE):
+        return jsonify({"error": "IITK email must contain your 2-digit year identifier before @iitk.ac.in (e.g. username25@iitk.ac.in)."}), 400
+
+    # Validate Chess.com ID if provided
+    if chess_username:
+        try:
+            chess_res = requests.get(
+                f"https://api.chess.com/pub/player/{chess_username}",
+                headers={"User-Agent": "ChessClubIITK-App/1.0 (contact: chessclubiitk@gmail.com)"},
+                timeout=5
+            )
+            if chess_res.status_code == 404:
+                return jsonify({"error": f"Chess.com ID '{chess_username}' does not exist. Please enter a valid username."}), 400
+        except Exception as err:
+            print("Chess.com API check error:", err)
+
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO alumni_requests (name, email, roll_no, graduation_year, chess_username, contact, notes, gender, status)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'pending')
+                RETURNING id;
+            """, (name, email, roll_no, graduation_year, chess_username, contact, notes, gender))
+            
+            if hasattr(connection, 'commit'):
+                connection.commit()
+    except Exception as e:
+        print(f"Database Alumni Request Error: {e}")
+        return jsonify({"error": "Failed to record alumni request in database."}), 500
+    finally:
+        if connection:
+            connection.close()
+
+    return jsonify({
+        "success": True,
+        "message": "Admins have been notified. Please wait while your request is processed."
+    }), 200

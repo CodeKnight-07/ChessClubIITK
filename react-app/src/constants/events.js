@@ -61,6 +61,7 @@ export const OFFICIAL_EVENTS = [
     ],
     prizes: "8 Gold Memberships for Winners + Mama Mio Coupons for Top 50!"
   },
+  /*
   {
     id: 3,
     title: "IITK Grand Swiss",
@@ -79,6 +80,7 @@ export const OFFICIAL_EVENTS = [
     ],
     prizes: "Top 3: Candidates. Pos 4-17: Chess Cup. Top 5: Gold Memberships. Top 50: Coupons."
   },
+  */
   /*
   {
     id: 4,

@@ -11,15 +11,16 @@ import { API_BASE_URL } from './config';
 import { globalCache } from './utils/cache';
 
 // Import critical images for preloading
-import chessboardImg from './assets/chessboard.jpg';
+import chessboardImg from './assets/chessclubiitklogo.jpeg';
 import homePgBg from './pages/home-pg-bg.png';
 import logoImg from './assets/chessclubiitklogo.jpeg';
+
+import AdminRoute from './components/AdminRoute';
 
 // Lazy loaded page components for optimal production bundle code-splitting
 const Landing = React.lazy(() => import('./pages/Landing'));
 const Calendar = React.lazy(() => import('./pages/Calendar'));
 const Events = React.lazy(() => import('./pages/Events'));
-const EventRegistration = React.lazy(() => import('./pages/EventRegistration'));
 const Blogs = React.lazy(() => import('./pages/Blogs'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 const UserProfile = React.lazy(() => import('./pages/UserProfile'));
@@ -29,6 +30,8 @@ const Gallery = React.lazy(() => import('./pages/Gallery'));
 const Signup = React.lazy(() => import('./pages/Signup'));
 const Login = React.lazy(() => import('./pages/Login'));
 const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword'));
+const Results = React.lazy(() => import('./pages/Results'));
+const AdminPortal = React.lazy(() => import('./pages/AdminPortal'));
 
 // Premium, brand-aligned loading spinner fallback
 const PageLoader = () => (
@@ -55,7 +58,7 @@ const GlobalPreloader = () => (
         <img src={logoImg} alt="Chess Club Logo" className="w-full h-full object-cover animate-none" />
       </div>
       <div className="space-y-1">
-        <h1 className="text-3xl font-serif tracking-tight text-white">Chess Club IITK</h1>
+        <h1 className="text-3xl font-serif tracking-tight text-white">Chess Club</h1>
         <p className="text-[10px] uppercase tracking-[0.25em] text-[#d4af37] font-semibold">IIT Kanpur</p>
       </div>
       <div className="w-40 h-[2px] bg-zinc-800 rounded-full overflow-hidden relative">
@@ -138,7 +141,7 @@ function App() {
                 <Route path="/" element={<PageTransition><Landing /></PageTransition>} />
                 <Route path="/calendar" element={<PageTransition><Calendar /></PageTransition>} />
                 <Route path="/events" element={<PageTransition><Events /></PageTransition>} />
-                <Route path="/events/register/:id" element={<PageTransition><EventRegistration /></PageTransition>} />
+                <Route path="/events/results/:id" element={<PageTransition><Results /></PageTransition>} />
                 <Route path="/blogs" element={<PageTransition><Blogs /></PageTransition>} />
                 <Route path="/blog/:id" element={<PageTransition><BlogPost /></PageTransition>} />
                 <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
@@ -148,6 +151,7 @@ function App() {
                 <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
                 <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
                 <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
+                <Route path="/admin" element={<AdminRoute><PageTransition><AdminPortal /></PageTransition></AdminRoute>} />
                 <Route path="/500" element={<PageTransition><ServerError500 /></PageTransition>} />
               </Routes>
             </Suspense>

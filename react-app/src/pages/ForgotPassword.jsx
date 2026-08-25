@@ -159,7 +159,7 @@ const ForgotPassword = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-on-surface-variant hover:text-primary focus:outline-none"
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-on-surface-variant hover:text-primary focus:outline-none z-20"
                   >
                     <span className="material-symbols-outlined text-[20px]">
                       {showPassword ? 'visibility_off' : 'visibility'}
