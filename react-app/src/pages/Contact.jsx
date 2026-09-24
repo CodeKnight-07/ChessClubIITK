@@ -18,10 +18,9 @@ import divyeshImg from "../assets/secretaries/divyesh.jpeg";
 import furzaanImg from "../assets/secretaries/furzaan.png";
 import hariomImg from "../assets/secretaries/hariom.jpg";
 import kratagyaImg from "../assets/secretaries/kratagya.jpg";
-import madhavImg from "../assets/secretaries/madhav.jpg";
+
 import mayankBhakhandImg from "../assets/secretaries/mayank_bhakhand.jpeg";
 import mayankGautamImg from "../assets/secretaries/mayank_gautam.webp";
-import mishthyImg from "../assets/secretaries/mishthy.jpg";
 import nishantImg from "../assets/secretaries/nishant.jpg";
 import piyushImg from "../assets/secretaries/piyush.jpg";
 import prajwalImg from "../assets/secretaries/prajwal.jpeg";
@@ -161,16 +160,7 @@ const SECRETARIES = [
     instagram: "https://www.instagram.com/aryankyayaar._?igsh=a28yZGI4ZmNwa2pz",
     linkedin: "https://www.linkedin.com/in/aryankurade?utm_source=share_via&utm_content=profile&utm_medium=member_android"
   },
-  {
-    id: "sec-7",
-    name: "B Madhav Krishna",
-    role: "Secretary",
-    funnyDescription: `"Chess is my number one priority"`,
-    image: madhavImg,
-    email: "bmadhav25@iitk.ac.in",
-    // instagram: "https://www.instagram.com/madhav_krishna/",
-    linkedin: "https://www.linkedin.com/in/madhav-krishna-6035b6202/"
-  },
+
   {
     id: "sec-8",
     name: "Chaitanya Malhotra",
@@ -240,16 +230,6 @@ const SECRETARIES = [
     email: "gmayank25@iitk.ac.in",
     instagram: "https://www.instagram.com/mayank.iitk?igsh=eWF6engyejNhZHg3",
     linkedin: "https://www.linkedin.com/in/mayank-gautam-48b844376?utm_source=share_via&utm_content=profile&utm_medium=member_android"
-  },
-  {
-    id: "sec-18",
-    name: "Mishthy Khatwa",
-    role: "Secretary",
-    funnyDescription: `"My pieces have trust issues with me"`,
-    image: mishthyImg,
-    email: "mishthyk24@iitk.ac.in",
-    instagram: "https://www.instagram.com/mishthy_khatwa/",
-    linkedin: "https://www.linkedin.com/in/mishthy-khatwa/"
   },
   {
     id: "sec-19",
