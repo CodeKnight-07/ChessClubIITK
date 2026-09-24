@@ -9,11 +9,9 @@ const Results = () => {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
   const [loadingEvent, setLoadingEvent] = useState(true);
-  const [standings, setStandings] = useState([]);
-  const [loadingStandings, setLoadingStandings] = useState(true);
 
   useEffect(() => {
-    const fetchEventDetailsAndStandings = async () => {
+    const fetchEventDetails = async () => {
       let foundEvent = null;
       if (globalCache.events && Array.isArray(globalCache.events)) {
         foundEvent = globalCache.events.find(e => `db-${e.id}` === id || String(e.id) === id);
@@ -34,34 +32,41 @@ const Results = () => {
       
       setEvent(foundEvent);
       setLoadingEvent(false);
+    };
+    fetchEventDetails();
+  }, [id]);
 
-      if (foundEvent) {
-        try {
-          const res = await fetch(`${API_BASE_URL}/api/events/${foundEvent.id}/standings`);
-          if (res.ok) {
-            const data = await res.json();
-            setStandings(data || []);
-          }
-        } catch (e) {
-          console.error("Error loading standings:", e);
+  const [standings, setStandings] = useState([]);
+  const [loadingStandings, setLoadingStandings] = useState(true);
+
+  useEffect(() => {
+    const fetchStandings = async () => {
+      if (!event || !event.id) {
+        setLoadingStandings(false);
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/events/${event.id}/standings`);
+        if (res.ok) {
+          const data = await res.json();
+          setStandings(data || []);
         }
+      } catch (e) {
+        console.error("Error loading standings:", e);
       }
       setLoadingStandings(false);
     };
-    fetchEventDetailsAndStandings();
-  }, [id]);
 
-  // Check if columns should be conditionally shown
-  const hasRollNo = standings.some(s => s.roll_no && s.roll_no.trim() !== '');
-  const hasTb1 = standings.some(s => s.tb1 && s.tb1.trim() !== '');
-  const hasTb2 = standings.some(s => s.tb2 && s.tb2.trim() !== '');
+    if (event) {
+      fetchStandings();
+    }
+  }, [event]);
 
-  const getRankBadgeClass = (rank) => {
-    if (rank === '1') return 'text-yellow-400 font-bold';
-    if (rank === '2') return 'text-zinc-300 font-bold';
-    if (rank === '3') return 'text-amber-600 font-bold';
-    return 'text-on-surface-variant font-medium';
-  };
+  // Determine which columns to show based on whether ANY row has data for that column
+  const hasRollNo = standings.some(row => row.roll_no && row.roll_no.trim() !== '');
+  const hasScore = standings.some(row => row.score && row.score.trim() !== '');
+  const hasTb1 = standings.some(row => row.tb1 && row.tb1.trim() !== '');
+  const hasTb2 = standings.some(row => row.tb2 && row.tb2.trim() !== '');
 
   return (
     <div className="min-h-screen text-on-surface pt-4 sm:pt-6 font-sans relative">
@@ -78,50 +83,68 @@ const Results = () => {
               </h1>
             )}
             <p className="mt-3 text-sm font-light leading-relaxed text-on-surface-variant/80 sm:text-base">
-              The official standings, scorecards, and results from Chess Club Kanpur's historical tournaments.
+              The official standings, scorecards, and results from Chess Club IIT Kanpur's historical tournaments.
             </p>
           </div>
         </div>
 
-        {/* Loading Spinner */}
+        {/* Loading State */}
         {(loadingEvent || loadingStandings) ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <div className="flex justify-center py-20">
+            <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
           </div>
         ) : standings.length > 0 ? (
-          /* Render Standings Table */
+          /* Table Section */
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="bg-surface-container-low border border-outline-variant/10 rounded-2xl overflow-hidden shadow-xl"
+            className="w-full overflow-hidden rounded-2xl border border-outline-variant/20 bg-surface-container-low shadow-xl"
           >
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-outline-variant/10 text-left text-sm">
-                <thead className="bg-[#151515] text-[#d4af37] uppercase font-mono text-xs tracking-wider font-bold">
-                  <tr>
-                    <th className="px-6 py-4 w-20 text-center">Rank</th>
-                    <th className="px-6 py-4">Player Name</th>
-                    {hasRollNo && <th className="px-6 py-4">Roll Number</th>}
-                    <th className="px-6 py-4">Score</th>
-                    {hasTb1 && <th className="px-6 py-4">Tiebreak 1</th>}
-                    {hasTb2 && <th className="px-6 py-4">Tiebreak 2</th>}
+              <table className="w-full text-left border-collapse min-w-[600px]">
+                <thead>
+                  <tr className="bg-surface-container/50 border-b border-outline-variant/20">
+                    <th className="py-4 px-6 text-xs font-label uppercase tracking-widest text-on-surface-variant font-bold w-20 text-center">Rank</th>
+                    <th className="py-4 px-6 text-xs font-label uppercase tracking-widest text-on-surface-variant font-bold">Player Name</th>
+                    {hasRollNo && <th className="py-4 px-6 text-xs font-label uppercase tracking-widest text-on-surface-variant font-bold">Roll No</th>}
+                    {hasScore && <th className="py-4 px-6 text-xs font-label uppercase tracking-widest text-on-surface-variant font-bold text-center">Score</th>}
+                    {hasTb1 && <th className="py-4 px-6 text-xs font-label uppercase tracking-widest text-on-surface-variant font-bold text-center">Tiebreak 1</th>}
+                    {hasTb2 && <th className="py-4 px-6 text-xs font-label uppercase tracking-widest text-on-surface-variant font-bold text-center">Tiebreak 2</th>}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-outline-variant/5 text-zinc-300">
-                  {standings.map((row, idx) => (
-                    <tr key={idx} className="hover:bg-surface-container-high/40 transition-colors">
-                      <td className={`px-6 py-4 text-center font-mono ${getRankBadgeClass(row.rank)}`}>
-                        {row.rank === '1' && '🥇 '}
-                        {row.rank === '2' && '🥈 '}
-                        {row.rank === '3' && '🥉 '}
-                        {row.rank !== '1' && row.rank !== '2' && row.rank !== '3' && row.rank}
+                <tbody>
+                  {standings.map((row, index) => (
+                    <tr 
+                      key={index}
+                      className="border-b border-outline-variant/10 hover:bg-surface-container/30 transition-colors"
+                    >
+                      <td className="py-4 px-6 text-center font-mono font-medium text-primary">
+                        {row.rank || (index + 1)}
                       </td>
-                      <td className="px-6 py-4 font-semibold text-white">{row.name}</td>
-                      {hasRollNo && <td className="px-6 py-4 font-mono text-zinc-400">{row.roll_no || '-'}</td>}
-                      <td className="px-6 py-4 text-primary font-bold">{row.score}</td>
-                      {hasTb1 && <td className="px-6 py-4 font-mono text-zinc-400">{row.tb1 || '-'}</td>}
-                      {hasTb2 && <td className="px-6 py-4 font-mono text-zinc-400">{row.tb2 || '-'}</td>}
+                      <td className="py-4 px-6 font-medium text-on-surface">
+                        {row.name}
+                      </td>
+                      {hasRollNo && (
+                        <td className="py-4 px-6 font-mono text-on-surface-variant">
+                          {row.roll_no || '-'}
+                        </td>
+                      )}
+                      {hasScore && (
+                        <td className="py-4 px-6 text-center font-mono font-medium text-on-surface">
+                          {row.score || '-'}
+                        </td>
+                      )}
+                      {hasTb1 && (
+                        <td className="py-4 px-6 text-center font-mono text-on-surface-variant">
+                          {row.tb1 || '-'}
+                        </td>
+                      )}
+                      {hasTb2 && (
+                        <td className="py-4 px-6 text-center font-mono text-on-surface-variant">
+                          {row.tb2 || '-'}
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
