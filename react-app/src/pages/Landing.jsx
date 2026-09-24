@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import Lenis from 'lenis';
 import fresherImg from '../assets/fresher_league_recap_1775765383248.png';
 import grandSwissImg from '../assets/grand_swiss_recap_1775765397656.png';
-import fideImg from '../assets/fide.png';
 import logoImg from '../assets/chessclubiitklogo.jpeg';
-import lolImg from "../assets/lol_poster.png";
 import { useAuth } from '../context/AuthContext';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Footer from '../components/Footer';
@@ -73,149 +72,31 @@ const Landing = () => {
   const heroRef = useRef(null);
   const [triggerStats, setTriggerStats] = useState(false);
 
-  const [currentStage, setCurrentStage] = useState(0);
-  const isScrollingRef = useRef(false);
-
-  // 1. Scroll snapping controller
+  // 1. Lenis Smooth Inertia scrolling controller
   useEffect(() => {
-    const handleWheel = (e) => {
-      if (document.body.style.overflow === 'hidden') return;
-      e.preventDefault();
+    // Initialize Lenis smooth scrolling with the golden timing parameters
+    const lenis = new Lenis({
+      duration: 1.5, 
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+      lerp: 0.07, 
+      wheelMultiplier: 0.45, 
+      infinite: false,
+      syncTouch: false 
+    });
 
-      if (isScrollingRef.current) return;
-
-      const direction = e.deltaY > 0 ? 1 : -1;
-      let nextStage = currentStage + direction;
-
-      if (nextStage < 0) nextStage = 0;
-      if (nextStage > 4) nextStage = 4;
-
-      if (nextStage === currentStage) return;
-
-      isScrollingRef.current = true;
-      setCurrentStage(nextStage);
-
-      if (heroRef.current) {
-        const scrollHeight = heroRef.current.scrollHeight;
-        const windowHeight = window.innerHeight;
-        const maxScroll = scrollHeight - windowHeight;
-        const stageProgress = [0.00, 0.30, 0.56, 0.88, 1.00];
-        
-        let targetScrollY = 0;
-        if (nextStage === 4) {
-          targetScrollY = document.documentElement.scrollHeight - windowHeight;
-        } else {
-          targetScrollY = heroRef.current.offsetTop + (maxScroll * stageProgress[nextStage]);
-        }
-
-        window.scrollTo({
-          top: targetScrollY,
-          behavior: 'smooth'
-        });
-      }
-
-      setTimeout(() => {
-        isScrollingRef.current = false;
-      }, 950);
+    let rafId;
+    const raf = (time) => {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
     };
 
-    const handleKeyDown = (e) => {
-      if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Space'].includes(e.key)) {
-        e.preventDefault();
-        if (isScrollingRef.current) return;
+    rafId = requestAnimationFrame(raf);
 
-        let direction = 0;
-        if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'Space') {
-          direction = 1;
-        } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-          direction = -1;
-        }
-
-        if (direction === 0) return;
-
-        let nextStage = currentStage + direction;
-        if (nextStage < 0) nextStage = 0;
-        if (nextStage > 4) nextStage = 4;
-
-        if (nextStage === currentStage) return;
-
-        isScrollingRef.current = true;
-        setCurrentStage(nextStage);
-
-        if (heroRef.current) {
-          const scrollHeight = heroRef.current.scrollHeight;
-          const windowHeight = window.innerHeight;
-          const maxScroll = scrollHeight - windowHeight;
-          const stageProgress = [0.00, 0.30, 0.56, 0.88, 1.00];
-          
-          let targetScrollY = 0;
-          if (nextStage === 4) {
-            targetScrollY = document.documentElement.scrollHeight - windowHeight;
-          } else {
-            targetScrollY = heroRef.current.offsetTop + (maxScroll * stageProgress[nextStage]);
-          }
-
-          window.scrollTo({
-            top: targetScrollY,
-            behavior: 'smooth'
-          });
-        }
-
-        setTimeout(() => {
-          isScrollingRef.current = false;
-        }, 950);
-      }
-    };
-
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('keydown', handleKeyDown, { passive: false });
     return () => {
-      window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('keydown', handleKeyDown);
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
     };
-  }, [currentStage]);
-
-  // 2. Scroll position sync to keep state aligned
-  useEffect(() => {
-    const handleScrollSync = () => {
-      if (isScrollingRef.current || !heroRef.current) return;
-
-      const scrollHeight = heroRef.current.scrollHeight;
-      const windowHeight = window.innerHeight;
-      const maxScroll = scrollHeight - windowHeight;
-      const currentScrollY = window.scrollY - heroRef.current.offsetTop;
-
-      // Force stage 4 if close to absolute bottom of page
-      const docScrollHeight = document.documentElement.scrollHeight;
-      if (window.scrollY + windowHeight >= docScrollHeight - 20) {
-        if (currentStage !== 4) {
-          setCurrentStage(4);
-        }
-        return;
-      }
-
-      const progress = maxScroll > 0 ? currentScrollY / maxScroll : 0;
-
-      const stageProgress = [0.00, 0.30, 0.56, 0.88, 1.00];
-      let closestStage = 0;
-      let minDiff = Infinity;
-
-      stageProgress.forEach((p, idx) => {
-        const diff = Math.abs(progress - p);
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestStage = idx;
-        }
-      });
-
-      if (closestStage !== currentStage) {
-        setCurrentStage(closestStage);
-      }
-    };
-
-    window.addEventListener('scroll', handleScrollSync);
-    return () => window.removeEventListener('scroll', handleScrollSync);
-  }, [currentStage]);
+  }, []);
 
   // Scroll tracking across the pinned container (520vh for 4 smooth in-place stages with generous pacing)
   const { scrollYProgress } = useScroll({
@@ -223,8 +104,7 @@ const Landing = () => {
     offset: ["start start", "end end"]
   });
 
-  // Center "CHESS CLUB IITK" zooms forward into the screen and dissolves away
-  const centerScale = useTransform(scrollYProgress, [0, 0.20], [1, 8]);
+  // Center "CHESS CLUB IITK" dissolves away without scaling to prevent layout/compositor lag
   const centerOpacity = useTransform(scrollYProgress, [0, 0.08, 0.18], [1, 0.8, 0]);
   const heroVisibility = useTransform(scrollYProgress, v => (v >= 0.20 ? 'none' : 'block'));
   const scrollIndicatorOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
@@ -321,10 +201,7 @@ const Landing = () => {
     fetchNextEvent();
   }, []);
 
-  // Helper to map event to image
-  const getEventImage = (event) => {
-    return logoImg;
-  };
+
 
   return (
     <>
@@ -382,8 +259,7 @@ const Landing = () => {
             {/* Center Brand Title */}
             <motion.div
               style={{ 
-                opacity: centerOpacity, 
-                scale: centerScale
+                opacity: centerOpacity
               }}
               className="absolute inset-0 flex flex-col items-center justify-center px-4 max-w-4xl mx-auto"
             >
@@ -434,17 +310,17 @@ const Landing = () => {
                 { 
                   id: 1, 
                   title: "Play and Grow", 
-                  desc: "We believe that mastery begins with consistent practice. Our club provides a welcoming environment where players of all experience levels can engage in regular over-the-board play, participate in casual match analysis, and benefit from peer-led mentorship designed to steadily elevate your game." 
+                  desc: "Our club provides a welcoming environment where players of all experience levels can engage in regular over-the-board play, participate in casual match analysis, and benefit from peer-led mentorship." 
                 },
                 { 
                   id: 2, 
                   title: "Competitive Environment", 
-                  desc: "The club hosts regular online and over-the-board campus tournaments open to all skill levels. We invite everyone to join this competitive environment, designed to foster creative tactical thinking, sharpen strategic skills, and help players flourish. Discover your potential and test your limits against peers in structured, official matchplay." 
+                  desc: "The club hosts regular online and over-the-board campus tournaments open to all skill levels. We invite everyone to join this competitive environment, designed to foster creative tactical thinking, sharpen strategic skills, and help players flourish." 
                 },
                 { 
                   id: 3, 
                   title: "Exclusive Events & Talk Shows", 
-                  desc: "The club hosts premier events, including the Chess Masters Premier League (CMPL) and official FIDE-rated tournaments. Additionally, we feature exclusive talk shows and masterclasses with renowned global chess personalities, including World Champion GM Gukesh Dommaraju, GM Arjun Erigaisi, ChessBase India's Sagar Shah, and Chess.com CEO Erik Allebest." 
+                  desc: "We feature exclusive talk shows and masterclasses with renowned global chess personalities, including World Champion GM Gukesh Dommaraju, GM Arjun Erigaisi, ChessBase India's Sagar Shah, and Chess.com CEO Erik Allebest." 
                 }
               ].map((card) => (
                 <div key={card.id} className="relative group cursor-pointer h-full">
@@ -568,23 +444,7 @@ const Landing = () => {
                 {/* Smooth Golden Hover Fill Overlay */}
                 <div className="absolute inset-0 bg-[#f2ca50] opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out z-0 pointer-events-none"></div>
 
-                {/* Event Image Container */}
-                <div className="w-full md:w-[45%] relative aspect-[16/10] md:aspect-auto md:min-h-[300px] shrink-0 overflow-hidden z-10">
-                  <img
-                    alt={nextEvent.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                    src={getEventImage(nextEvent)}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-surface/70 via-transparent to-transparent"></div>
-                  <div className="absolute inset-0 bg-[#d4af37]/5 mix-blend-overlay"></div>
 
-                  {/* Event Tag Floating Badge */}
-                  {nextEvent.tag && (
-                    <span className="absolute top-4 left-4 px-3 py-1 text-[9px] font-bold uppercase tracking-widest bg-surface/90 text-primary border border-primary/30 rounded-full backdrop-blur-sm shadow-md">
-                      {nextEvent.tag}
-                    </span>
-                  )}
-                </div>
 
                 {/* Event Details */}
                 <div className="p-6 sm:p-8 flex flex-col justify-between flex-1 min-w-0 relative z-10">
